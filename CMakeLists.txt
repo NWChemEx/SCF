@@ -40,7 +40,6 @@ set(DEPENDENCIES "")
 cmaize_find_or_build_dependency(
     simde
     URL github.com/NWChemEx/SimDE
-    PRIVATE TRUE
     VERSION ${NWX_SIMDE_VERSION}
     BUILD_TARGET simde
     FIND_TARGET nwx::simde
@@ -66,8 +65,17 @@ cmaize_add_library(
     DEPENDS "${DEPENDENCIES}"
 )
 
+cmaize_find_or_build_dependency(
+    chemcache 
+    URL github.com/NWChemEx/ChemCache
+    VERSION master
+    BUILD_TARGET chemcache
+    FIND_TARGET nwx::chemcache
+    CMAKE_ARGS BUILD_TESTING=OFF
+)
+
 cmaize_add_executable(
     fastscf_driver
     SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/examples/driver"
-    DEPENDS fastscf
+    DEPENDS fastscf chemcache
 )
