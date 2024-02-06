@@ -66,3 +66,8 @@ cmaize_add_library(
     DEPENDS "${DEPENDENCIES}"
 )
 
+cmaize_add_executable(
+    fastscf_driver
+    SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/examples/driver"
+    DEPENDS fastscf
+)

@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-#include "fastscf_modules.hpp"
-#include <simde/simde.hpp>
+#include <iostream>
 
-namespace fastscf {
+#include <fastscf/fastscf.hpp>
 
-using energy_pt = simde::AOEnergy;
+int main(int argc, char** argv) {
 
-MODULE_CTOR(FastSCFEnergy) {
-    satisfies_property_type<energy_pt>();
+    // Populate modules
+    pluginplay::ModuleManager mm;
+    fastscf::load_modules(mm);
+
+    // TODO Create ChemicalSystem
+    simde::type::chemical_system cs;
+
+    // TODO Create BasisSet
+    simde::type::ao_basis_set aos;
+
+    // Run module
+    auto E = mm.at("FastSCF Energy").run_as<simde::AOEnergy>(aos, cs);
+    std::cout << "SCF Energy = " << E << " Eh" << std::endl;
+    
+
+    return 0;
 }
-
-MODULE_RUN(FastSCFEnergy) {
-    const auto& [aos, cs] = energy_pt::unwrap_inputs(inputs);
-
-    double E0 = 3.14; /// This is a total energy
-    auto rv = results();
-    return energy_pt::wrap_results(rv, E0);
-}
-
-} // namespace fastscf
