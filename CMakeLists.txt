@@ -37,6 +37,12 @@ nwx_cxx_api_docs("${CMAKE_CURRENT_SOURCE_DIR}/fastscf")
 
 set(DEPENDENCIES "")
 
+cmaize_option_list(
+    BUILD_TESTING OFF "Should we build the tests?"
+    BUILD_PYBIND11_PYBINDINGS ON "Build pybind11 python3 bindings?"
+    ENABLE_EXPERIMENTAL_FEATURES OFF "Build features which are not 1.0-ed yet?"
+)
+
 cmaize_find_or_build_dependency(
     simde
     URL github.com/NWChemEx/SimDE
@@ -44,6 +50,7 @@ cmaize_find_or_build_dependency(
     BUILD_TARGET simde
     FIND_TARGET nwx::simde
     CMAKE_ARGS BUILD_TESTING=OFF
+            BUILD_PYBIND11_PYBINDINGS=${BUILD_PYBIND11_PYBINDINGS}
 )
 list(APPEND DEPENDENCIES simde)
 
@@ -92,10 +99,19 @@ cmaize_find_or_build_dependency(
     BUILD_TARGET chemcache
     FIND_TARGET nwx::chemcache
     CMAKE_ARGS BUILD_TESTING=OFF
+            BUILD_PYBIND11_PYBINDINGS=${BUILD_PYBIND11_PYBINDINGS}
 )
 
 cmaize_add_executable(
     fastscf_driver
     SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/examples/driver"
     DEPENDS fastscf chemcache
+)
+
+include(CTest)
+include(nwx_pybind11)
+nwx_pybind11_tests(
+    set(PYTHON_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/tests/python")
+    py_test_unit_${PROJECT_NAME} "${PYTHON_TEST_DIR}/unit_tests/test_fastscf.py"
+    SUBMODULES simde chemist pluginplay parallelzone
 )
