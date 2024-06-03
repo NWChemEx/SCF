@@ -50,7 +50,7 @@ cmaize_find_or_build_dependency(
     BUILD_TARGET simde
     FIND_TARGET nwx::simde
     CMAKE_ARGS BUILD_TESTING=OFF
-            BUILD_PYBIND11_PYBINDINGS=${BUILD_PYBIND11_PYBINDINGS}
+               BUILD_PYBIND11_PYBINDINGS=${BUILD_PYBIND11_PYBINDINGS}
 )
 list(APPEND DEPENDENCIES simde)
 
@@ -92,6 +92,13 @@ cmaize_add_library(
     DEPENDS "${DEPENDENCIES}"
 )
 
+include(nwx_pybind11)
+nwx_add_pybind11_module(
+    ${PROJECT_NAME}
+    SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/src/python"
+    DEPENDS "${PROJECT_NAME}"
+)
+
 cmaize_find_or_build_dependency(
     chemcache 
     URL github.com/NWChemEx/ChemCache
@@ -99,7 +106,7 @@ cmaize_find_or_build_dependency(
     BUILD_TARGET chemcache
     FIND_TARGET nwx::chemcache
     CMAKE_ARGS BUILD_TESTING=OFF
-            BUILD_PYBIND11_PYBINDINGS=${BUILD_PYBIND11_PYBINDINGS}
+               BUILD_PYBIND11_PYBINDINGS=${BUILD_PYBIND11_PYBINDINGS}
 )
 
 cmaize_add_executable(
@@ -109,9 +116,8 @@ cmaize_add_executable(
 )
 
 include(CTest)
-include(nwx_pybind11)
+set(PYTHON_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/tests/python")
 nwx_pybind11_tests(
-    set(PYTHON_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/tests/python")
     py_test_unit_${PROJECT_NAME} "${PYTHON_TEST_DIR}/unit_tests/test_fastscf.py"
-    SUBMODULES simde chemist pluginplay parallelzone
+    SUBMODULES chemcache simde chemist pluginplay parallelzone
 )

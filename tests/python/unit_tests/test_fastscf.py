@@ -1,3 +1,4 @@
+#!/Users/jwaldrop/venvs/nwx/bin/python
 # Copyright 2023 NWChemEx-Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,21 +14,48 @@
 # limitations under the License.
 
 from pluginplay import ModuleManager
-from friendzone import friends, load_modules
-from simde import TotalEnergy
+from fastscf import load_modules
+from simde import AOEnergy, MoleculeFromString, MolecularBasisSet
+import chemcache as ccache
 from molecules import make_h2
+import parallelzone as pz
+from chemist import ChemicalSystem
 import unittest
+import os
+import sys
 
 
 class TestFastSCF(unittest.TestCase):
 
     def test_scf(self):
-        mol = make_h2()
-        key = 'FastSCF : SCF'
-        self.mm.change_input(key, 'basis set', 'sto-3g')
-        egy = self.mm.run_as(TotalEnergy(), key, mol)
+        mol_name = "water"
+        mol = self.mm.run_as(MoleculeFromString(), "NWX Molecules", mol_name)
+        cs = ChemicalSystem(mol)
+
+        basis_name = "sto-3g"
+        aos = self.mm.run_as(MolecularBasisSet(), basis_name, mol)
+
+        key = 'FastSCF Energy'
+        egy = self.mm.run_as(AOEnergy(), key, aos, cs)
         self.assertAlmostEqual(egy, -1.094184522864, places=5)
 
     def setUp(self):
         self.mm = ModuleManager()
+        ccache.load_modules(self.mm)
         load_modules(self.mm)
+
+
+if __name__ == '__main__':
+    # fastscf.tamm_initialize(argc, argv)
+    rv = pz.runtime.RuntimeView()
+
+    my_dir = os.path.dirname(os.path.realpath(__file__))
+
+    loader = unittest.TestLoader()
+    tests = loader.discover(my_dir)
+    testrunner = unittest.runner.TextTestRunner()
+    ret = not testrunner.run(tests).wasSuccessful()
+
+    # fastscf.tamm_finalize()
+
+    sys.exit(ret)

@@ -17,9 +17,17 @@
 #include <fastscf/fastscf.hpp>
 #include <pluginplay/plugin/plugin.hpp>
 #include <pybind11/pybind11.h>
+#include <tamm/tamm.hpp>
 
 namespace fastscf {
 
-EXPORT_PLUGIN(fastscf, m) {}
+EXPORT_PLUGIN(fastscf, m) {
+    // m.def("tamm_initialize", [](int argc, char** argv) {
+    //     tamm::initialize(argc, argv);
+    // });
+    // m.def("tamm_finalize", []() {
+    //     tamm::finalize();
+    // });
+}
 
 } // namespace fastscf
