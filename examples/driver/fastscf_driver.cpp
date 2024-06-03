@@ -18,8 +18,11 @@
 
 #include <fastscf/fastscf.hpp>
 #include <chemcache/chemcache.hpp>
+#include <tamm/tamm.hpp>
 
 int main(int argc, char** argv) {
+
+    tamm::initialize(argc, argv);
 
     // Populate modules
     pluginplay::ModuleManager mm;
@@ -37,8 +40,9 @@ int main(int argc, char** argv) {
 
     // Run module
     auto E = mm.at("FastSCF Energy").run_as<simde::AOEnergy>(aos, cs);
-    std::cout << "SCF Energy = " << E << " Eh" << std::endl;
+    std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
     
-
+    tamm::finalize();
+    
     return 0;
 }

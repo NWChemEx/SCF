@@ -1,4 +1,4 @@
-# Copyright 2022 NWChemEx-Project
+# Copyright 2024 NWChemEx-Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,6 +57,26 @@ cmaize_find_or_build_dependency(
     CMAKE_ARGS BUILD_TESTING=OFF GAUXC_ENABLE_HDF5=OFF
 )
 list(APPEND DEPENDENCIES gauxc)
+
+
+cmaize_find_or_build_dependency(
+    tamm
+    URL github.com/NWChemEx-Project/TAMM
+    VERSION main
+    BUILD_TARGET tamm
+    FIND_TARGET tamm::tamm
+    CMAKE_ARGS BUILD_METHODS=OFF
+)
+list(APPEND DEPENDENCIES tamm)
+
+cmaize_find_or_build_dependency(
+    Libint2
+    URL github.com/evaleev/libint
+    VERSION 2.7.2
+    BUILD_TARGET int2
+    FIND_TARGET Libint2::int2
+)
+list(APPEND DEPENDENCIES Libint2)
 
 cmaize_add_library(
     fastscf
