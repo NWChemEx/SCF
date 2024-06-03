@@ -14,7 +14,7 @@
 # limitations under the License.
 
 from pluginplay import ModuleManager
-from fastscf import load_modules
+from fastscf import load_modules, tamm_finalize, tamm_initialize
 from simde import AOEnergy, MoleculeFromString, MolecularBasisSet
 import chemcache as ccache
 from molecules import make_h2
@@ -46,7 +46,7 @@ class TestFastSCF(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # fastscf.tamm_initialize(argc, argv)
+    fastscf.tamm_initialize(argc, argv)
     rv = pz.runtime.RuntimeView()
 
     my_dir = os.path.dirname(os.path.realpath(__file__))
@@ -56,6 +56,6 @@ if __name__ == '__main__':
     testrunner = unittest.runner.TextTestRunner()
     ret = not testrunner.run(tests).wasSuccessful()
 
-    # fastscf.tamm_finalize()
+    fastscf.tamm_finalize()
 
     sys.exit(ret)

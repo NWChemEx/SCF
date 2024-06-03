@@ -22,12 +22,21 @@
 namespace fastscf {
 
 EXPORT_PLUGIN(fastscf, m) {
-    // m.def("tamm_initialize", [](int argc, char** argv) {
-    //     tamm::initialize(argc, argv);
-    // });
-    // m.def("tamm_finalize", []() {
-    //     tamm::finalize();
-    // });
+    m.def("tamm_initialize", [](pybind11::list py_args) {
+        std::vector<std::string> args;
+        for (const auto& arg : py_args) 
+            args.push_back(arg.cast<std::string>());
+
+        std::vector<char*> argv;
+        for (const auto& arg : args) 
+            argv.push_back(const_cast<char*>(arg.c_str()));
+
+        int argc = static_cast<int>(argv.size());        
+        tamm::initialize(argc, argv.data());
+    });
+    m.def("tamm_finalize", []() {
+        tamm::finalize();
+    });
 }
 
 } // namespace fastscf
