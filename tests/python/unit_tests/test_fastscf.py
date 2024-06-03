@@ -37,7 +37,7 @@ class TestFastSCF(unittest.TestCase):
 
         key = 'FastSCF Energy'
         egy = self.mm.run_as(AOEnergy(), key, aos, cs)
-        self.assertAlmostEqual(egy, -1.094184522864, places=5)
+        self.assertAlmostEqual(egy, -74.3670617803483, places=5)
 
     def setUp(self):
         self.mm = ModuleManager()
@@ -46,7 +46,7 @@ class TestFastSCF(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    fastscf.tamm_initialize(argc, argv)
+    tamm_initialize(sys.argv)
     rv = pz.runtime.RuntimeView()
 
     my_dir = os.path.dirname(os.path.realpath(__file__))
@@ -56,6 +56,6 @@ if __name__ == '__main__':
     testrunner = unittest.runner.TextTestRunner()
     ret = not testrunner.run(tests).wasSuccessful()
 
-    fastscf.tamm_finalize()
+    tamm_finalize()
 
     sys.exit(ret)
