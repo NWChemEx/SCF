@@ -121,3 +121,18 @@ nwx_pybind11_tests(
     py_test_unit_${PROJECT_NAME} "${PYTHON_TEST_DIR}/unit_tests/test_fastscf.py"
     SUBMODULES chemcache simde chemist pluginplay parallelzone
 )
+
+set(CXX_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/tests/cxx")
+cmaize_find_or_build_dependency(
+    Catch2
+    URL github.com/catchorg/Catch2
+    BUILD_TARGET Catch2
+    FIND_TARGET Catch2::Catch2
+    VERSION ${NWX_CATCH2_VERSION}
+)
+cmaize_add_tests(
+    test_fastscf
+    SOURCE_DIR "${CXX_TEST_DIR}"
+    INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/fastscf"
+    DEPENDS Catch2 fastscf chemcache
+)

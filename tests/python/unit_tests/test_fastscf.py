@@ -27,7 +27,7 @@ import sys
 
 class TestFastSCF(unittest.TestCase):
 
-    def test_scf(self):
+    def test_4cHF(self):
         mol_name = "water"
         mol = self.mm.run_as(MoleculeFromString(), "NWX Molecules", mol_name)
         cs = ChemicalSystem(mol)
@@ -37,7 +37,21 @@ class TestFastSCF(unittest.TestCase):
 
         key = 'FastSCF Energy'
         egy = self.mm.run_as(AOEnergy(), key, aos, cs)
-        self.assertAlmostEqual(egy, -74.3670617803483, places=5)
+        self.assertAlmostEqual(egy, -74.3670617803483, places=6)
+
+    def test_dft(self):
+        mol_name = "water"
+        mol = self.mm.run_as(MoleculeFromString(), "NWX Molecules", mol_name)
+        cs = ChemicalSystem(mol)
+
+        basis_name = "sto-3g"
+        aos = self.mm.run_as(MolecularBasisSet(), basis_name, mol)
+
+        key = 'FastSCF Energy'
+        self.mm.change_input(key, 'xc_type', ["pbe0"])
+        egy = self.mm.run_as(AOEnergy(), key, aos, cs)
+        self.assertAlmostEqual(egy, -74.81168986385825, places=6)
+    
 
     def setUp(self):
         self.mm = ModuleManager()
