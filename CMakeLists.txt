@@ -33,7 +33,10 @@ set(
 include(nwx_versions)
 include(get_cmaize)
 include(nwx_cxx_api_docs)
-nwx_cxx_api_docs("${CMAKE_CURRENT_SOURCE_DIR}/fastscf")
+
+set(FASTSCF_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(FASTSCF_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+nwx_cxx_api_docs("${FASTSCF_SOURCE_DIR}" "${FASTSCF_INCLUDE_DIR}")
 
 set(DEPENDENCIES "")
 
@@ -54,7 +57,6 @@ cmaize_find_or_build_dependency(
 )
 list(APPEND DEPENDENCIES simde)
 
-# Put after SimDE to allow TA to discover BLAS/LAPACK
 cmaize_find_or_build_dependency(
     gauxc
     URL github.com/wavefunction91/GauXC
@@ -64,7 +66,6 @@ cmaize_find_or_build_dependency(
     CMAKE_ARGS BUILD_TESTING=OFF GAUXC_ENABLE_HDF5=OFF
 )
 list(APPEND DEPENDENCIES gauxc)
-
 
 cmaize_find_or_build_dependency(
     tamm
@@ -115,24 +116,44 @@ cmaize_add_executable(
     DEPENDS fastscf chemcache
 )
 
-include(CTest)
-set(PYTHON_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/tests/python")
-nwx_pybind11_tests(
-    py_test_unit_${PROJECT_NAME} "${PYTHON_TEST_DIR}/unit_tests/test_fastscf.py"
-    SUBMODULES chemcache simde chemist pluginplay parallelzone
-)
+if("${BUILD_TESTING}") 
+    include(CTest)
+    set(PYTHON_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/tests/python")
+    set(CXX_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/tests/cxx")
 
-set(CXX_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/tests/cxx")
-cmaize_find_or_build_dependency(
-    Catch2
-    URL github.com/catchorg/Catch2
-    BUILD_TARGET Catch2
-    FIND_TARGET Catch2::Catch2
-    VERSION ${NWX_CATCH2_VERSION}
-)
-cmaize_add_tests(
-    test_fastscf
-    SOURCE_DIR "${CXX_TEST_DIR}"
-    INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/fastscf"
-    DEPENDS Catch2 fastscf chemcache
-)
+    # Need to call with MPI, so we have to deconstruct the cmaize_add_test and
+    # nwx_pybind11_tests methods
+    cmaize_find_or_build_dependency(
+        Catch2
+        URL github.com/catchorg/Catch2
+        BUILD_TARGET Catch2
+        FIND_TARGET Catch2::Catch2
+        VERSION ${NWX_CATCH2_VERSION}
+    )
+    cmaize_add_executable(
+        test_fastscf
+        SOURCE_DIR "${CXX_TEST_DIR}"
+        INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/fastscf"
+        DEPENDS Catch2 fastscf chemcache
+    )
+    add_test(
+        NAME "test_fastscf"
+        COMMAND "${MPIEXEC_EXECUTABLE}" "${MPIEXEC_NUMPROC_FLAG}" "2"
+                "${CMAKE_BINARY_DIR}/test_fastscf"
+    )
+
+    add_test(
+        NAME py_test_unit_${PROJECT_NAME}
+        COMMAND "${MPIEXEC_EXECUTABLE}" "${MPIEXEC_NUMPROC_FLAG}" "2"
+                "${Python_EXECUTABLE}" 
+                "${PYTHON_TEST_DIR}/unit_tests/test_fastscf.py"
+    )
+    nwx_python_path(
+        TEST_PYTHONPATH
+        SUBMODULES chemcache simde chemist pluginplay parallelzone
+    )
+    set_tests_properties(
+        py_test_unit_${PROJECT_NAME}
+        PROPERTIES ENVIRONMENT "${TEST_PYTHONPATH}"
+    )
+endif()
