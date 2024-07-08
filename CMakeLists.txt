@@ -73,9 +73,19 @@ cmaize_find_or_build_dependency(
     VERSION main
     BUILD_TARGET tamm
     FIND_TARGET tamm::tamm
-    CMAKE_ARGS BUILD_METHODS=OFF
+    CMAKE_ARGS MODULES="DFT"
 )
 list(APPEND DEPENDENCIES tamm)
+
+cmaize_find_or_build_dependency(
+    exachem
+    URL github.com/ExaChem/exachem
+    VERSION main
+    BUILD_TARGET exachem
+    FIND_TARGET exachem::exachem
+    CMAKE_ARGS MODULES="DFT"
+)
+list(APPEND DEPENDENCIES exachem)
 
 cmaize_find_or_build_dependency(
     Libint2

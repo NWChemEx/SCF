@@ -17,9 +17,9 @@
 #include "fastscf_modules.hpp"
 #include <libint2.hpp>
 #include <simde/simde.hpp>
-#include "common/chemenv.hpp"
-#include "scf/scf_main.hpp"
-#include "common/initialize_system_data.hpp"
+#include "exachem/common/chemenv.hpp"
+#include "exachem/scf/scf_main.hpp"
+#include "exachem/common/initialize_system_data.hpp"
 
 namespace fastscf {
 
