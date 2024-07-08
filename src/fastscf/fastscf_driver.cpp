@@ -236,6 +236,12 @@ MODULE_RUN(FastSCFEnergy) {
     // chem_env.ioptions.scf_options.xc_type={"pbe0"}; //For testing DFT
 
     IniSystemData    ini_sys_data(chem_env);
+    SCFOptions& scf_options   = chem_env.ioptions.scf_options;
+    chem_env.ec_basis         = ECBasis(ec, scf_options.basis, scf_options.basisfile,
+                                        scf_options.gaussian_type, chem_env.atoms, chem_env.ec_atoms);
+    chem_env.shells           = chem_env.ec_basis.shells;
+    chem_env.sys_data.has_ecp = chem_env.ec_basis.has_ecp;
+
     exachem::scf::scf(ec, chem_env);
 
     double E0 = chem_env.hf_energy; // This is a total energy in Hartree
