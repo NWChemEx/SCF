@@ -86,6 +86,9 @@ inline libint2::BasisSet make_libint_basis(const simde::type::ao_basis_set& bs) 
 MODULE_CTOR(FastSCFEnergy) {
   satisfies_property_type<energy_pt>();
 
+  add_input<std::string>("molecule_name").set_description("The name of the molecule");
+  add_input<std::string>("units").set_default("angstrom").set_description("Specifies the units as bohr or angstrom");
+
   add_input<int>("charge").set_default(0).set_description("Charge");
   add_input<int>("multiplicity").set_default(1).set_description("number of singly occupied orbitals for a particular calculation");
   add_input<double>("lshift").set_default(0.0).set_description("level shift factor denoting the amount of shift applied to the diagonal elements of the unoccupied block of the Fock matrix");
@@ -147,27 +150,21 @@ MODULE_RUN(FastSCFEnergy) {
 
     const auto& [aos, cs] = energy_pt::unwrap_inputs(inputs);
 
-    ChemEnv chem_env;
-    // TODO: Get from input
-    chem_env.input_file = "water";
+    const double angstrom_to_bohr = 1.8897259878858;
 
     libint2::BasisSet li_shells = make_libint_basis(aos);
 
+    ChemEnv chem_env;
+    chem_env.input_file = inputs.at("molecule_name").value<std::string>();
     auto mol = cs.molecule();
-    const double angstrom_to_bohr = 1.8897259878858;
-    // TODO: Get from input
-    std::string  geom_units{"angstrom"};
-    const double convert_units = (geom_units == "angstrom") ? angstrom_to_bohr : 1.0;
-
     chem_env.ec_atoms.resize(mol.size());
     chem_env.atoms.resize(mol.size());
 
     CommonOptions& coptions = chem_env.ioptions.common_options;
-
     //parse common options
-    coptions.geom_units = geom_units;
-    // TODO: Get from input
-    coptions.basis = "sto-3g";
+    coptions.geom_units = inputs.at("units").value<std::string>();
+    const double convert_units = (coptions.geom_units == "angstrom") ? angstrom_to_bohr : 1.0;    
+    coptions.basis = aos[0].basis_set_name().value_or("sto-3g");
 
     std::cout << std::endl;
     for (int i = 0; i < mol.size(); i++) {
@@ -232,8 +229,6 @@ MODULE_RUN(FastSCFEnergy) {
     scf.xc_int_kernel = inputs.at("xc_int_kernel").value<std::string>();
     scf.xc_red_kernel = inputs.at("xc_red_kernel").value<std::string>();
     scf.xc_lwd_kernel = inputs.at("xc_lwd_kernel").value<std::string>();    
-
-    // chem_env.ioptions.scf_options.xc_type={"pbe0"}; //For testing DFT
 
     IniSystemData    ini_sys_data(chem_env);
     SCFOptions& scf_options   = chem_env.ioptions.scf_options;

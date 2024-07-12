@@ -44,6 +44,7 @@ int main(int argc, char** argv) {
     
     std::vector<std::string> xc_type = {"pbe0"};
     mm.change_input("FastSCF Energy", "xc_type", xc_type);
+    mm.change_input("FastSCF Energy", "molecule_name", mol_name);
     E = mm.at("FastSCF Energy").run_as<simde::AOEnergy>(aos, cs);
     std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
         

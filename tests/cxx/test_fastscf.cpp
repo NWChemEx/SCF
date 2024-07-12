@@ -37,6 +37,7 @@ TEST_CASE("SCF") {
     auto aos = mm.at(basis_name).run_as<simde::MolecularBasisSet>(mol);
 
     // Run module
+    mm.change_input("FastSCF Energy", "molecule_name", mol_name);
     auto E = mm.at("FastSCF Energy").run_as<simde::AOEnergy>(aos, cs);
     std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
     
@@ -62,6 +63,7 @@ TEST_CASE("DFT") {
     // Run module
     std::vector<std::string> xc_type = {"pbe0"};
     mm.change_input("FastSCF Energy", "xc_type", xc_type);
+    mm.change_input("FastSCF Energy", "molecule_name", mol_name);
     auto E = mm.at("FastSCF Energy").run_as<simde::AOEnergy>(aos, cs);
     std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
         
