@@ -36,6 +36,7 @@ class TestFastSCF(unittest.TestCase):
         aos = self.mm.run_as(MolecularBasisSet(), basis_name, mol)
 
         key = 'FastSCF Energy'
+        self.mm.change_input(key, 'molecule_name', mol_name)
         egy = self.mm.run_as(AOEnergy(), key, aos, cs)
         self.assertAlmostEqual(egy, -74.3670617803483, places=6)
 
@@ -49,6 +50,7 @@ class TestFastSCF(unittest.TestCase):
 
         key = 'FastSCF Energy'
         self.mm.change_input(key, 'xc_type', ["pbe0"])
+        self.mm.change_input(key, 'molecule_name', mol_name)
         egy = self.mm.run_as(AOEnergy(), key, aos, cs)
         self.assertAlmostEqual(egy, -74.81168986385825, places=6)
     
