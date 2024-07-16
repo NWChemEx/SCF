@@ -16,18 +16,16 @@
 
 #include <iostream>
 
-#include <fastscf/fastscf.hpp>
+#include <scf/scf.hpp>
 #include <chemcache/chemcache.hpp>
-#include <tamm/tamm.hpp>
+#include <catch2/catch.hpp>
 
-int main(int argc, char** argv) {
-
-    tamm::initialize(argc, argv);
+TEST_CASE("SCF") {
 
     // Populate modules
     pluginplay::ModuleManager mm;
     chemcache::load_modules(mm);
-    fastscf::load_modules(mm);
+    scf::load_modules(mm);
 
     // Create ChemicalSystem
     std::string mol_name = "water";
@@ -39,16 +37,35 @@ int main(int argc, char** argv) {
     auto aos = mm.at(basis_name).run_as<simde::MolecularBasisSet>(mol);
 
     // Run module
-    auto E = mm.at("FastSCF Energy").run_as<simde::AOEnergy>(aos, cs);
+    mm.change_input("SCF Energy", "molecule_name", mol_name);
+    auto E = mm.at("SCF Energy").run_as<simde::AOEnergy>(aos, cs);
     std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
     
+    REQUIRE(E == Approx(-74.3670617803483).margin(1.0e-6));
+}
+
+TEST_CASE("DFT") {
+
+    // Populate modules
+    pluginplay::ModuleManager mm;
+    chemcache::load_modules(mm);
+    scf::load_modules(mm);
+
+    // Create ChemicalSystem
+    std::string mol_name = "water";
+    auto mol = mm.at("NWX Molecules").run_as<simde::MoleculeFromString>(mol_name);
+    simde::type::chemical_system cs(mol);
+
+    // Create BasisSet
+    std::string basis_name = "sto-3g"; // This is the only supported basis in ChemCache
+    auto aos = mm.at(basis_name).run_as<simde::MolecularBasisSet>(mol);
+
+    // Run module
     std::vector<std::string> xc_type = {"pbe0"};
-    mm.change_input("FastSCF Energy", "xc_type", xc_type);
-    mm.change_input("FastSCF Energy", "molecule_name", mol_name);
-    E = mm.at("FastSCF Energy").run_as<simde::AOEnergy>(aos, cs);
+    mm.change_input("SCF Energy", "xc_type", xc_type);
+    mm.change_input("SCF Energy", "molecule_name", mol_name);
+    auto E = mm.at("SCF Energy").run_as<simde::AOEnergy>(aos, cs);
     std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
         
-    tamm::finalize();
-    
-    return 0;
+    REQUIRE(E == Approx(-74.81168986385825).margin(1.0e-6));
 }

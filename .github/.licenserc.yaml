@@ -21,8 +21,8 @@ header:
     - .github/
     - docs/Makefile
     - docs/requirements.txt
-    - src/fastscf/common/
-    - src/fastscf/scf/
+    - src/scf/common/
+    - src/scf/scf/
     - LICENSE
 
   comment: never

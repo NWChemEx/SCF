@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-#include <fastscf/fastscf.hpp>
+#include <scf/scf.hpp>
 #include <pluginplay/plugin/plugin.hpp>
 #include <pybind11/pybind11.h>
 #include <tamm/tamm.hpp>
 
-namespace fastscf {
+namespace scf {
 
-EXPORT_PLUGIN(fastscf, m) {
+EXPORT_PLUGIN(scf, m) {
     m.def("tamm_initialize", [](pybind11::list py_args) {
         std::vector<std::string> args;
         for (const auto& arg : py_args) 
@@ -39,4 +39,4 @@ EXPORT_PLUGIN(fastscf, m) {
     });
 }
 
-} // namespace fastscf
+} // namespace scf

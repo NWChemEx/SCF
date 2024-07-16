@@ -17,8 +17,8 @@
 #pragma once
 #include <pluginplay/pluginplay.hpp>
 
-namespace fastscf {
-/** @brief Loads the modules contained in the FastSCF module collection into the
+namespace scf {
+/** @brief Loads the modules contained in the SCF module collection into the
  *         provided ModuleManager instance.
  */
 void load_modules(pluginplay::ModuleManager& mm);

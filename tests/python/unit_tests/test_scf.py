@@ -14,7 +14,7 @@
 # limitations under the License.
 
 from pluginplay import ModuleManager
-from fastscf import load_modules, tamm_finalize, tamm_initialize
+from scf import load_modules, tamm_finalize, tamm_initialize
 from simde import AOEnergy, MoleculeFromString, MolecularBasisSet
 import chemcache as ccache
 from molecules import make_h2
@@ -25,7 +25,7 @@ import os
 import sys
 
 
-class TestFastSCF(unittest.TestCase):
+class TestSCF(unittest.TestCase):
 
     def test_4cHF(self):
         mol_name = "water"
@@ -35,7 +35,7 @@ class TestFastSCF(unittest.TestCase):
         basis_name = "sto-3g"
         aos = self.mm.run_as(MolecularBasisSet(), basis_name, mol)
 
-        key = 'FastSCF Energy'
+        key = 'SCF Energy'
         self.mm.change_input(key, 'molecule_name', mol_name)
         egy = self.mm.run_as(AOEnergy(), key, aos, cs)
         self.assertAlmostEqual(egy, -74.3670617803483, places=6)
@@ -48,7 +48,7 @@ class TestFastSCF(unittest.TestCase):
         basis_name = "sto-3g"
         aos = self.mm.run_as(MolecularBasisSet(), basis_name, mol)
 
-        key = 'FastSCF Energy'
+        key = 'SCF Energy'
         self.mm.change_input(key, 'xc_type', ["pbe0"])
         self.mm.change_input(key, 'molecule_name', mol_name)
         egy = self.mm.run_as(AOEnergy(), key, aos, cs)

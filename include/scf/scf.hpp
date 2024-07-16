@@ -15,10 +15,6 @@
  */
 
 #pragma once
-#include <pluginplay/pluginplay.hpp>
+#include "scf/scf_mm.hpp"
+#include <simde/simde.hpp>
 
-namespace fastscf {
-
-DECLARE_MODULE(FastSCFEnergy);
-
-} // namespace fastscf

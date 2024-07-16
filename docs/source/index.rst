@@ -13,7 +13,7 @@
 .. limitations under the License.
 
 #########
-FastSCF
+SCF
 #########
 
 .. toctree::
@@ -21,4 +21,4 @@ FastSCF
    :caption: APIs:
 
    module_api/index
-   C++ API <https://nwchemex.github.io/SCF/fastscf_cxx_api/index.html>
+   C++ API <https://nwchemex.github.io/SCF/scf_cxx_api/index.html>

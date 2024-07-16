@@ -14,7 +14,7 @@
 
 cmake_minimum_required(VERSION 3.14)
 set(VERSION 1.0.0) #TODO: get from git
-project(fastscf VERSION "${VERSION}" LANGUAGES CXX)
+project(scf VERSION "${VERSION}" LANGUAGES CXX)
 
 include(FetchContent)
 enable_language(C)
@@ -34,9 +34,9 @@ include(nwx_versions)
 include(get_cmaize)
 include(nwx_cxx_api_docs)
 
-set(FASTSCF_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(FASTSCF_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
-nwx_cxx_api_docs("${FASTSCF_SOURCE_DIR}" "${FASTSCF_INCLUDE_DIR}")
+set(SCF_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(SCF_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+nwx_cxx_api_docs("${SCF_SOURCE_DIR}" "${SCF_INCLUDE_DIR}")
 
 set(DEPENDENCIES "")
 
@@ -97,9 +97,9 @@ cmaize_find_or_build_dependency(
 list(APPEND DEPENDENCIES Libint2)
 
 cmaize_add_library(
-    fastscf
-    SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/src/fastscf"
-    INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/include/fastscf"
+    scf
+    SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/src/scf"
+    INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/include/scf"
     DEPENDS "${DEPENDENCIES}"
 )
 
@@ -121,9 +121,9 @@ cmaize_find_or_build_dependency(
 )
 
 cmaize_add_executable(
-    fastscf_driver
+    scf_driver
     SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/examples/driver"
-    DEPENDS fastscf chemcache
+    DEPENDS scf chemcache
 )
 
 if("${BUILD_TESTING}") 
@@ -141,22 +141,22 @@ if("${BUILD_TESTING}")
         VERSION ${NWX_CATCH2_VERSION}
     )
     cmaize_add_executable(
-        test_fastscf
+        test_scf
         SOURCE_DIR "${CXX_TEST_DIR}"
-        INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/fastscf"
-        DEPENDS Catch2 fastscf chemcache
+        INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/scf"
+        DEPENDS Catch2 scf chemcache
     )
     add_test(
-        NAME "test_fastscf"
+        NAME "test_scf"
         COMMAND "${MPIEXEC_EXECUTABLE}" "${MPIEXEC_NUMPROC_FLAG}" "2"
-                "${CMAKE_BINARY_DIR}/test_fastscf"
+                "${CMAKE_BINARY_DIR}/test_scf"
     )
 
     add_test(
         NAME py_test_unit_${PROJECT_NAME}
         COMMAND "${MPIEXEC_EXECUTABLE}" "${MPIEXEC_NUMPROC_FLAG}" "2"
                 "${Python_EXECUTABLE}" 
-                "${PYTHON_TEST_DIR}/unit_tests/test_fastscf.py"
+                "${PYTHON_TEST_DIR}/unit_tests/test_scf.py"
     )
     nwx_python_path(
         TEST_PYTHONPATH

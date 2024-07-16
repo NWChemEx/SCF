@@ -24,6 +24,6 @@ jobs:
   Common-Merge:
     uses: NWChemEx/.github/.github/workflows/common_merge.yaml@master
     with:
-      doc_target: 'fastscf_cxx_api'
+      doc_target: 'scf_cxx_api'
       generate_module_docs: true
     secrets: inherit

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-#include <fastscf/fastscf_mm.hpp>
+#include <scf/scf_mm.hpp>
 
-#include "fastscf_modules.hpp"
+#include "scf_modules.hpp"
 
-namespace fastscf {
+namespace scf {
 
 void load_modules(pluginplay::ModuleManager& mm) {
-    mm.add_module<FastSCFEnergy>("FastSCF Energy");
+    mm.add_module<SCFEnergy>("SCF Energy");
 }
 
 } // namespace scf

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-#include "fastscf_modules.hpp"
+#include "scf_modules.hpp"
 #include <libint2.hpp>
 #include <simde/simde.hpp>
 #include "exachem/common/chemenv.hpp"
 #include "exachem/scf/scf_main.hpp"
 #include "exachem/common/initialize_system_data.hpp"
 
-namespace fastscf {
+namespace scf {
 
 using energy_pt = simde::AOEnergy;
 
@@ -83,7 +83,7 @@ inline libint2::BasisSet make_libint_basis(const simde::type::ao_basis_set& bs) 
   return basis_t(centers, element_bases);
 }
 
-MODULE_CTOR(FastSCFEnergy) {
+MODULE_CTOR(SCFEnergy) {
   satisfies_property_type<energy_pt>();
 
   add_input<std::string>("molecule_name").set_description("The name of the molecule");
@@ -142,7 +142,7 @@ MODULE_CTOR(FastSCFEnergy) {
 
 }
 
-MODULE_RUN(FastSCFEnergy) {
+MODULE_RUN(SCFEnergy) {
 
     const auto       rank = ProcGroup::world_rank();
     ProcGroup        pg   = ProcGroup::create_world_coll();
@@ -244,4 +244,4 @@ MODULE_RUN(FastSCFEnergy) {
     return energy_pt::wrap_results(rv, E0);
 }
 
-} // namespace fastscf
+} // namespace scf

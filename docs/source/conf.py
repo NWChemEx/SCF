@@ -25,7 +25,7 @@ import git
 
 # -- Project information -----------------------------------------------------
 
-project = u'FastSCF'
+project = u'SCF'
 copyright = u'2024, NWChemEx Team'
 author = u'NWChemEx Team'
 
