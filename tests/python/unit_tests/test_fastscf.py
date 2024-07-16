@@ -53,7 +53,6 @@ class TestFastSCF(unittest.TestCase):
         self.mm.change_input(key, 'molecule_name', mol_name)
         egy = self.mm.run_as(AOEnergy(), key, aos, cs)
         self.assertAlmostEqual(egy, -74.81168986385825, places=6)
-    
 
     def setUp(self):
         self.mm = ModuleManager()
