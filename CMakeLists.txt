@@ -1,4 +1,4 @@
-# Copyright 2022 NWChemEx-Project
+# Copyright 2024 NWChemEx-Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 cmake_minimum_required(VERSION 3.14)
 set(VERSION 1.0.0) #TODO: get from git
-project(fastscf VERSION "${VERSION}" LANGUAGES CXX)
+project(scf VERSION "${VERSION}" LANGUAGES CXX)
 
 include(FetchContent)
 enable_language(C)
@@ -33,9 +33,18 @@ set(
 include(nwx_versions)
 include(get_cmaize)
 include(nwx_cxx_api_docs)
-nwx_cxx_api_docs("${CMAKE_CURRENT_SOURCE_DIR}/fastscf")
+
+set(SCF_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(SCF_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+nwx_cxx_api_docs("${SCF_SOURCE_DIR}" "${SCF_INCLUDE_DIR}")
 
 set(DEPENDENCIES "")
+
+cmaize_option_list(
+    BUILD_TESTING OFF "Should we build the tests?"
+    BUILD_PYBIND11_PYBINDINGS ON "Build pybind11 python3 bindings?"
+    ENABLE_EXPERIMENTAL_FEATURES OFF "Build features which are not 1.0-ed yet?"
+)
 
 cmaize_find_or_build_dependency(
     simde
@@ -44,10 +53,10 @@ cmaize_find_or_build_dependency(
     BUILD_TARGET simde
     FIND_TARGET nwx::simde
     CMAKE_ARGS BUILD_TESTING=OFF
+               BUILD_PYBIND11_PYBINDINGS=${BUILD_PYBIND11_PYBINDINGS}
 )
 list(APPEND DEPENDENCIES simde)
 
-# Put after SimDE to allow TA to discover BLAS/LAPACK
 cmaize_find_or_build_dependency(
     gauxc
     URL github.com/wavefunction91/GauXC
@@ -58,11 +67,47 @@ cmaize_find_or_build_dependency(
 )
 list(APPEND DEPENDENCIES gauxc)
 
+cmaize_find_or_build_dependency(
+    tamm
+    URL github.com/NWChemEx-Project/TAMM
+    VERSION main
+    BUILD_TARGET tamm
+    FIND_TARGET tamm::tamm
+    CMAKE_ARGS MODULES="DFT"
+)
+list(APPEND DEPENDENCIES tamm)
+
+cmaize_find_or_build_dependency(
+    exachem
+    URL github.com/ExaChem/exachem
+    VERSION main
+    BUILD_TARGET exachem
+    FIND_TARGET exachem::exachem
+    CMAKE_ARGS MODULES="DFT"
+)
+list(APPEND DEPENDENCIES exachem)
+
+cmaize_find_or_build_dependency(
+    Libint2
+    URL github.com/evaleev/libint
+    VERSION 2.7.2
+    BUILD_TARGET int2
+    FIND_TARGET Libint2::int2
+)
+list(APPEND DEPENDENCIES Libint2)
+
 cmaize_add_library(
-    fastscf
-    SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/src/fastscf"
-    INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/include/fastscf"
+    scf
+    SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/src/scf"
+    INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/include/scf"
     DEPENDS "${DEPENDENCIES}"
+)
+
+include(nwx_pybind11)
+nwx_add_pybind11_module(
+    ${PROJECT_NAME}
+    SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/src/python"
+    DEPENDS "${PROJECT_NAME}"
 )
 
 cmaize_find_or_build_dependency(
@@ -72,10 +117,53 @@ cmaize_find_or_build_dependency(
     BUILD_TARGET chemcache
     FIND_TARGET nwx::chemcache
     CMAKE_ARGS BUILD_TESTING=OFF
+               BUILD_PYBIND11_PYBINDINGS=${BUILD_PYBIND11_PYBINDINGS}
 )
 
 cmaize_add_executable(
-    fastscf_driver
+    scf_driver
     SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/examples/driver"
-    DEPENDS fastscf chemcache
+    DEPENDS scf chemcache
 )
+
+if("${BUILD_TESTING}") 
+    include(CTest)
+    set(PYTHON_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/tests/python")
+    set(CXX_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}/tests/cxx")
+
+    # Need to call with MPI, so we have to deconstruct the cmaize_add_test and
+    # nwx_pybind11_tests methods
+    cmaize_find_or_build_dependency(
+        Catch2
+        URL github.com/catchorg/Catch2
+        BUILD_TARGET Catch2
+        FIND_TARGET Catch2::Catch2
+        VERSION ${NWX_CATCH2_VERSION}
+    )
+    cmaize_add_executable(
+        test_scf
+        SOURCE_DIR "${CXX_TEST_DIR}"
+        INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/scf"
+        DEPENDS Catch2 scf chemcache
+    )
+    add_test(
+        NAME "test_scf"
+        COMMAND "${MPIEXEC_EXECUTABLE}" "${MPIEXEC_NUMPROC_FLAG}" "2"
+                "${CMAKE_BINARY_DIR}/test_scf"
+    )
+
+    add_test(
+        NAME py_test_unit_${PROJECT_NAME}
+        COMMAND "${MPIEXEC_EXECUTABLE}" "${MPIEXEC_NUMPROC_FLAG}" "2"
+                "${Python_EXECUTABLE}" 
+                "${PYTHON_TEST_DIR}/unit_tests/test_scf.py"
+    )
+    nwx_python_path(
+        TEST_PYTHONPATH
+        SUBMODULES chemcache simde chemist pluginplay parallelzone
+    )
+    set_tests_properties(
+        py_test_unit_${PROJECT_NAME}
+        PROPERTIES ENVIRONMENT "${TEST_PYTHONPATH}"
+    )
+endif()

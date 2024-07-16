@@ -15,12 +15,6 @@
  */
 
 #pragma once
-#include <pluginplay/module_manager.hpp>
+#include "scf/scf_mm.hpp"
+#include <simde/simde.hpp>
 
-namespace fastscf {
-/** @brief Loads the modules contained in the FastSCF module collection into the
- *         provided ModuleManager instance.
- */
-void load_modules(pluginplay::ModuleManager& mm);
-
-} // namespace scf

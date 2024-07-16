@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-#include "fastscf_modules.hpp"
-#include <simde/simde.hpp>
+#include <scf/scf_mm.hpp>
 
-namespace fastscf {
+#include "scf_modules.hpp"
 
-using energy_pt = simde::AOEnergy;
+namespace scf {
 
-MODULE_CTOR(FastSCFEnergy) {
-    satisfies_property_type<energy_pt>();
+void load_modules(pluginplay::ModuleManager& mm) {
+    mm.add_module<SCFEnergy>("SCF Energy");
 }
 
-MODULE_RUN(FastSCFEnergy) {
-    const auto& [aos, cs] = energy_pt::unwrap_inputs(inputs);
-
-    double E0 = 3.14; /// This is a total energy
-    auto rv = results();
-    return energy_pt::wrap_results(rv, E0);
-}
-
-} // namespace fastscf
+} // namespace scf

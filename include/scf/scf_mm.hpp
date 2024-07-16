@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-#include <fastscf/fastscf_mm.hpp>
+#pragma once
+#include <pluginplay/pluginplay.hpp>
 
-#include "fastscf_modules.hpp"
-
-namespace fastscf {
-
-void load_modules(pluginplay::ModuleManager& mm) {
-    mm.add_module<FastSCFEnergy>("FastSCF Energy");
-}
+namespace scf {
+/** @brief Loads the modules contained in the SCF module collection into the
+ *         provided ModuleManager instance.
+ */
+void load_modules(pluginplay::ModuleManager& mm);
 
 } // namespace scf

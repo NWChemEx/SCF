@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-#pragma once
-#include <pluginplay/pluginplay.hpp>
+#define CATCH_CONFIG_RUNNER
+#include <catch2/catch.hpp>
+#include <tamm/tamm.hpp>
 
-namespace fastscf {
+int main(int argc, char* argv[]) {
+    tamm::initialize(argc, argv);
 
-DECLARE_MODULE(FastSCFEnergy);
+    int res = Catch::Session().run(argc, argv);
 
-} // namespace fastscf
+    tamm::finalize();
+
+    return res;
+}
