@@ -28,5 +28,5 @@ jobs:
       source_dir: ''
       compilers: '["gcc-11"]'
       doc_target: 'fastscf_cxx_api'
-      build_fail_on_warnings: false
+      build_fail_on_warning: false
     secrets: inherit
