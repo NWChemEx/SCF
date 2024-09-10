@@ -49,7 +49,6 @@ cmaize_option_list(
 cmaize_find_or_build_dependency(
     simde
     URL github.com/NWChemEx/SimDE
-    VERSION ${NWX_SIMDE_VERSION}
     BUILD_TARGET simde
     FIND_TARGET nwx::simde
     CMAKE_ARGS BUILD_TESTING=OFF
@@ -60,7 +59,6 @@ list(APPEND DEPENDENCIES simde)
 cmaize_find_or_build_dependency(
     gauxc
     URL github.com/wavefunction91/GauXC
-    VERSION ${NWX_GAUXC_VERSION}
     BUILD_TARGET gauxc
     FIND_TARGET gauxc::gauxc
     CMAKE_ARGS BUILD_TESTING=OFF GAUXC_ENABLE_HDF5=OFF
@@ -113,7 +111,6 @@ nwx_add_pybind11_module(
 cmaize_find_or_build_dependency(
     chemcache 
     URL github.com/NWChemEx/ChemCache
-    VERSION master
     BUILD_TARGET chemcache
     FIND_TARGET nwx::chemcache
     CMAKE_ARGS BUILD_TESTING=OFF
@@ -138,7 +135,7 @@ if("${BUILD_TESTING}")
         URL github.com/catchorg/Catch2
         BUILD_TARGET Catch2
         FIND_TARGET Catch2::Catch2
-        VERSION ${NWX_CATCH2_VERSION}
+        VERSION v3.6.0
     )
     cmaize_add_executable(
         test_scf
