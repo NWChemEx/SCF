@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-#include <iostream>
-
-#include <scf/scf.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <chemcache/chemcache.hpp>
-#include <catch2/catch.hpp>
+#include <iostream>
+#include <scf/scf.hpp>
 
 TEST_CASE("SCF") {
 
@@ -41,7 +42,7 @@ TEST_CASE("SCF") {
     auto E = mm.at("SCF Energy").run_as<simde::AOEnergy>(aos, cs);
     std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
     
-    REQUIRE(E == Approx(-74.3670617803483).margin(1.0e-6));
+    REQUIRE(E == Catch::Approx(-74.3670617803483).margin(1.0e-6));
 }
 
 TEST_CASE("DFT") {
@@ -67,5 +68,5 @@ TEST_CASE("DFT") {
     auto E = mm.at("SCF Energy").run_as<simde::AOEnergy>(aos, cs);
     std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
         
-    REQUIRE(E == Approx(-74.81168986385825).margin(1.0e-6));
+    REQUIRE(E == Catch::Approx(-74.81168986385825).margin(1.0e-6));
 }
