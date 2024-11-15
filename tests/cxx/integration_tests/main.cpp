@@ -16,14 +16,14 @@
 
 #define CATCH_CONFIG_RUNNER
 #include <catch2/catch_session.hpp>
-#include <tamm/tamm.hpp>
+#include <scf/scf.hpp>
 
-int main(int argc, char* argv[]) {
-    tamm::initialize(argc, argv);
+int main(int argc, char *argv[]) {
+  auto rt = scf::initialize(argc, argv);
 
-    int res = Catch::Session().run(argc, argv);
+  int res = Catch::Session().run(argc, argv);
 
-    tamm::finalize();
+  scf::finalize();
 
-    return res;
+  return res;
 }

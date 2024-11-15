@@ -19,6 +19,8 @@
 
 namespace scf {
 
-DECLARE_MODULE(SCFEnergy);
+#ifdef BUILD_TAMM_SCF
+DECLARE_MODULE(TAMMEnergy);
+#endif
 
 } // namespace scf
