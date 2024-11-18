@@ -39,7 +39,7 @@ cmaize_option_list(
     INTEGRATION_TESTING OFF "Should we build the integration tests?"
 )
 if("${BUILD_TAMM_SCF}")
-    set(DEPENDENCIES simde gauxc tamm exachem Libint2 chemcache)
+    set(DEPENDENCIES simde gauxc tamm exachem libint2 chemcache)
 else()
     set(DEPENDENCIES simde gauxc)
 endif()
