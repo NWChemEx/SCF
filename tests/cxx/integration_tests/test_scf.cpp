@@ -23,50 +23,52 @@
 
 TEST_CASE("SCF") {
 
-    // Populate modules
-    pluginplay::ModuleManager mm;
-    chemcache::load_modules(mm);
-    scf::load_modules(mm);
+  // Populate modules
+  pluginplay::ModuleManager mm;
+  chemcache::load_modules(mm);
+  scf::load_modules(mm);
 
-    // Create ChemicalSystem
-    std::string mol_name = "water";
-    auto mol = mm.at("NWX Molecules").run_as<simde::MoleculeFromString>(mol_name);
-    simde::type::chemical_system cs(mol);
+  // Create ChemicalSystem
+  std::string mol_name = "water";
+  auto mol = mm.at("NWX Molecules").run_as<simde::MoleculeFromString>(mol_name);
+  simde::type::chemical_system cs(mol);
 
-    // Create BasisSet
-    std::string basis_name = "sto-3g"; // This is the only supported basis in ChemCache
-    auto aos = mm.at(basis_name).run_as<simde::MolecularBasisSet>(mol);
+  // Create BasisSet
+  std::string basis_name =
+      "sto-3g"; // This is the only supported basis in ChemCache
+  auto aos = mm.at(basis_name).run_as<simde::MolecularBasisSet>(mol);
 
-    // Run module
-    mm.change_input("SCF Energy", "molecule_name", mol_name);
-    auto E = mm.at("SCF Energy").run_as<simde::AOEnergy>(aos, cs);
-    std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
-    
-    REQUIRE(E == Catch::Approx(-74.3670617803483).margin(1.0e-6));
+  // Run module
+  mm.change_input("SCF Energy via TAMM", "molecule_name", mol_name);
+  auto E = mm.at("SCF Energy via TAMM").run_as<simde::AOEnergy>(aos, cs);
+  std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
+
+  REQUIRE(E == Catch::Approx(-74.3670617803483).margin(1.0e-6));
 }
 
 TEST_CASE("DFT") {
 
-    // Populate modules
-    pluginplay::ModuleManager mm;
-    chemcache::load_modules(mm);
-    scf::load_modules(mm);
+  // Populate modules
+  pluginplay::ModuleManager mm;
+  chemcache::load_modules(mm);
+  scf::load_modules(mm);
 
-    // Create ChemicalSystem
-    std::string mol_name = "water";
-    auto mol = mm.at("NWX Molecules").run_as<simde::MoleculeFromString>(mol_name);
-    simde::type::chemical_system cs(mol);
+  // Create ChemicalSystem
+  std::string mol_name = "water";
+  auto mol = mm.at("NWX Molecules").run_as<simde::MoleculeFromString>(mol_name);
+  simde::type::chemical_system cs(mol);
 
-    // Create BasisSet
-    std::string basis_name = "sto-3g"; // This is the only supported basis in ChemCache
-    auto aos = mm.at(basis_name).run_as<simde::MolecularBasisSet>(mol);
+  // Create BasisSet
+  std::string basis_name =
+      "sto-3g"; // This is the only supported basis in ChemCache
+  auto aos = mm.at(basis_name).run_as<simde::MolecularBasisSet>(mol);
 
-    // Run module
-    std::vector<std::string> xc_type = {"pbe0"};
-    mm.change_input("SCF Energy", "xc_type", xc_type);
-    mm.change_input("SCF Energy", "molecule_name", mol_name);
-    auto E = mm.at("SCF Energy").run_as<simde::AOEnergy>(aos, cs);
-    std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
-        
-    REQUIRE(E == Catch::Approx(-74.81168986385825).margin(1.0e-6));
+  // Run module
+  std::vector<std::string> xc_type = {"pbe0"};
+  mm.change_input("SCF Energy via TAMM", "xc_type", xc_type);
+  mm.change_input("SCF Energy via TAMM", "molecule_name", mol_name);
+  auto E = mm.at("SCF Energy via TAMM").run_as<simde::AOEnergy>(aos, cs);
+  std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
+
+  REQUIRE(E == Catch::Approx(-74.81168986385825).margin(1.0e-6));
 }
