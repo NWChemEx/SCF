@@ -43,7 +43,3 @@ class TestTAMMSCF(unittest.TestCase):
         mol = self.mm.run_as(pt, "NWX Molecules", "water")
         self.aos = self.mm.run_as(MolecularBasisSet(), basis_name, mol)
         self.cs = ChemicalSystem(mol)
-
-
-
-
