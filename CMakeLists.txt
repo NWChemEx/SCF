@@ -96,7 +96,7 @@ if("${BUILD_TESTING}")
             integration_test_scf
             SOURCE_DIR "${CXX_TEST_DIR}/integration_tests"
             INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/scf"
-            DEPENDS Catch2 nwchemex
+            DEPENDS Catch2 nwchemex scf
         )
 
         python_mpi_test(
