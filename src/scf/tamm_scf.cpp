@@ -323,7 +323,8 @@ MODULE_RUN(TAMMEnergy) {
 
   exachem::scf::scf(ec, chem_env);
 
-  double E0 = chem_env.hf_energy; // This is a total energy in Hartree
+  // This is a total energy in Hartree
+  double E0 = chem_env.scf_context.hf_energy;
   auto rv = results();
   return energy_pt::wrap_results(rv, E0);
 }
