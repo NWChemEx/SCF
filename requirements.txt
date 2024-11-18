@@ -1,0 +1,6 @@
+# This file is a hack to get CI/CD to work. These packages are needed by
+# FriendZone NOT this repo.
+pydantic>=1.10.13
+qcengine
+networkx
+ase
