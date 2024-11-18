@@ -39,7 +39,8 @@ cmaize_option_list(
     INTEGRATION_TESTING OFF "Should we build the integration tests?"
 )
 if("${BUILD_TAMM_SCF}")
-    set(DEPENDENCIES simde gauxc tamm exachem libint2 chemcache)
+    set(DEPENDENCIES simde gauxc tamm exachem chemcache)
+    include(get_libint2)
 else()
     set(DEPENDENCIES simde gauxc)
 endif()
@@ -60,7 +61,7 @@ if("${BUILD_TAMM_SCF}")
     cmaize_add_executable(
         scf_driver
         SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/examples/driver"
-        DEPENDS scf
+        DEPENDS scf Libint2
     )
 endif()
 
