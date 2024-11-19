@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-#include "scf_modules.hpp"
-#include <scf/scf_mm.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
 
-namespace scf {
-
-void load_modules(pluginplay::ModuleManager &mm) {
-#ifdef BUILD_TAMM_SCF
-  mm.add_module<TAMMEnergy>("SCF Energy via TAMM");
-#endif
-}
-
-} // namespace scf
+TEST_CASE("Stub Test") {}

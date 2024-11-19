@@ -15,6 +15,25 @@
  */
 
 #pragma once
-#include "scf/scf_mm.hpp"
+#include <scf/scf_mm.hpp>
 #include <simde/simde.hpp>
+#ifdef BUILD_TAMM_SCF
+#include <tamm/tamm.hpp>
+#endif
 
+namespace scf {
+
+inline auto initialize(int argc, char *argv[]) {
+#ifdef BUILD_TAMM_SCF
+  tamm::initialize(argc, argv);
+#endif
+  return parallelzone::runtime::RuntimeView(argc, argv);
+}
+
+inline auto finalize() {
+#ifdef BUILD_TAMM_SCF
+  tamm::finalize();
+#endif
+}
+
+} // namespace scf

@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-#include "scf_modules.hpp"
-#include <scf/scf_mm.hpp>
+#define CATCH_CONFIG_RUNNER
+#include <catch2/catch_session.hpp>
+#include <scf/scf.hpp>
 
-namespace scf {
+int main(int argc, char *argv[]) {
+  auto rt = scf::initialize(argc, argv);
 
-void load_modules(pluginplay::ModuleManager &mm) {
-#ifdef BUILD_TAMM_SCF
-  mm.add_module<TAMMEnergy>("SCF Energy via TAMM");
-#endif
+  int res = Catch::Session().run(argc, argv);
+
+  scf::finalize();
+
+  return res;
 }
-
-} // namespace scf
