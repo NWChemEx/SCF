@@ -4,5 +4,3 @@ Modules API
 
 .. toctree::
    :maxdepth: 1
-
-   SCF_Energy
