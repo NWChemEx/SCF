@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
+#include "fock_operator/fock_operator.hpp"
 #include "scf_modules.hpp"
 #include <scf/scf_mm.hpp>
 
 namespace scf {
 
-void load_modules(pluginplay::ModuleManager &mm) {
+void load_modules(pluginplay::ModuleManager& mm) {
+    fock_operator::load_modules(mm);
 #ifdef BUILD_TAMM_SCF
-  mm.add_module<TAMMEnergy>("SCF Energy via TAMM");
+    mm.add_module<TAMMEnergy>("SCF Energy via TAMM");
 #endif
 }
 
