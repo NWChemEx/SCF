@@ -22,6 +22,7 @@ namespace scf {
 
 void load_modules(pluginplay::ModuleManager& mm) {
     fock_operator::load_modules(mm);
+    mm.add_module<CoulombsLaw>("Coulomb's Law");
 #ifdef BUILD_TAMM_SCF
     mm.add_module<TAMMEnergy>("SCF Energy via TAMM");
 #endif
