@@ -4,3 +4,6 @@ Modules API
 
 .. toctree::
    :maxdepth: 1
+
+   AO_Restricted_Fock_Op
+   Restricted_Fock_Op
