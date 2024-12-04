@@ -23,4 +23,6 @@ namespace scf {
 DECLARE_MODULE(TAMMEnergy);
 #endif
 
+DECLARE_MODULE(CoulombsLaw);
+
 } // namespace scf
