@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Restricted Fock Op &mdash; SCF v0.0.5 documentation</title>
+  <title>Coulomb’s Law &mdash; SCF v0.0.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
@@ -16,10 +16,12 @@
       <script src="../_static/documentation_options.js?v=d39b79ef"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Coulomb’s Law" href="Coulomb%27s_Law.html" /> 
+    <link rel="next" title="Restricted Fock Op" href="Restricted_Fock_Op.html" />
+    <link rel="prev" title="AO Restricted Fock Op" href="AO_Restricted_Fock_Op.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,22 +47,22 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Modules API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AO_Restricted_Fock_Op.html">AO Restricted Fock Op</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Coulomb%27s_Law.html">Coulomb’s Law</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Restricted Fock Op</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#restricted-fock-operator-builder">Restricted Fock Operator Builder</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Coulomb’s Law</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#charge-charge-interaction-via-coulomb-s-law">Charge-Charge Interaction via Coulomb’s Law</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#please-cite">Please Cite</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#property-types">Property Types</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-inputs">Module Inputs</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#density">Density</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#hamiltonian">Hamiltonian</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#objects">Objects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#potential">Potential</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#module-results">Module Results</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="Restricted_Fock_Op.html">Restricted Fock Op</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://nwchemex.github.io/SCF/scf_cxx_api/index.html">C++ API</a></li>
@@ -81,9 +83,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Modules API</a></li>
-      <li class="breadcrumb-item active">Restricted Fock Op</li>
+      <li class="breadcrumb-item active">Coulomb’s Law</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/module_api/Restricted_Fock_Op.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/module_api/Coulomb&#39;s_Law.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -91,16 +93,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="restricted-fock-op">
-<h1>Restricted Fock Op<a class="headerlink" href="#restricted-fock-op" title="Link to this heading"></a></h1>
-<section id="restricted-fock-operator-builder">
-<h2>Restricted Fock Operator Builder<a class="headerlink" href="#restricted-fock-operator-builder" title="Link to this heading"></a></h2>
-<p>This module builds the Fock operator given a restricted density. Under this
-assumption, the Fock operator is created by mapping each term in the
-electronic Hamiltonian to itself with the exception of the electron-electron
-repulsion. The electron-electron repulsion is mapped to 2J-K where J is the
-Coulomb operator for the electrons interacting with a density and K is the
-exchange operator for the same density.</p>
+  <section id="coulomb-s-law">
+<h1>Coulomb’s Law<a class="headerlink" href="#coulomb-s-law" title="Link to this heading"></a></h1>
+<section id="charge-charge-interaction-via-coulomb-s-law">
+<h2>Charge-Charge Interaction via Coulomb’s Law<a class="headerlink" href="#charge-charge-interaction-via-coulomb-s-law" title="Link to this heading"></a></h2>
+<p>Let <span class="math notranslate nohighlight">\(Q\)</span> be a set of <span class="math notranslate nohighlight">\(N_Q\)</span> point charges such that the <span class="math notranslate nohighlight">\(i\)</span>-th
+point charge has charge <span class="math notranslate nohighlight">\(q_i\)</span> and position <span class="math notranslate nohighlight">\(\mathbf{r_i}\)</span>. The
+electrostatic potential at the point <span class="math notranslate nohighlight">\(\mathbf{r}\)</span> generated by <span class="math notranslate nohighlight">\(Q\)</span>,
+<span class="math notranslate nohighlight">\(E_Q(\mathbf{r})\)</span> is given by:</p>
+<div class="math notranslate nohighlight">
+\[E_Q(\mathbf{r}) = \sum_{i=1}^{N_Q}
+                  \frac{q_i}{\left|\mathbf{r} - \mathbf{r_i}\right|}\]</div>
+<p>Let <span class="math notranslate nohighlight">\(S\)</span> be a set of <span class="math notranslate nohighlight">\(N_S\)</span> point charges that is disjoint with
+<span class="math notranslate nohighlight">\(Q\)</span>, then the interaction of <span class="math notranslate nohighlight">\(S\)</span> with <span class="math notranslate nohighlight">\(Q\)</span>, <span class="math notranslate nohighlight">\(V_{SQ}\)</span> is
+given by:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}V_{SQ} =&amp; \sum_{i=1}^{N_S} q_i E_Q(\mathbf{r_i})\\
+       =&amp; \sum_{i=1}^{N_S}\sum_{j=1}^{N_Q}
+          \frac{q_i q_j}{\left|\mathbf{r_i} - \mathbf{r_j}\right|}\end{split}\]</div>
+<p>This module will compute <span class="math notranslate nohighlight">\(V_{SQ}\)</span>, including in the common scenario where
+<span class="math notranslate nohighlight">\(S\)</span> equals <span class="math notranslate nohighlight">\(Q\)</span> (in which case terms for which the denominator is
+zero are skipped).</p>
 <section id="please-cite">
 <h3>Please Cite<a class="headerlink" href="#please-cite" title="Link to this heading"></a></h3>
 <p>No citations</p>
@@ -109,7 +122,7 @@ exchange operator for the same density.</p>
 <h3>Property Types<a class="headerlink" href="#property-types" title="Link to this heading"></a></h3>
 <p>The following is a list of property types that this module satisfies.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">simde::FockOperator&lt;chemist::DecomposableDensity&lt;chemist::Electron&gt;&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simde::ElectrostaticEnergy&lt;chemist::Charges&lt;double&gt;,</span> <span class="pre">chemist::Charges&lt;double&gt;&gt;</span></code></p></li>
 </ul>
 </section>
 <section id="module-inputs">
@@ -135,13 +148,13 @@ module. The columns are:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Density</p></td>
+<tr class="row-even"><td><p>Objects</p></td>
 <td><p>N/A</p></td>
-<td><p>N/A</p></td>
+<td><p>The objects interacting with the potential</p></td>
 </tr>
-<tr class="row-odd"><td><p>Hamiltonian</p></td>
+<tr class="row-odd"><td><p>Potential</p></td>
 <td><p>N/A</p></td>
-<td><p>N/A</p></td>
+<td><p>The electrostatic potential (or the objects generating the potential)</p></td>
 </tr>
 </tbody>
 </table>
@@ -161,30 +174,30 @@ subsection we list:</p>
 </section>
 </section>
 </section>
-<section id="density">
-<h2>Density<a class="headerlink" href="#density" title="Link to this heading"></a></h2>
+<section id="objects">
+<h2>Objects<a class="headerlink" href="#objects" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Description : N/A</p></li>
+<li><p>Description : The objects interacting with the potential</p></li>
 <li><p>Default Value : N/A</p></li>
 <li><p>Optional? : False</p></li>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == chemist::DecomposableDensity&lt;chemist::Electron&gt;</p></li>
+<li><p>Type == chemist::Charges&lt;double&gt;</p></li>
 </ul>
 </li>
 </ul>
 </section>
-<section id="hamiltonian">
-<h2>Hamiltonian<a class="headerlink" href="#hamiltonian" title="Link to this heading"></a></h2>
+<section id="potential">
+<h2>Potential<a class="headerlink" href="#potential" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Description : N/A</p></li>
+<li><p>Description : The electrostatic potential (or the objects generating the potential)</p></li>
 <li><p>Default Value : N/A</p></li>
 <li><p>Optional? : False</p></li>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == chemist::qm_operator::Hamiltonian</p></li>
+<li><p>Type == chemist::Charges&lt;double&gt;</p></li>
 </ul>
 </li>
 </ul>
@@ -211,8 +224,8 @@ the Module class’s advanced API.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Fock operator</p></td>
-<td><p>chemist::qm_operator::Fock</p></td>
+<tr class="row-even"><td><p>Energy</p></td>
+<td><p>double</p></td>
 <td><p>N/A</p></td>
 </tr>
 </tbody>
@@ -229,7 +242,8 @@ the Module class’s advanced API.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Coulomb%27s_Law.html" class="btn btn-neutral float-left" title="Coulomb’s Law" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="AO_Restricted_Fock_Op.html" class="btn btn-neutral float-left" title="AO Restricted Fock Op" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Restricted_Fock_Op.html" class="btn btn-neutral float-right" title="Restricted Fock Op" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

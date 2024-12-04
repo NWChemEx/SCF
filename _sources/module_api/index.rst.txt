@@ -6,4 +6,5 @@ Modules API
    :maxdepth: 1
 
    AO_Restricted_Fock_Op
+   Coulomb's_Law
    Restricted_Fock_Op
