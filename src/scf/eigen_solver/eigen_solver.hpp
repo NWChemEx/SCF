@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-#include "eigen_solver/eigen_solver.hpp"
-#include "fock_operator/fock_operator.hpp"
-#include "scf_modules.hpp"
-#include <scf/scf_mm.hpp>
+#pragma once
+#include <simde/simde.hpp>
 
-namespace scf {
+namespace scf::eigen_solver {
 
-void load_modules(pluginplay::ModuleManager& mm) {
-    eigen_solver::load_modules(mm);
-    fock_operator::load_modules(mm);
-    mm.add_module<CoulombsLaw>("Coulomb's Law");
-#ifdef BUILD_TAMM_SCF
-    mm.add_module<TAMMEnergy>("SCF Energy via TAMM");
-#endif
+DECLARE_MODULE(EigenGeneralized);
+
+inline void load_modules(pluginplay::ModuleManager& mm) {
+    mm.add_module<EigenGeneralized>("Generalized eigensolve via Eigen");
 }
 
-} // namespace scf
+} // namespace scf::eigen_solver

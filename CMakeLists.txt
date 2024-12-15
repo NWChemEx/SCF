@@ -49,11 +49,19 @@ foreach(dependency_i ${DEPENDENCIES})
     include(get_${dependency_i})
 endforeach()
 
+cmaize_find_or_build_dependency(
+    eigen
+    URL https://www.gitlab.com/libeigen/eigen
+    VERSION 3.4.0
+    BUILD_TARGET eigen
+    FIND_TARGET Eigen3::Eigen
+)
+
 cmaize_add_library(
     scf
     SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/src/scf"
     INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/include/scf"
-    DEPENDS "${DEPENDENCIES}"
+    DEPENDS "${DEPENDENCIES}" eigen
 )
 
 if("${BUILD_TAMM_SCF}")
