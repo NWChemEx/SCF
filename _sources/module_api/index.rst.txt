@@ -7,4 +7,5 @@ Modules API
 
    AO_Restricted_Fock_Op
    Coulomb's_Law
+   Generalized_eigensolve_via_Eigen
    Restricted_Fock_Op
