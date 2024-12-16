@@ -16,7 +16,9 @@
 
 #include "eigen_solver/eigen_solver.hpp"
 #include "fock_operator/fock_operator.hpp"
+#include "guess/guess.hpp"
 #include "scf_modules.hpp"
+#include "update/update.hpp"
 #include <scf/scf_mm.hpp>
 
 namespace scf {
@@ -24,10 +26,14 @@ namespace scf {
 void load_modules(pluginplay::ModuleManager& mm) {
     eigen_solver::load_modules(mm);
     fock_operator::load_modules(mm);
+    guess::load_modules(mm);
+    update::load_modules(mm);
     mm.add_module<CoulombsLaw>("Coulomb's Law");
 #ifdef BUILD_TAMM_SCF
     mm.add_module<TAMMEnergy>("SCF Energy via TAMM");
 #endif
+
+    guess::set_defaults(mm);
 }
 
 } // namespace scf

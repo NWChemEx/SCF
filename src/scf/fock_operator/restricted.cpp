@@ -18,13 +18,11 @@
 
 namespace scf::fock_operator {
 
-template<typename DensityType>
+using namespace chemist::qm_operator;
+
+template<typename DensityType, typename ElectronType>
 class RestrictedVisitor : public chemist::qm_operator::OperatorVisitor {
 public:
-    using many_electrons = simde::type::many_electrons;
-    using J_type = chemist::qm_operator::Coulomb<many_electrons, DensityType>;
-    using K_type = chemist::qm_operator::Exchange<many_electrons, DensityType>;
-
     using T_e_term  = simde::type::T_e_type;
     using V_en_term = simde::type::V_en_type;
     using V_ee_term = simde::type::V_ee_type;
@@ -33,17 +31,39 @@ public:
     RestrictedVisitor(simde::type::fock& F, const DensityType& rho) :
       m_pF_(&F), m_prho_(&rho) {}
 
-    void run(const T_e_term& T_e) { m_pF_->emplace_back(1.0, T_e.clone()); }
+    void run(const T_e_term& T_e) {
+        auto t = std::make_unique<Kinetic<ElectronType>>(get_e_(T_e));
+        m_pF_->emplace_back(1.0, std::move(t));
+    }
 
-    void run(const V_en_term& V_en) { m_pF_->emplace_back(1.0, V_en.clone()); }
+    void run(const V_en_term& V_en) {
+        auto rhs     = V_en.rhs_particle().as_nuclei();
+        using v_type = Coulomb<ElectronType, simde::type::nuclei>;
+        auto v       = std::make_unique<v_type>(get_e_(V_en), rhs);
+        m_pF_->emplace_back(1.0, std::move(v));
+    }
 
     void run(const V_ee_term& V_ee) {
-        auto es = V_ee.at<0>();
-        m_pF_->emplace_back(2.0, std::make_unique<J_type>(es, *m_prho_));
-        m_pF_->emplace_back(-1.0, std::make_unique<K_type>(es, *m_prho_));
+        if(*m_prho_ == DensityType{}) return;
+        using j_type = Coulomb<ElectronType, DensityType>;
+        using k_type = Exchange<ElectronType, DensityType>;
+
+        auto j = std::make_unique<j_type>(get_e_(V_ee), *m_prho_);
+        auto k = std::make_unique<k_type>(get_e_(V_ee), *m_prho_);
+        m_pF_->emplace_back(2.0, std::move(j));
+        m_pF_->emplace_back(-1.0, std::move(k));
     }
 
 private:
+    template<typename T>
+    auto get_e_(T&& op) {
+        if constexpr(std::is_same_v<ElectronType, simde::type::electron>) {
+            return simde::type::electron{};
+        } else {
+            return op.template at<0>();
+        }
+    }
+
     simde::type::fock* m_pF_;
     const DensityType* m_prho_;
 };
@@ -58,32 +78,40 @@ electronic Hamiltonian to itself with the exception of the electron-electron
 repulsion. The electron-electron repulsion is mapped to 2J-K where J is the
 Coulomb operator for the electrons interacting with a density and K is the 
 exchange operator for the same density.
+
+N.b. Empty densities are treated as zero densities and this module will skip
+adding 2J-K if provided an empty density.
 )";
 
-template<typename DensityType>
-TEMPLATED_MODULE_CTOR(Restricted, DensityType) {
+template<typename DensityType, typename ElectronType>
+TEMPLATED_MODULE_CTOR(Restricted, DensityType, ElectronType) {
     using pt = simde::FockOperator<DensityType>;
     satisfies_property_type<pt>();
     description(desc);
 }
 
-template<typename DensityType>
-TEMPLATED_MODULE_RUN(Restricted, DensityType) {
+template<typename DensityType, typename ElectronType>
+TEMPLATED_MODULE_RUN(Restricted, DensityType, ElectronType) {
     using pt = simde::FockOperator<DensityType>;
-    using simde::type::many_electrons;
 
     const auto& [H, rho] = pt::unwrap_inputs(inputs);
     auto H_elec          = H.electronic_hamiltonian();
 
     simde::type::fock F;
-    RestrictedVisitor<DensityType> visitor(F, rho);
+    RestrictedVisitor<DensityType, ElectronType> visitor(F, rho);
     H_elec.visit(visitor);
 
     auto rv = results();
     return pt::wrap_results(rv, F);
 }
 
-template class Restricted<simde::type::e_density>;
-template class Restricted<simde::type::decomposable_e_density>;
+#define RESTRICTED(density)                                          \
+    template class Restricted<density, simde::type::many_electrons>; \
+    template class Restricted<density, simde::type::electron>
+
+RESTRICTED(simde::type::e_density);
+RESTRICTED(simde::type::decomposable_e_density);
+
+#undef RESTRICTED
 
 } // namespace scf::fock_operator
