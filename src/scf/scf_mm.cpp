@@ -17,6 +17,7 @@
 #include "eigen_solver/eigen_solver.hpp"
 #include "fock_operator/fock_operator.hpp"
 #include "guess/guess.hpp"
+#include "matrix_builder/matrix_builder.hpp"
 #include "scf_modules.hpp"
 #include "update/update.hpp"
 #include <scf/scf_mm.hpp>
@@ -27,6 +28,7 @@ void load_modules(pluginplay::ModuleManager& mm) {
     eigen_solver::load_modules(mm);
     fock_operator::load_modules(mm);
     guess::load_modules(mm);
+    matrix_builder::load_modules(mm);
     update::load_modules(mm);
     mm.add_module<CoulombsLaw>("Coulomb's Law");
 #ifdef BUILD_TAMM_SCF
