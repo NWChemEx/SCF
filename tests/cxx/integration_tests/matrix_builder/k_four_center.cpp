@@ -16,21 +16,21 @@
 
 #include "../integration_tests.hpp"
 
-using pt = simde::aos_j_e_aos;
+using pt = simde::aos_k_e_aos;
 
-TEST_CASE("JFourCenter") {
+TEST_CASE("KFourCenter") {
     auto mm   = test_scf::load_modules();
-    auto& mod = mm.at("Four center J builder");
+    auto& mod = mm.at("Four center K builder");
     auto aos  = test_scf::h2_aos();
 
-    simde::type::j_e_type j_e(simde::type::electron{}, test_scf::h2_density());
-    const auto& J = mod.run_as<pt>(chemist::braket::BraKet(aos, j_e, aos));
+    simde::type::k_e_type k_e(simde::type::electron{}, test_scf::h2_density());
+    const auto& K = mod.run_as<pt>(chemist::braket::BraKet(aos, k_e, aos));
 
     using alloc_type    = tensorwrapper::allocator::Eigen<double, 2>;
-    const auto& J_eigen = alloc_type::rebind(J.buffer());
+    const auto& K_eigen = alloc_type::rebind(K.buffer());
     using Catch::Matchers::WithinAbs;
-    REQUIRE_THAT(J_eigen.value()(0, 0), WithinAbs(0.71438149, 1E-6));
-    REQUIRE_THAT(J_eigen.value()(0, 1), WithinAbs(0.47471072, 1E-6));
-    REQUIRE_THAT(J_eigen.value()(1, 0), WithinAbs(0.47471072, 1E-6));
-    REQUIRE_THAT(J_eigen.value()(1, 1), WithinAbs(0.71438149, 1E-6));
+    REQUIRE_THAT(K_eigen.value()(0, 0), WithinAbs(0.627264, 1E-6));
+    REQUIRE_THAT(K_eigen.value()(0, 1), WithinAbs(0.561828, 1E-6));
+    REQUIRE_THAT(K_eigen.value()(1, 0), WithinAbs(0.561828, 1E-6));
+    REQUIRE_THAT(K_eigen.value()(1, 1), WithinAbs(0.627264, 1E-6));
 }

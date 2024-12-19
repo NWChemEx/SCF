@@ -6,12 +6,14 @@ namespace scf::update {
 DECLARE_MODULE(Diagonalization);
 
 inline void load_modules(pluginplay::ModuleManager& mm) {
-    mm.add_module<Diagonalization>("Diagonalization Fock update.");
+    mm.add_module<Diagonalization>("Diagonalization Fock update");
 }
 
 inline void set_defaults(pluginplay::ModuleManager& mm) {
     mm.change_submod("Diagonalization Fock update", "Diagonalizer",
                      "Generalized eigensolve via Eigen");
+    mm.change_submod("Diagonalization Fock update", "Fock matrix builder",
+                     "Fock matrix builder");
 }
 
 } // namespace scf::update

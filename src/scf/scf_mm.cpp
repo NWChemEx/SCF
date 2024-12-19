@@ -30,12 +30,15 @@ void load_modules(pluginplay::ModuleManager& mm) {
     guess::load_modules(mm);
     matrix_builder::load_modules(mm);
     update::load_modules(mm);
+
     mm.add_module<CoulombsLaw>("Coulomb's Law");
 #ifdef BUILD_TAMM_SCF
     mm.add_module<TAMMEnergy>("SCF Energy via TAMM");
 #endif
 
     guess::set_defaults(mm);
+    matrix_builder::set_defaults(mm);
+    update::set_defaults(mm);
 }
 
 } // namespace scf

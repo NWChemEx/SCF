@@ -100,7 +100,7 @@ inline auto h2_mos() {
 inline auto h2_density() {
     using density_type = simde::type::decomposable_e_density;
     typename density_type::value_type rho(
-      {{0.92501791, -0.54009707}, {-0.28540122, 1.7505162}});
+      {{0.31980835, 0.31980835}, {0.31980835, 0.31980835}});
     return density_type(rho, h2_mos());
 }
 
