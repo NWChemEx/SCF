@@ -24,15 +24,55 @@ TEST_CASE("Restricted") {
 
     using density_type = simde::type::decomposable_e_density;
     using pt           = simde::FockOperator<density_type>;
+    auto H             = test_scf::h2_hamiltonian();
+    auto h2            = test_scf::make_h2<simde::type::nuclei>();
+    auto rho           = test_scf::h2_density();
 
-    auto& mod = mm.at("Restricted Fock Op");
+    SECTION("Many-electron version") {
+        auto& mod = mm.at("Restricted Fock Op");
 
-    SECTION("H2 Molecule") {
-        auto H   = test_scf::h2_hamiltonian();
-        auto rho = test_scf::h2_density();
+        SECTION("No density") {
+            density_type rho;
+            auto F = mod.run_as<pt>(H, rho);
+            simde::type::many_electrons es(2);
 
-        auto F      = mod.run_as<pt>(H, rho);
-        auto F_corr = test_scf::h2_fock();
-        REQUIRE(F == F_corr);
+            simde::type::fock F_corr;
+            using simde::type::T_e_type;
+            using simde::type::V_en_type;
+            F_corr.emplace_back(1.0, std::make_unique<T_e_type>(es));
+            F_corr.emplace_back(1.0, std::make_unique<V_en_type>(es, h2));
+            REQUIRE(F == F_corr);
+        }
+
+        SECTION("Density") {
+            auto rho = test_scf::h2_density();
+
+            auto F      = mod.run_as<pt>(H, rho);
+            auto F_corr = test_scf::h2_fock<simde::type::many_electrons>();
+            REQUIRE(F == F_corr);
+        }
+    }
+    SECTION("One-electron version") {
+        auto& mod = mm.at("Restricted One-Electron Fock Op");
+
+        SECTION(" No density") {
+            density_type rho;
+            auto f = mod.run_as<pt>(H, rho);
+            simde::type::fock f_corr;
+            simde::type::electron e;
+            using simde::type::t_e_type;
+            using simde::type::v_en_type;
+            f_corr.emplace_back(1.0, std::make_unique<t_e_type>(e));
+            f_corr.emplace_back(1.0, std::make_unique<v_en_type>(e, h2));
+            REQUIRE(f == f_corr);
+        }
+
+        SECTION("Density") {
+            auto rho = test_scf::h2_density();
+
+            auto f      = mod.run_as<pt>(H, rho);
+            auto f_corr = test_scf::h2_fock<simde::type::electron>();
+            REQUIRE(f == f_corr);
+        }
     }
 }

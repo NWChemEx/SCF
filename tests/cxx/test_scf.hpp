@@ -100,20 +100,31 @@ inline auto h2_mos() {
 inline auto h2_density() {
     using density_type = simde::type::decomposable_e_density;
     typename density_type::value_type rho(
-      {{0.92501791, -0.54009707}, {-0.28540122, 1.7505162}});
+      {{0.31980835, 0.31980835}, {0.31980835, 0.31980835}});
     return density_type(rho, h2_mos());
 }
 
 /// The Fock matrix consistent with h2_hamiltonian and h2_density
+template<typename ElectronType>
 inline auto h2_fock() {
-    simde::type::many_electrons es(2);
+    ElectronType es;
+    if constexpr(std::is_same_v<ElectronType, simde::type::many_electrons>) {
+        es = simde::type::many_electrons(2);
+    }
+
     auto h2  = make_h2<simde::type::nuclei>();
     auto rho = h2_density();
     simde::type::fock F;
-    F.emplace_back(1.0, std::make_unique<simde::type::T_e_type>(es));
-    F.emplace_back(1.0, std::make_unique<simde::type::V_en_type>(es, h2));
-    F.emplace_back(2.0, std::make_unique<simde::type::J_e_type>(es, rho));
-    F.emplace_back(-1.0, std::make_unique<simde::type::K_e_type>(es, rho));
+    using namespace chemist::qm_operator;
+    using t_type = Kinetic<ElectronType>;
+    using v_type = Coulomb<ElectronType, chemist::Nuclei>;
+    using j_type = Coulomb<ElectronType, simde::type::decomposable_e_density>;
+    using k_type = Exchange<ElectronType, simde::type::decomposable_e_density>;
+
+    F.emplace_back(1.0, std::make_unique<t_type>(es));
+    F.emplace_back(1.0, std::make_unique<v_type>(es, h2));
+    F.emplace_back(2.0, std::make_unique<j_type>(es, rho));
+    F.emplace_back(-1.0, std::make_unique<k_type>(es, rho));
     return F;
 }
 

@@ -19,17 +19,31 @@
 
 namespace scf::fock_operator {
 
-template<typename DensityType>
+template<typename DensityType, typename ElectronType>
 DECLARE_MODULE(Restricted);
 
 inline void load_modules(pluginplay::ModuleManager& mm) {
     using simde::type::decomposable_e_density;
     using simde::type::e_density;
-    mm.add_module<Restricted<e_density>>("AO Restricted Fock Op");
-    mm.add_module<Restricted<decomposable_e_density>>("Restricted Fock Op");
+    using simde::type::electron;
+    using simde::type::many_electrons;
+    using e_many = Restricted<e_density, many_electrons>;
+    using e_e    = Restricted<e_density, electron>;
+    using d_many = Restricted<decomposable_e_density, many_electrons>;
+    using d_e    = Restricted<decomposable_e_density, electron>;
+
+    mm.add_module<e_many>("AO Restricted Fock Op");
+    mm.add_module<d_many>("Restricted Fock Op");
+    mm.add_module<e_e>("AO Restricted One-Electron Fock Op");
+    mm.add_module<d_e>("Restricted One-Electron Fock Op");
 }
 
-extern template class Restricted<simde::type::e_density>;
-extern template class Restricted<simde::type::decomposable_e_density>;
+#define EXTERN_RESTRICTED(density)                                          \
+    extern template class Restricted<density, simde::type::many_electrons>; \
+    extern template class Restricted<density, simde::type::electron>
 
+EXTERN_RESTRICTED(simde::type::e_density);
+EXTERN_RESTRICTED(simde::type::decomposable_e_density);
+
+#undef EXTERN_RESTRICTED
 } // namespace scf::fock_operator
