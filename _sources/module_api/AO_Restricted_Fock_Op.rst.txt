@@ -16,6 +16,9 @@ repulsion. The electron-electron repulsion is mapped to 2J-K where J is the
 Coulomb operator for the electrons interacting with a density and K is the 
 exchange operator for the same density.
 
+N.b. Empty densities are treated as zero densities and this module will skip
+adding 2J-K if provided an empty density.
+
 
 ***********
 Please Cite

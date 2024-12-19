@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>scf: scf::fock_operator::RestrictedVisitor&lt; DensityType &gt; Class Template Reference</title>
+<title>scf: scf::fock_operator::RestrictedVisitor&lt; DensityType, ElectronType &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -71,66 +71,57 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classscf_1_1fock__operator_1_1RestrictedVisitor-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">scf::fock_operator::RestrictedVisitor&lt; DensityType &gt; Class Template Reference</div>  </div>
+<div class="title">scf::fock_operator::RestrictedVisitor&lt; DensityType, ElectronType &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="dynheader">
-Inheritance diagram for scf::fock_operator::RestrictedVisitor&lt; DensityType &gt;:</div>
+Inheritance diagram for scf::fock_operator::RestrictedVisitor&lt; DensityType, ElectronType &gt;:</div>
 <div class="dyncontent">
-<div class="center"><img src="classscf_1_1fock__operator_1_1RestrictedVisitor__inherit__graph.png" border="0" usemap="#ascf_1_1fock__operator_1_1RestrictedVisitor_3_01DensityType_01_4_inherit__map" alt="Inheritance graph"/></div>
-<map name="ascf_1_1fock__operator_1_1RestrictedVisitor_3_01DensityType_01_4_inherit__map" id="ascf_1_1fock__operator_1_1RestrictedVisitor_3_01DensityType_01_4_inherit__map">
-<area shape="rect" title=" " alt="" coords="19,95,157,151"/>
-<area shape="rect" title=" " alt="" coords="5,5,171,47"/>
+<div class="center"><img src="classscf_1_1fock__operator_1_1RestrictedVisitor__inherit__graph.png" border="0" usemap="#ascf_1_1fock__operator_1_1RestrictedVisitor_3_01DensityType_00_01ElectronType_01_4_inherit__map" alt="Inheritance graph"/></div>
+<map name="ascf_1_1fock__operator_1_1RestrictedVisitor_3_01DensityType_00_01ElectronType_01_4_inherit__map" id="ascf_1_1fock__operator_1_1RestrictedVisitor_3_01DensityType_00_01ElectronType_01_4_inherit__map">
+<area shape="rect" title=" " alt="" coords="5,95,228,151"/>
+<area shape="rect" title=" " alt="" coords="34,5,199,47"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
-Collaboration diagram for scf::fock_operator::RestrictedVisitor&lt; DensityType &gt;:</div>
+Collaboration diagram for scf::fock_operator::RestrictedVisitor&lt; DensityType, ElectronType &gt;:</div>
 <div class="dyncontent">
-<div class="center"><img src="classscf_1_1fock__operator_1_1RestrictedVisitor__coll__graph.png" border="0" usemap="#ascf_1_1fock__operator_1_1RestrictedVisitor_3_01DensityType_01_4_coll__map" alt="Collaboration graph"/></div>
-<map name="ascf_1_1fock__operator_1_1RestrictedVisitor_3_01DensityType_01_4_coll__map" id="ascf_1_1fock__operator_1_1RestrictedVisitor_3_01DensityType_01_4_coll__map">
-<area shape="rect" title=" " alt="" coords="19,95,157,151"/>
-<area shape="rect" title=" " alt="" coords="5,5,171,47"/>
+<div class="center"><img src="classscf_1_1fock__operator_1_1RestrictedVisitor__coll__graph.png" border="0" usemap="#ascf_1_1fock__operator_1_1RestrictedVisitor_3_01DensityType_00_01ElectronType_01_4_coll__map" alt="Collaboration graph"/></div>
+<map name="ascf_1_1fock__operator_1_1RestrictedVisitor_3_01DensityType_00_01ElectronType_01_4_coll__map" id="ascf_1_1fock__operator_1_1RestrictedVisitor_3_01DensityType_00_01ElectronType_01_4_coll__map">
+<area shape="rect" title=" " alt="" coords="5,95,228,151"/>
+<area shape="rect" title=" " alt="" coords="34,5,199,47"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a0427fa1a41a855ca37a89ba0827dcaec"><td class="memItemLeft" align="right" valign="top"><a id="a0427fa1a41a855ca37a89ba0827dcaec"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>many_electrons</b> = simde::type::many_electrons</td></tr>
-<tr class="separator:a0427fa1a41a855ca37a89ba0827dcaec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a199060445f71795d803d9d78ada0af"><td class="memItemLeft" align="right" valign="top"><a id="a1a199060445f71795d803d9d78ada0af"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>J_type</b> = chemist::qm_operator::Coulomb&lt; many_electrons, DensityType &gt;</td></tr>
-<tr class="separator:a1a199060445f71795d803d9d78ada0af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5139f97a0f3b49c60c13d445460eb963"><td class="memItemLeft" align="right" valign="top"><a id="a5139f97a0f3b49c60c13d445460eb963"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>K_type</b> = chemist::qm_operator::Exchange&lt; many_electrons, DensityType &gt;</td></tr>
-<tr class="separator:a5139f97a0f3b49c60c13d445460eb963"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ed6ab85160ebbc132b38a28cef31997"><td class="memItemLeft" align="right" valign="top"><a id="a6ed6ab85160ebbc132b38a28cef31997"></a>
+<tr class="memitem:a877f26b16dcdd9d7feaf2859b76e5802"><td class="memItemLeft" align="right" valign="top"><a id="a877f26b16dcdd9d7feaf2859b76e5802"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>T_e_term</b> = simde::type::T_e_type</td></tr>
-<tr class="separator:a6ed6ab85160ebbc132b38a28cef31997"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa904b2997e66d94914bef4930c7246b3"><td class="memItemLeft" align="right" valign="top"><a id="aa904b2997e66d94914bef4930c7246b3"></a>
+<tr class="separator:a877f26b16dcdd9d7feaf2859b76e5802"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6290eaff38d840757477380985665ac4"><td class="memItemLeft" align="right" valign="top"><a id="a6290eaff38d840757477380985665ac4"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>V_en_term</b> = simde::type::V_en_type</td></tr>
-<tr class="separator:aa904b2997e66d94914bef4930c7246b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6dad1cc1f3a3802248f37176bb28d016"><td class="memItemLeft" align="right" valign="top"><a id="a6dad1cc1f3a3802248f37176bb28d016"></a>
+<tr class="separator:a6290eaff38d840757477380985665ac4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6733fc5c6125a0c248f7bf4d32035aa"><td class="memItemLeft" align="right" valign="top"><a id="ab6733fc5c6125a0c248f7bf4d32035aa"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>V_ee_term</b> = simde::type::V_ee_type</td></tr>
-<tr class="separator:a6dad1cc1f3a3802248f37176bb28d016"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9df692308f040bcae4fd90166324958"><td class="memItemLeft" align="right" valign="top"><a id="ae9df692308f040bcae4fd90166324958"></a>
+<tr class="separator:ab6733fc5c6125a0c248f7bf4d32035aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e5e7b5d5104666d8f60444c57858141"><td class="memItemLeft" align="right" valign="top"><a id="a3e5e7b5d5104666d8f60444c57858141"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>V_nn_term</b> = simde::type::V_nn_type</td></tr>
-<tr class="separator:ae9df692308f040bcae4fd90166324958"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a3e5e7b5d5104666d8f60444c57858141"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a799ab38c4f7d41a1d0323c0858bf29c5"><td class="memItemLeft" align="right" valign="top"><a id="a799ab38c4f7d41a1d0323c0858bf29c5"></a>
+<tr class="memitem:a88e1630969bd1cc5a15ca09fdf407e67"><td class="memItemLeft" align="right" valign="top"><a id="a88e1630969bd1cc5a15ca09fdf407e67"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>RestrictedVisitor</b> (simde::type::fock &amp;F, const DensityType &amp;rho)</td></tr>
-<tr class="separator:a799ab38c4f7d41a1d0323c0858bf29c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81db59f422ba4aaa0dc8d493f1c79669"><td class="memItemLeft" align="right" valign="top"><a id="a81db59f422ba4aaa0dc8d493f1c79669"></a>
+<tr class="separator:a88e1630969bd1cc5a15ca09fdf407e67"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fe5a2666236932c3869c0bb80106d0b"><td class="memItemLeft" align="right" valign="top"><a id="a9fe5a2666236932c3869c0bb80106d0b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (const T_e_term &amp;T_e)</td></tr>
-<tr class="separator:a81db59f422ba4aaa0dc8d493f1c79669"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27c397845dab7ef45376341e5f1fc610"><td class="memItemLeft" align="right" valign="top"><a id="a27c397845dab7ef45376341e5f1fc610"></a>
+<tr class="separator:a9fe5a2666236932c3869c0bb80106d0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d87f51bcd959ee1fe6f2dc52e5f8a68"><td class="memItemLeft" align="right" valign="top"><a id="a5d87f51bcd959ee1fe6f2dc52e5f8a68"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (const V_en_term &amp;V_en)</td></tr>
-<tr class="separator:a27c397845dab7ef45376341e5f1fc610"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af60e440327a613fb9df7eb48e68dcb17"><td class="memItemLeft" align="right" valign="top"><a id="af60e440327a613fb9df7eb48e68dcb17"></a>
+<tr class="separator:a5d87f51bcd959ee1fe6f2dc52e5f8a68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36a3562901be30f63cbe9c10226f8624"><td class="memItemLeft" align="right" valign="top"><a id="a36a3562901be30f63cbe9c10226f8624"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (const V_ee_term &amp;V_ee)</td></tr>
-<tr class="separator:af60e440327a613fb9df7eb48e68dcb17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a36a3562901be30f63cbe9c10226f8624"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/scf/fock_operator/restricted.cpp</li>

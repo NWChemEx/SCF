@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['restrictedvisitor_1',['RestrictedVisitor',['../classscf_1_1fock__operator_1_1RestrictedVisitor.html',1,'scf::fock_operator']]]
+  ['aodispatcher_3',['AODispatcher',['../classscf_1_1matrix__builder_1_1AODispatcher.html',1,'scf::matrix_builder']]]
 ];

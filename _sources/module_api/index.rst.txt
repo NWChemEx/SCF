@@ -5,7 +5,15 @@ Modules API
 .. toctree::
    :maxdepth: 1
 
+   AO_integral_driver
    AO_Restricted_Fock_Op
+   AO_Restricted_One-Electron_Fock_Op
+   Core_guess
    Coulomb's_Law
+   Diagonalization_Fock_update
+   Fock_matrix_builder
+   Four_center_J_builder
+   Four_center_K_builder
    Generalized_eigensolve_via_Eigen
    Restricted_Fock_Op
+   Restricted_One-Electron_Fock_Op
