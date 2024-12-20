@@ -18,6 +18,7 @@
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <scf/scf.hpp>
 #include <simde/simde.hpp>
 
 namespace test_scf {
@@ -95,6 +96,13 @@ inline auto h2_mos() {
     using tensor_type = typename mos_type::transform_type;
     tensor_type c({{-0.565516, -1.07019}, {-0.565516, 1.07019}});
     return mos_type(h2_aos(), std::move(c));
+}
+
+inline auto h2_cmos() {
+    using cmos_type   = simde::type::cmos;
+    using tensor_type = typename cmos_type::transform_type;
+    tensor_type e({-1.25330893, -0.47506974});
+    return cmos_type(e, h2_aos(), h2_mos().transform());
 }
 
 inline auto h2_density() {

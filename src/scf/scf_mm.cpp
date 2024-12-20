@@ -32,6 +32,7 @@ void load_modules(pluginplay::ModuleManager& mm) {
     update::load_modules(mm);
 
     mm.add_module<CoulombsLaw>("Coulomb's Law");
+    // mm.add_module<SCFDriver>("Driver");
 #ifdef BUILD_TAMM_SCF
     mm.add_module<TAMMEnergy>("SCF Energy via TAMM");
 #endif
@@ -39,6 +40,8 @@ void load_modules(pluginplay::ModuleManager& mm) {
     guess::set_defaults(mm);
     matrix_builder::set_defaults(mm);
     update::set_defaults(mm);
+    // mm.change_submod("Driver", "Guess", "Core");
+    // mm.change_submod("Driver", "Optimizer", "");
 }
 
 } // namespace scf

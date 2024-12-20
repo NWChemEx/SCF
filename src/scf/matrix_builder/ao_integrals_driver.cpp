@@ -31,20 +31,22 @@ using pluginplay::type::submodule_map;
 using simde::type::aos;
 using simde::type::tensor;
 
-using pt      = simde::aos_op_base_aos;
-using t_e_pt  = simde::aos_t_e_aos;
-using v_en_pt = simde::aos_v_en_aos;
-using j_e_pt  = simde::aos_j_e_aos;
-using k_e_pt  = simde::aos_k_e_aos;
-using f_e_pt  = simde::aos_f_e_aos;
+using pt       = simde::aos_op_base_aos;
+using t_e_pt   = simde::aos_t_e_aos;
+using v_en_pt  = simde::aos_v_en_aos;
+using j_e_pt   = simde::aos_j_e_aos;
+using k_e_pt   = simde::aos_k_e_aos;
+using f_e_pt   = simde::aos_f_e_aos;
+using rho_e_pt = simde::aos_rho_e_aos<simde::type::cmos>;
 
 class AODispatcher : public chemist::qm_operator::OperatorVisitor {
 public:
-    using t_e_type  = simde::type::t_e_type;
-    using v_en_type = simde::type::v_en_type;
-    using j_e_type  = simde::type::j_e_type;
-    using k_e_type  = simde::type::k_e_type;
-    using f_e_type  = simde::type::fock;
+    using t_e_type   = simde::type::t_e_type;
+    using v_en_type  = simde::type::v_en_type;
+    using j_e_type   = simde::type::j_e_type;
+    using k_e_type   = simde::type::k_e_type;
+    using f_e_type   = simde::type::fock;
+    using rho_e_type = simde::type::rho_e<simde::type::cmos>;
 
     using submods_type = pluginplay::type::submodule_map;
 
@@ -81,6 +83,12 @@ public:
     //     *m_ptensor_    = m_psubmods_->at(key).run_as<f_e_pt>(input);
     // }
 
+    void run(const rho_e_type& rho_e) {
+        chemist::braket::BraKet input(*m_pbra_, rho_e, *m_pket_);
+        const auto key = "Density matrix";
+        *m_ptensor_    = m_psubmods_->at(key).run_as<rho_e_pt>(input);
+    }
+
 private:
     const aos* m_pbra_;
     const aos* m_pket_;
@@ -96,6 +104,7 @@ MODULE_CTOR(AOIntegralsDriver) {
     add_submodule<j_e_pt>("Coulomb matrix");
     add_submodule<k_e_pt>("Exchange matrix");
     // add_submodule<f_e_pt>("Fock matrix");
+    add_submodule<rho_e_pt>("Density matrix");
 }
 
 MODULE_RUN(AOIntegralsDriver) {

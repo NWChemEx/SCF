@@ -91,6 +91,20 @@ TEST_CASE("AOIntegralsDriver") {
         compare_matrices(K, K_corr);
     }
 
+    SECTION("Calling density matrix") {
+        auto& pmod = mm.at("Density matrix builder");
+        auto aos   = test_scf::h2_aos();
+        auto cmos  = test_scf::h2_cmos();
+        std::vector<int> occs{1, 0};
+        simde::type::rho_e<simde::type::cmos> rho_hat(cmos, occs);
+        chemist::braket::BraKet braket(aos, rho_hat, aos);
+        erased_type copy_braket(braket);
+        const auto& P      = mod.run_as<pt>(copy_braket);
+        using op_pt        = simde::aos_rho_e_aos<simde::type::cmos>;
+        const auto& P_corr = pmod.run_as<op_pt>(braket);
+        compare_matrices(P, P_corr);
+    }
+
     // Re-enable when PluginPlay doesn't choke on loops in modules
     // SECTION("Calling Fock Matrix") {
     //     auto& fmod = mm.at("Fock matrix builder");
