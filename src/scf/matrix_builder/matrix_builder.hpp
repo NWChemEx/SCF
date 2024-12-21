@@ -22,6 +22,7 @@ namespace scf::matrix_builder {
 DECLARE_MODULE(AOIntegralsDriver);
 DECLARE_MODULE(DensityMatrix);
 DECLARE_MODULE(DeterminantDriver);
+DECLARE_MODULE(ElectronicEnergy);
 DECLARE_MODULE(Fock);
 DECLARE_MODULE(JFourCenter);
 DECLARE_MODULE(KFourCenter);
@@ -30,6 +31,7 @@ inline void load_modules(pluginplay::ModuleManager& mm) {
     mm.add_module<AOIntegralsDriver>("AO integral driver");
     mm.add_module<DensityMatrix>("Density matrix builder");
     mm.add_module<DeterminantDriver>("Determinant driver");
+    mm.add_module<ElectronicEnergy>("Electronic energy");
     mm.add_module<Fock>("Fock matrix builder");
     mm.add_module<JFourCenter>("Four center J builder");
     mm.add_module<KFourCenter>("Four center K builder");
@@ -48,6 +50,8 @@ inline void set_defaults(pluginplay::ModuleManager& mm) {
     const auto det_driver = "Determinant driver";
     mm.change_submod(det_driver, "Two center evaluator", ao_driver);
     mm.change_submod(det_driver, "Fock matrix", "Fock matrix builder");
+
+    mm.change_submod("Electronic energy", "determinant driver", det_driver);
 }
 
 } // namespace scf::matrix_builder

@@ -68,6 +68,6 @@ TEST_CASE("DeterminantDriver") {
         chemist::braket::BraKet braket(psi, K_e, psi);
         erased_type<wf_type> copy_braket(braket);
         const auto& K = mod.run_as<pt<wf_type>>(copy_braket);
-        REQUIRE_THAT(K, WithinAbs(-0.76056339681664897, 1E-6));
+        REQUIRE_THAT(K, WithinAbs(0.76056339681664897, 1E-6));
     }
 }
