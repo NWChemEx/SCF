@@ -40,7 +40,8 @@ MODULE_RUN(ElectronicEnergy) {
         const auto& O_i = H.get_operator(i);
 
         chemist::braket::BraKet O_ij(bra, O_i, ket);
-        e += ci * mod.run_as<det_pt<wf_type>>(O_ij);
+        const auto o = mod.run_as<det_pt<wf_type>>(O_ij);
+        e += ci * o;
     }
 
     auto rv = results();

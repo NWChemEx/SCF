@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include "driver/driver.hpp"
 #include "eigen_solver/eigen_solver.hpp"
 #include "fock_operator/fock_operator.hpp"
 #include "guess/guess.hpp"
@@ -25,6 +26,7 @@
 namespace scf {
 
 void load_modules(pluginplay::ModuleManager& mm) {
+    driver::load_modules(mm);
     eigen_solver::load_modules(mm);
     fock_operator::load_modules(mm);
     guess::load_modules(mm);
@@ -32,16 +34,16 @@ void load_modules(pluginplay::ModuleManager& mm) {
     update::load_modules(mm);
 
     mm.add_module<CoulombsLaw>("Coulomb's Law");
+
     // mm.add_module<SCFDriver>("Driver");
 #ifdef BUILD_TAMM_SCF
     mm.add_module<TAMMEnergy>("SCF Energy via TAMM");
 #endif
 
+    driver::set_defaults(mm);
     guess::set_defaults(mm);
     matrix_builder::set_defaults(mm);
     update::set_defaults(mm);
-    // mm.change_submod("Driver", "Guess", "Core");
-    // mm.change_submod("Driver", "Optimizer", "");
 }
 
 } // namespace scf

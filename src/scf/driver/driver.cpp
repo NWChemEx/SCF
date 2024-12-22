@@ -47,11 +47,13 @@
 //     auto& guess_mod  = submods.at("Guess");
 //     const auto& Psi0 = guess_mod.run_as<guess_pt<wf_type>>(H, aos);
 
-//     braket_t<wf_type> H_00(Psi0, H, Psi0);
+//     auto H_e = H.electronic_hamiltonian();
+//     braket_t<wf_type> H_00(Psi0, H_e, Psi0);
 
 //     auto& opt_mod         = submods.at("Optimizer");
 //     const auto&& [e, Psi] = opt_mod.run_as<opt_pt<wf_type>>(H_00, Psi0);
 
+//     TODO: n-n term
 //     auto rv = results();
 //     return pt::wrap_results(rv, e);
 // }
