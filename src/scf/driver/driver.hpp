@@ -3,10 +3,11 @@
 
 namespace scf::driver {
 
-// DECLARE_MODULE(SCFDriver);
+DECLARE_MODULE(SCFDriver);
 DECLARE_MODULE(SCFLoop);
 
 inline void load_modules(pluginplay::ModuleManager& mm) {
+    mm.add_module<SCFDriver>("SCF Driver");
     mm.add_module<SCFLoop>("Loop");
 }
 
@@ -19,8 +20,8 @@ inline void set_defaults(pluginplay::ModuleManager& mm) {
     mm.change_submod("Loop", "Fock operator", "Restricted Fock Op");
     mm.change_submod("Loop", "Charge-charge", "Coulomb's Law");
 
-    // mm.change_submod("Driver", "Guess", "Core");
-    // mm.change_submod("Driver", "Optimizer", "Loop");
+    mm.change_submod("SCF Driver", "Guess", "Core guess");
+    mm.change_submod("SCF Driver", "Optimizer", "Loop");
 }
 
 } // namespace scf::driver

@@ -131,9 +131,7 @@ MODULE_RUN(SCFLoop) {
         auto e_new = egy_mod.run_as<elec_egy_pt<wf_type>>(H_00);
 
         // Step 6: Converged?
-        std::cout << "E_new: " << e_new + e_nuclear << std::endl;
-        std::cout << "E_old: " << e_old + e_nuclear << std::endl;
-        std::cout << e_new - e_old << std::endl;
+        // TODO: gradient and energy differences
 
         // Step 7: Not converged so reset
         e_old   = e_new;

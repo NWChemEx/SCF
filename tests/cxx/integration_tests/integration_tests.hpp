@@ -17,6 +17,7 @@
 #pragma once
 #include "../test_scf.hpp"
 #include <integrals/integrals.hpp>
+#include <nux/nux.hpp>
 #include <scf/scf.hpp>
 #include <simde/simde.hpp>
 
@@ -27,6 +28,10 @@ inline auto load_modules() {
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
     integrals::load_modules(mm);
+    nux::load_modules(mm);
+
+    mm.change_submod("SCF Driver", "Hamiltonian",
+                     "Born-Oppenheimer approximation");
 
     mm.change_submod("Four center J builder", "Four-center ERI", "ERI4");
     mm.change_submod("Four center K builder", "Four-center ERI", "ERI4");

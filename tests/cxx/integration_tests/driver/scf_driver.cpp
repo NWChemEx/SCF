@@ -18,23 +18,13 @@
 
 using Catch::Matchers::WithinAbs;
 
-template<typename WFType>
-using egy_pt = simde::eval_braket<WFType, simde::type::hamiltonian, WFType>;
+using pt = simde::AOEnergy;
 
-template<typename WFType>
-using pt = simde::Optimize<egy_pt<WFType>, WFType>;
+TEST_CASE("SCFDriver") {
+    auto mm  = test_scf::load_modules();
+    auto h2  = test_scf::make_h2<simde::type::chemical_system>();
+    auto aos = test_scf::h2_aos().ao_basis_set();
 
-TEST_CASE("SCFLoop") {
-    using wf_type = simde::type::rscf_wf;
-    auto mm       = test_scf::load_modules();
-    auto& mod     = mm.at("Loop");
-
-    using index_set = typename wf_type::orbital_index_set_type;
-    wf_type psi0(index_set{0}, test_scf::h2_cmos());
-
-    auto H = test_scf::h2_hamiltonian();
-
-    chemist::braket::BraKet H_00(psi0, H, psi0);
-    const auto& [e, psi] = mod.run_as<pt<wf_type>>(H_00, psi0);
+    const auto e = mm.run_as<pt>("SCF Driver", aos, h2);
     REQUIRE_THAT(e, WithinAbs(-1.1167592336, 1E-6));
 }

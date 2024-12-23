@@ -40,12 +40,15 @@ TEST_CASE("Diagaonalization") {
         simde::type::tensor empty;
         simde::type::cmos cmos(empty, aos, empty);
         simde::type::rscf_wf core_guess(occs, cmos);
+
         const auto& psi = mod.run_as<pt>(f_e, core_guess);
         REQUIRE(psi.orbital_indices() == occs);
         REQUIRE(psi.orbitals().from_space() == aos);
+
+        // Check orbital energies
         const auto& evals       = psi.orbitals().diagonalized_matrix();
-        using allocator_type    = tensorwrapper::allocator::Eigen<double, 1>;
-        const auto& eval_buffer = allocator_type::rebind(evals.buffer());
+        using vector_allocator  = tensorwrapper::allocator::Eigen<double, 1>;
+        const auto& eval_buffer = vector_allocator::rebind(evals.buffer());
 
         const auto tol = 1E-6;
         using Catch::Matchers::WithinAbs;

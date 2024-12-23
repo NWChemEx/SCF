@@ -53,7 +53,7 @@ MODULE_RUN(EigenGeneralized) {
     Eigen::Map<const Eigen::MatrixXd> B_map(pB, rows, cols);
 
     // Compute
-    Eigen::GeneralizedEigenSolver<Eigen::MatrixXd> ges(A_map, B_map);
+    Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXd> ges(A_map, B_map);
     auto eigen_values  = ges.eigenvalues();
     auto eigen_vectors = ges.eigenvectors();
 
@@ -69,9 +69,9 @@ MODULE_RUN(EigenGeneralized) {
     typename vector_buffer::data_type vector_tensor(rows);
     typename matrix_buffer::data_type matrix_tensor(rows, cols);
     for(auto i = 0; i < rows; ++i) {
-        vector_tensor(i) = eigen_values(i).real();
+        vector_tensor(i) = eigen_values(i);
         for(auto j = 0; j < cols; ++j) {
-            matrix_tensor(i, j) = eigen_vectors(i, j).real();
+            matrix_tensor(i, j) = eigen_vectors(i, j);
         }
     }
 
