@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-#pragma once
-#include <pluginplay/pluginplay.hpp>
+#include "../integration_tests.hpp"
 
-namespace scf {
+using Catch::Matchers::WithinAbs;
 
-#ifdef BUILD_TAMM_SCF
-DECLARE_MODULE(TAMMEnergy);
-#endif
+using pt = simde::AOEnergy;
 
-// DECLARE_MODULE(SCFDriver);
-// DECLARE_MODULE(SCFLoop);
-DECLARE_MODULE(CoulombsLaw);
+TEST_CASE("SCFDriver") {
+    auto mm  = test_scf::load_modules();
+    auto h2  = test_scf::make_h2<simde::type::chemical_system>();
+    auto aos = test_scf::h2_aos().ao_basis_set();
 
-} // namespace scf
+    const auto e = mm.run_as<pt>("SCF Driver", aos, h2);
+    REQUIRE_THAT(e, WithinAbs(-1.1167592336, 1E-6));
+}
