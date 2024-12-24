@@ -59,7 +59,7 @@ MODULE_RUN(DensityMatrix) {
     for(size_type i = 0; i < participants.size(); ++i)
         if(participants[i] != i)
             throw std::runtime_error(
-              "Pleas shuffle your orbitals so that the ensemble is a "
+              "Please shuffle your orbitals so that the ensemble is a "
               "contiguous slice of the orbitals.");
 
     // Step 2: Grab the orbitals in the ensemble
