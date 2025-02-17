@@ -43,10 +43,10 @@ using erased_type =
   chemist::braket::BraKet<simde::type::aos, simde::type::op_base_type,
                           simde::type::aos>;
 
-TEST_CASE("AOIntegralsDriver") {
+TEST_CASE("SCFIntegralsDriver") {
     auto mm  = test_scf::load_modules();
     auto aos = test_scf::h2_aos();
-    auto mod = mm.at("AO integral driver");
+    auto mod = mm.at("SCF integral driver");
     simde::type::electron e;
     auto rho = test_scf::h2_density();
 
@@ -105,7 +105,6 @@ TEST_CASE("AOIntegralsDriver") {
         compare_matrices(P, P_corr);
     }
 
-    // Re-enable when PluginPlay doesn't choke on loops in modules
     // SECTION("Calling Fock Matrix") {
     //     auto& fmod = mm.at("Fock matrix builder");
     //     auto f_e   = test_scf::h2_fock<simde::type::electron>();
