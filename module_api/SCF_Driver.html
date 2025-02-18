@@ -6,21 +6,21 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AO integral driver &mdash; SCF v0.0.7 documentation</title>
+  <title>SCF Driver &mdash; SCF v0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=401b779c"></script>
+      <script src="../_static/documentation_options.js?v=a801d45e"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="AO Restricted Fock Op" href="AO_Restricted_Fock_Op.html" />
-    <link rel="prev" title="Modules API" href="index.html" /> 
+    <link rel="next" title="SCF integral driver" href="SCF_integral_driver.html" />
+    <link rel="prev" title="Restricted One-Electron Fock Op" href="Restricted_One-Electron_Fock_Op.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,31 +45,32 @@
               <p class="caption" role="heading"><span class="caption-text">APIs:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Modules API</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">AO integral driver</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#ao-integrals-driver">AO Integrals Driver</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#please-cite">Please Cite</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#property-types">Property Types</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-inputs">Module Inputs</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#braket">BraKet</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#module-results">Module Results</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="AO_Restricted_Fock_Op.html">AO Restricted Fock Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AO_Restricted_One-Electron_Fock_Op.html">AO Restricted One-Electron Fock Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Core_guess.html">Core guess</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Coulomb%27s_Law.html">Coulomb’s Law</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Density_matrix_builder.html">Density matrix builder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Determinant_driver.html">Determinant driver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Diagonalization_Fock_update.html">Diagonalization Fock update</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Electronic_energy.html">Electronic energy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Fock_matrix_builder.html">Fock matrix builder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Four_center_J_builder.html">Four center J builder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Four_center_K_builder.html">Four center K builder</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Generalized_eigensolve_via_Eigen.html">Generalized eigensolve via Eigen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Loop.html">Loop</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Restricted_Fock_Op.html">Restricted Fock Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Restricted_One-Electron_Fock_Op.html">Restricted One-Electron Fock Op</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SCF Driver</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#please-cite">Please Cite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#property-types">Property Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-inputs">Module Inputs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#quick-reference">Quick Reference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#detailed-descriptions">Detailed Descriptions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-results">Module Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="SCF_integral_driver.html">SCF integral driver</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://nwchemex.github.io/SCF/scf_cxx_api/index.html">C++ API</a></li>
@@ -90,9 +91,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Modules API</a></li>
-      <li class="breadcrumb-item active">AO integral driver</li>
+      <li class="breadcrumb-item active">SCF Driver</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/module_api/AO_integral_driver.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/module_api/SCF_Driver.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -100,29 +101,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="ao-integral-driver">
-<h1>AO integral driver<a class="headerlink" href="#ao-integral-driver" title="Link to this heading"></a></h1>
-<section id="ao-integrals-driver">
-<h2>AO Integrals Driver<a class="headerlink" href="#ao-integrals-driver" title="Link to this heading"></a></h2>
+  <section id="scf-driver">
+<h1>SCF Driver<a class="headerlink" href="#scf-driver" title="Link to this heading"></a></h1>
 <section id="please-cite">
-<h3>Please Cite<a class="headerlink" href="#please-cite" title="Link to this heading"></a></h3>
+<h2>Please Cite<a class="headerlink" href="#please-cite" title="Link to this heading"></a></h2>
 <p>No citations</p>
 </section>
 <section id="property-types">
-<h3>Property Types<a class="headerlink" href="#property-types" title="Link to this heading"></a></h3>
+<h2>Property Types<a class="headerlink" href="#property-types" title="Link to this heading"></a></h2>
 <p>The following is a list of property types that this module satisfies.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::AOs,</span> <span class="pre">chemist::qm_operator::OperatorBase,</span> <span class="pre">chemist::wavefunction::AOs&gt;&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simde::AOEnergy</span></code></p></li>
 </ul>
 </section>
 <section id="module-inputs">
-<h3>Module Inputs<a class="headerlink" href="#module-inputs" title="Link to this heading"></a></h3>
+<h2>Module Inputs<a class="headerlink" href="#module-inputs" title="Link to this heading"></a></h2>
 <p>This section details the full list of inputs that the module accepts. Inputs
 that are not listed as optional must have their value set before the module can
 be run. Inputs can be set manually by calling the module’s <code class="docutils literal notranslate"><span class="pre">change_input</span></code>
 function or by passing arguments to a property type.</p>
 <section id="quick-reference">
-<h4>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading"></a></h4>
+<h3>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading"></a></h3>
 <p>The following table provides a quick summary of the inputs available to this
 module. The columns are:</p>
 <ul class="simple">
@@ -138,7 +137,11 @@ module. The columns are:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>BraKet</p></td>
+<tr class="row-even"><td><p>AOs</p></td>
+<td><p>N/A</p></td>
+<td><p>The atomic orbital basis set</p></td>
+</tr>
+<tr class="row-odd"><td><p>Chemical System</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
@@ -146,7 +149,7 @@ module. The columns are:</p>
 </table>
 </section>
 <section id="detailed-descriptions">
-<h4>Detailed Descriptions<a class="headerlink" href="#detailed-descriptions" title="Link to this heading"></a></h4>
+<h3>Detailed Descriptions<a class="headerlink" href="#detailed-descriptions" title="Link to this heading"></a></h3>
 <p>The following subsections provide detailed descriptions of each input recognized
 by this module. The subsection headings are the name of the input. Within each
 subsection we list:</p>
@@ -157,11 +160,22 @@ subsection we list:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">Opaque?</span></code> : Does the value of the input influence memoization?.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Domain</span> <span class="pre">Restrictions</span></code> : Criteria a value must obey to be deemed valid.</p></li>
 </ul>
+<section id="aos">
+<h4>AOs<a class="headerlink" href="#aos" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Description : The atomic orbital basis set</p></li>
+<li><p>Default Value : N/A</p></li>
+<li><p>Optional? : False</p></li>
+<li><p>Opaque? : True</p></li>
+<li><p>Domain Restrictions :</p>
+<ul>
+<li><p>Type == chemist::basis_set::AOBasisSet&lt;chemist::basis_set::AtomicBasisSet&lt;chemist::basis_set::Shell&lt;chemist::basis_set::ContractedGaussian&lt;chemist::basis_set::Primitive&lt;double&gt;&gt;&gt;&gt;&gt;</p></li>
+</ul>
+</li>
+</ul>
 </section>
-</section>
-</section>
-<section id="braket">
-<h2>BraKet<a class="headerlink" href="#braket" title="Link to this heading"></a></h2>
+<section id="chemical-system">
+<h4>Chemical System<a class="headerlink" href="#chemical-system" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p>Description : N/A</p></li>
 <li><p>Default Value : N/A</p></li>
@@ -169,12 +183,15 @@ subsection we list:</p>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == chemist::braket::BraKet&lt;chemist::wavefunction::AOs, chemist::qm_operator::OperatorBase, chemist::wavefunction::AOs&gt;</p></li>
+<li><p>Type == chemist::ChemicalSystem</p></li>
 </ul>
 </li>
 </ul>
+</section>
+</section>
+</section>
 <section id="module-results">
-<h3>Module Results<a class="headerlink" href="#module-results" title="Link to this heading"></a></h3>
+<h2>Module Results<a class="headerlink" href="#module-results" title="Link to this heading"></a></h2>
 <p>This section tabulates the full list of results that the module returns. The
 columns respectively are:</p>
 <ul class="simple">
@@ -196,15 +213,15 @@ the Module class’s advanced API.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>tensor representation</p></td>
-<td><p>tensorwrapper::Tensor</p></td>
+<tr class="row-even"><td><p>Energy</p></td>
+<td><p>double</p></td>
 <td><p>N/A</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="submodules">
-<h3>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h3>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 <p>This section details the full list of submodules that the module uses. For each
 submodule we have listed:</p>
 <ul class="simple">
@@ -220,25 +237,20 @@ submodule we have listed:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Coulomb matrix</p></td>
-<td><p>simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::AOs, chemist::qm_operator::Coulomb&lt;chemist::Electron, chemist::DecomposableDensity&lt;chemist::Electron&gt;&gt;, chemist::wavefunction::AOs&gt;&gt;</p></td>
+<tr class="row-even"><td><p>Guess</p></td>
+<td><p>simde::InitialGuess&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-odd"><td><p>Electron-Nuclear attraction</p></td>
-<td><p>simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::AOs, chemist::qm_operator::Coulomb&lt;chemist::Electron, chemist::Nuclei&gt;, chemist::wavefunction::AOs&gt;&gt;</p></td>
+<tr class="row-odd"><td><p>Hamiltonian</p></td>
+<td><p>simde::Convert&lt;chemist::qm_operator::Hamiltonian, chemist::ChemicalSystem&gt;</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-even"><td><p>Exchange matrix</p></td>
-<td><p>simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::AOs, chemist::qm_operator::Exchange&lt;chemist::Electron, chemist::DecomposableDensity&lt;chemist::Electron&gt;&gt;, chemist::wavefunction::AOs&gt;&gt;</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>Kinetic</p></td>
-<td><p>simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::AOs, chemist::qm_operator::Kinetic&lt;chemist::Electron&gt;, chemist::wavefunction::AOs&gt;&gt;</p></td>
+<tr class="row-even"><td><p>Optimizer</p></td>
+<td><p>simde::Optimize&lt;simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;, chemist::qm_operator::Hamiltonian, chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;&gt;, chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;</p></td>
 <td><p>N/A</p></td>
 </tr>
 </tbody>
 </table>
-</section>
 </section>
 </section>
 
@@ -246,8 +258,8 @@ submodule we have listed:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Modules API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="AO_Restricted_Fock_Op.html" class="btn btn-neutral float-right" title="AO Restricted Fock Op" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Restricted_One-Electron_Fock_Op.html" class="btn btn-neutral float-left" title="Restricted One-Electron Fock Op" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SCF_integral_driver.html" class="btn btn-neutral float-right" title="SCF integral driver" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

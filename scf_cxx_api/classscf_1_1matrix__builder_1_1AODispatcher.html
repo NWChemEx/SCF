@@ -95,21 +95,12 @@ Collaboration diagram for scf::matrix_builder::AODispatcher:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:ac57c158611ed4dfd4831496adbd2cca6"><td class="memItemLeft" align="right" valign="top"><a id="ac57c158611ed4dfd4831496adbd2cca6"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>t_e_type</b> = simde::type::t_e_type</td></tr>
-<tr class="separator:ac57c158611ed4dfd4831496adbd2cca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad9ef77bdf1a25c713b0fba1874dd6270"><td class="memItemLeft" align="right" valign="top"><a id="ad9ef77bdf1a25c713b0fba1874dd6270"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>v_en_type</b> = simde::type::v_en_type</td></tr>
-<tr class="separator:ad9ef77bdf1a25c713b0fba1874dd6270"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04ff57037aaaf5f6ccc209f2b7ad55e2"><td class="memItemLeft" align="right" valign="top"><a id="a04ff57037aaaf5f6ccc209f2b7ad55e2"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>j_e_type</b> = simde::type::j_e_type</td></tr>
-<tr class="separator:a04ff57037aaaf5f6ccc209f2b7ad55e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7329a170f0ced5229970119cc9e89ad1"><td class="memItemLeft" align="right" valign="top"><a id="a7329a170f0ced5229970119cc9e89ad1"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>k_e_type</b> = simde::type::k_e_type</td></tr>
-<tr class="separator:a7329a170f0ced5229970119cc9e89ad1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33a86dc4fc0f1a6f8821c31f790ce601"><td class="memItemLeft" align="right" valign="top"><a id="a33a86dc4fc0f1a6f8821c31f790ce601"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>f_e_type</b> = simde::type::fock</td></tr>
 <tr class="separator:a33a86dc4fc0f1a6f8821c31f790ce601"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fb22b449988ac4299c4584ec72d6663"><td class="memItemLeft" align="right" valign="top"><a id="a1fb22b449988ac4299c4584ec72d6663"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>rho_e_type</b> = simde::type::rho_e&lt; simde::type::cmos &gt;</td></tr>
+<tr class="separator:a1fb22b449988ac4299c4584ec72d6663"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab26e130a6e2f31716aa8fa468313747d"><td class="memItemLeft" align="right" valign="top"><a id="ab26e130a6e2f31716aa8fa468313747d"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>submods_type</b> = pluginplay::type::submodule_map</td></tr>
 <tr class="separator:ab26e130a6e2f31716aa8fa468313747d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -119,21 +110,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6af5ab94872884f20cfcd1faccc5156e"><td class="memItemLeft" align="right" valign="top"><a id="a6af5ab94872884f20cfcd1faccc5156e"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>AODispatcher</b> (const aos &amp;bra, const aos &amp;ket, submodule_map &amp;submods, tensor &amp;t)</td></tr>
 <tr class="separator:a6af5ab94872884f20cfcd1faccc5156e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae60f857f3e8e0aaf7847a2f5cf7095ff"><td class="memItemLeft" align="right" valign="top"><a id="ae60f857f3e8e0aaf7847a2f5cf7095ff"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (const t_e_type &amp;t_e)</td></tr>
-<tr class="separator:ae60f857f3e8e0aaf7847a2f5cf7095ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7084f3fd1c49afec927ab8695c313353"><td class="memItemLeft" align="right" valign="top"><a id="a7084f3fd1c49afec927ab8695c313353"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (const v_en_type &amp;v_en)</td></tr>
-<tr class="separator:a7084f3fd1c49afec927ab8695c313353"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af21a9dc4c3487e50252acec8b765154f"><td class="memItemLeft" align="right" valign="top"><a id="af21a9dc4c3487e50252acec8b765154f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (const j_e_type &amp;j_e)</td></tr>
-<tr class="separator:af21a9dc4c3487e50252acec8b765154f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15c9ca6ed8764ef52279b0c8a6a61f82"><td class="memItemLeft" align="right" valign="top"><a id="a15c9ca6ed8764ef52279b0c8a6a61f82"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (const k_e_type &amp;k_e)</td></tr>
-<tr class="separator:a15c9ca6ed8764ef52279b0c8a6a61f82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d16fb4f81a121681dc7a70fdf1ea3c3"><td class="memItemLeft" align="right" valign="top"><a id="a4d16fb4f81a121681dc7a70fdf1ea3c3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> (const rho_e_type &amp;rho_e)</td></tr>
+<tr class="separator:a4d16fb4f81a121681dc7a70fdf1ea3c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91ada153b649ba7d57d7c09107d417a0"><td class="memItemLeft" align="right" valign="top"><a id="a91ada153b649ba7d57d7c09107d417a0"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>evaluated</b> () const noexcept</td></tr>
+<tr class="separator:a91ada153b649ba7d57d7c09107d417a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>src/scf/matrix_builder/ao_integrals_driver.cpp</li>
+<li>src/scf/matrix_builder/scf_integrals_driver.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

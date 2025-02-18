@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>scf: src/scf/scf_modules.hpp Source File</title>
+<title>scf: src/scf/driver/driver.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,12 +62,12 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_a419911e885a1f0d28fc2be30ad7aaa6.html">scf</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_a419911e885a1f0d28fc2be30ad7aaa6.html">scf</a></li><li class="navelem"><a class="el" href="dir_cc2871e379709be1f81c86ee10ccebd9.html">driver</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">scf_modules.hpp</div>  </div>
+<div class="title">driver.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
@@ -87,19 +87,32 @@ $(function() {
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment"> */</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#pragma once</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;pluginplay/pluginplay.hpp&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;simde/simde.hpp&gt;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">namespace </span>scf {</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">namespace </span>scf::driver {</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#ifdef BUILD_TAMM_SCF</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;DECLARE_MODULE(TAMMEnergy);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment">// DECLARE_MODULE(SCFDriver);</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment">// DECLARE_MODULE(SCFLoop);</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;DECLARE_MODULE(CoulombsLaw);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;DECLARE_MODULE(SCFDriver);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;DECLARE_MODULE(SCFLoop);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> load_modules(pluginplay::ModuleManager&amp; mm) {</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    mm.add_module&lt;SCFDriver&gt;(<span class="stringliteral">&quot;SCF Driver&quot;</span>);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    mm.add_module&lt;SCFLoop&gt;(<span class="stringliteral">&quot;Loop&quot;</span>);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;}</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;} <span class="comment">// namespace scf</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> set_defaults(pluginplay::ModuleManager&amp; mm) {</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    mm.change_submod(<span class="stringliteral">&quot;Loop&quot;</span>, <span class="stringliteral">&quot;Electronic energy&quot;</span>, <span class="stringliteral">&quot;Electronic energy&quot;</span>);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    mm.change_submod(<span class="stringliteral">&quot;Loop&quot;</span>, <span class="stringliteral">&quot;Density matrix&quot;</span>, <span class="stringliteral">&quot;Density matrix builder&quot;</span>);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    mm.change_submod(<span class="stringliteral">&quot;Loop&quot;</span>, <span class="stringliteral">&quot;Guess update&quot;</span>, <span class="stringliteral">&quot;Diagonalization Fock update&quot;</span>);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    mm.change_submod(<span class="stringliteral">&quot;Loop&quot;</span>, <span class="stringliteral">&quot;One-electron Fock operator&quot;</span>,</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;                     <span class="stringliteral">&quot;Restricted One-Electron Fock op&quot;</span>);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    mm.change_submod(<span class="stringliteral">&quot;Loop&quot;</span>, <span class="stringliteral">&quot;Fock operator&quot;</span>, <span class="stringliteral">&quot;Restricted Fock Op&quot;</span>);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    mm.change_submod(<span class="stringliteral">&quot;Loop&quot;</span>, <span class="stringliteral">&quot;Charge-charge&quot;</span>, <span class="stringliteral">&quot;Coulomb&#39;s Law&quot;</span>);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    mm.change_submod(<span class="stringliteral">&quot;SCF Driver&quot;</span>, <span class="stringliteral">&quot;Guess&quot;</span>, <span class="stringliteral">&quot;Core guess&quot;</span>);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    mm.change_submod(<span class="stringliteral">&quot;SCF Driver&quot;</span>, <span class="stringliteral">&quot;Optimizer&quot;</span>, <span class="stringliteral">&quot;Loop&quot;</span>);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;}</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;} <span class="comment">// namespace scf::driver</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

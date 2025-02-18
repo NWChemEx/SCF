@@ -91,29 +91,33 @@ $(function() {
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">namespace </span>scf::matrix_builder {</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;DECLARE_MODULE(AOIntegralsDriver);</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;DECLARE_MODULE(Fock);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;DECLARE_MODULE(JFourCenter);</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;DECLARE_MODULE(KFourCenter);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> load_modules(pluginplay::ModuleManager&amp; mm) {</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    mm.add_module&lt;AOIntegralsDriver&gt;(<span class="stringliteral">&quot;AO integral driver&quot;</span>);</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    mm.add_module&lt;Fock&gt;(<span class="stringliteral">&quot;Fock matrix builder&quot;</span>);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    mm.add_module&lt;JFourCenter&gt;(<span class="stringliteral">&quot;Four center J builder&quot;</span>);</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    mm.add_module&lt;KFourCenter&gt;(<span class="stringliteral">&quot;Four center K builder&quot;</span>);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;}</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> set_defaults(pluginplay::ModuleManager&amp; mm) {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> ao_driver = <span class="stringliteral">&quot;AO integral driver&quot;</span>;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    mm.change_submod(ao_driver, <span class="stringliteral">&quot;Coulomb matrix&quot;</span>, <span class="stringliteral">&quot;Four center J builder&quot;</span>);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    mm.change_submod(ao_driver, <span class="stringliteral">&quot;Exchange matrix&quot;</span>, <span class="stringliteral">&quot;Four center K builder&quot;</span>);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="comment">// TODO: Re-enable when PluginPlay doesn&#39;t choke on loops in modules</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="comment">// mm.change_submod(ao_driver, &quot;Fock matrix&quot;, &quot;Fock Matrix Builder&quot;);</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;DECLARE_MODULE(SCFIntegralsDriver);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;DECLARE_MODULE(DensityMatrix);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;DECLARE_MODULE(DeterminantDriver);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;DECLARE_MODULE(ElectronicEnergy);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;DECLARE_MODULE(Fock);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> load_modules(pluginplay::ModuleManager&amp; mm) {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    mm.add_module&lt;SCFIntegralsDriver&gt;(<span class="stringliteral">&quot;SCF integral driver&quot;</span>);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    mm.add_module&lt;DensityMatrix&gt;(<span class="stringliteral">&quot;Density matrix builder&quot;</span>);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    mm.add_module&lt;DeterminantDriver&gt;(<span class="stringliteral">&quot;Determinant driver&quot;</span>);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    mm.add_module&lt;ElectronicEnergy&gt;(<span class="stringliteral">&quot;Electronic energy&quot;</span>);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    mm.add_module&lt;Fock&gt;(<span class="stringliteral">&quot;Fock matrix builder&quot;</span>);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;}</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> set_defaults(pluginplay::ModuleManager&amp; mm) {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> ao_driver = <span class="stringliteral">&quot;SCF integral driver&quot;</span>;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    mm.change_submod(ao_driver, <span class="stringliteral">&quot;Fock matrix&quot;</span>, <span class="stringliteral">&quot;Fock Matrix Builder&quot;</span>);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    mm.change_submod(ao_driver, <span class="stringliteral">&quot;Density matrix&quot;</span>, <span class="stringliteral">&quot;Density matrix builder&quot;</span>);</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    mm.change_submod(<span class="stringliteral">&quot;Fock matrix builder&quot;</span>, <span class="stringliteral">&quot;Two center evaluator&quot;</span>, ao_driver);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;}</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;} <span class="comment">// namespace scf::matrix_builder</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> det_driver = <span class="stringliteral">&quot;Determinant driver&quot;</span>;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    mm.change_submod(det_driver, <span class="stringliteral">&quot;Two center evaluator&quot;</span>, ao_driver);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    mm.change_submod(det_driver, <span class="stringliteral">&quot;Fock matrix&quot;</span>, <span class="stringliteral">&quot;Fock matrix builder&quot;</span>);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    mm.change_submod(<span class="stringliteral">&quot;Electronic energy&quot;</span>, <span class="stringliteral">&quot;determinant driver&quot;</span>, det_driver);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;}</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;} <span class="comment">// namespace scf::matrix_builder</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
