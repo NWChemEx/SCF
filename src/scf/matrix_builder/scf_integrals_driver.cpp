@@ -53,12 +53,12 @@ public:
       m_psubmods_(&submods),
       m_ptensor_(&t) {}
 
-    void run(const f_e_type& f_e) {
-        chemist::braket::BraKet input(*m_pbra_, f_e, *m_pket_);
-        const auto key = "Fock matrix";
-        *m_ptensor_    = m_psubmods_->at(key).run_as<f_e_pt>(input);
-        m_evaluated_   = true;
-    }
+    // void run(const f_e_type& f_e) {
+    //     chemist::braket::BraKet input(*m_pbra_, f_e, *m_pket_);
+    //     const auto key = "Fock matrix";
+    //     *m_ptensor_    = m_psubmods_->at(key).run_as<f_e_pt>(input);
+    //     m_evaluated_   = true;
+    // }
 
     void run(const rho_e_type& rho_e) {
         chemist::braket::BraKet input(*m_pbra_, rho_e, *m_pket_);
@@ -94,7 +94,6 @@ MODULE_RUN(SCFIntegralsDriver) {
     tensor t;
     AODispatcher visitor(bra, ket, submods, t);
     op.visit(visitor);
-
     if(!visitor.evaluated()) {
         t = submods.at("Fundamental matrices").run_as<pt>(braket);
     }

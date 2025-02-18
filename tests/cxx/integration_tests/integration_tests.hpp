@@ -25,7 +25,8 @@ namespace test_scf {
 
 /// Factors out setting submodules for SCF plugin from other plugins
 inline auto load_modules() {
-    pluginplay::ModuleManager mm;
+    auto rv = std::make_shared<parallelzone::runtime::RuntimeView>();
+    pluginplay::ModuleManager mm(rv, nullptr);
     scf::load_modules(mm);
     integrals::load_modules(mm);
     nux::load_modules(mm);

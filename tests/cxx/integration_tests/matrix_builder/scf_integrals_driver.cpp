@@ -93,7 +93,6 @@ TEST_CASE("SCFIntegralsDriver") {
 
     SECTION("Calling density matrix") {
         auto& pmod = mm.at("Density matrix builder");
-        auto aos   = test_scf::h2_aos();
         auto cmos  = test_scf::h2_cmos();
         std::vector<int> occs{1, 0};
         simde::type::rho_e<simde::type::cmos> rho_hat(cmos, occs);
