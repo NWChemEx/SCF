@@ -25,7 +25,8 @@ namespace test_scf {
 
 /// Factors out setting submodules for SCF plugin from other plugins
 inline auto load_modules() {
-    pluginplay::ModuleManager mm;
+    auto rv = std::make_shared<parallelzone::runtime::RuntimeView>();
+    pluginplay::ModuleManager mm(rv, nullptr);
     scf::load_modules(mm);
     integrals::load_modules(mm);
     nux::load_modules(mm);
@@ -33,12 +34,12 @@ inline auto load_modules() {
     mm.change_submod("SCF Driver", "Hamiltonian",
                      "Born-Oppenheimer approximation");
 
-    mm.change_submod("Four center J builder", "Four-center ERI", "ERI4");
-    mm.change_submod("Four center K builder", "Four-center ERI", "ERI4");
+    const auto ao_driver_key = "SCF integral driver";
+    mm.change_submod(ao_driver_key, "Fundamental matrices",
+                     "AO integral driver");
 
-    const auto ao_driver_key = "AO integral driver";
-    mm.change_submod(ao_driver_key, "Kinetic", "Kinetic");
-    mm.change_submod(ao_driver_key, "Electron-Nuclear attraction", "Nuclear");
+    mm.change_submod("Fock Matrix Builder", "Two center evaluator",
+                     "AO integral driver");
 
     mm.change_submod("Diagonalization Fock update", "Overlap matrix builder",
                      "Overlap");
