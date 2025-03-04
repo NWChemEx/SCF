@@ -49,9 +49,7 @@ MODULE_RUN(Fock) {
         chemist::braket::BraKet term0(bra_aos, op_0, ket_aos);
         F = ao_dispatcher.run_as<ao_pt>(term0);
 
-        using allocator_type = tensorwrapper::allocator::Eigen<double, 2>;
-        auto& f_buffer       = allocator_type::rebind(F.buffer());
-        f_buffer.value()     = f_buffer.value() * c0;
+        F("i,j") = F("i,j") * c0;
 
         for(decltype(n_terms) i = 1; i < n_terms; ++i) {
             const auto ci    = f.coefficient(i);
@@ -59,8 +57,8 @@ MODULE_RUN(Fock) {
             chemist::braket::BraKet termi(bra_aos, op_i, ket_aos);
             auto matrix = ao_dispatcher.run_as<ao_pt>(termi);
 
-            auto& matrix_buffer = allocator_type::rebind(matrix.buffer());
-            f_buffer.value() += ci * matrix_buffer.value();
+            matrix("i,j") = matrix("i,j") * ci;
+            F("i,j")      = F("i,j") + matrix("i,j");
         }
     }
 

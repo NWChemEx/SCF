@@ -29,12 +29,12 @@ TEST_CASE("Density Matrix Builder") {
 
     chemist::braket::BraKet p_mn(aos, rho_hat, aos);
     const auto& P        = mod.run_as<pt>(p_mn);
-    using allocator_type = tensorwrapper::allocator::Eigen<double, 2>;
-    const auto& P_eigen  = allocator_type::rebind(P.buffer()).value();
+    using allocator_type = tensorwrapper::allocator::Eigen<double>;
+    const auto& P_eigen  = allocator_type::rebind(P.buffer());
 
     using Catch::Matchers::WithinAbs;
-    REQUIRE_THAT(P_eigen(0, 0), WithinAbs(0.31980835, 1E-6));
-    REQUIRE_THAT(P_eigen(0, 1), WithinAbs(0.31980835, 1E-6));
-    REQUIRE_THAT(P_eigen(1, 0), WithinAbs(0.31980835, 1E-6));
-    REQUIRE_THAT(P_eigen(1, 1), WithinAbs(0.31980835, 1E-6));
+    REQUIRE_THAT(P_eigen.at(0, 0), WithinAbs(0.31980835, 1E-6));
+    REQUIRE_THAT(P_eigen.at(0, 1), WithinAbs(0.31980835, 1E-6));
+    REQUIRE_THAT(P_eigen.at(1, 0), WithinAbs(0.31980835, 1E-6));
+    REQUIRE_THAT(P_eigen.at(1, 1), WithinAbs(0.31980835, 1E-6));
 }

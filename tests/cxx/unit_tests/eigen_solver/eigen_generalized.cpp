@@ -31,10 +31,10 @@ TEST_CASE("EigenGeneralized") {
 
     auto&& [values, vector] = mod.run_as<pt>(A, B);
 
-    using value_alloc_t      = tensorwrapper::allocator::Eigen<double, 1>;
+    using value_alloc_t      = tensorwrapper::allocator::Eigen<double>;
     const auto& eigen_values = value_alloc_t::rebind(values.buffer());
 
     using Catch::Matchers::WithinAbs;
-    REQUIRE_THAT(eigen_values.value()(0), WithinAbs(-0.236068, 1E-6));
-    REQUIRE_THAT(eigen_values.value()(1), WithinAbs(4.236068, 1E-6));
+    REQUIRE_THAT(eigen_values.at(0), WithinAbs(-0.236068, 1E-6));
+    REQUIRE_THAT(eigen_values.at(1), WithinAbs(4.236068, 1E-6));
 }

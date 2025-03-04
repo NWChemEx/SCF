@@ -47,12 +47,12 @@ TEST_CASE("Diagaonalization") {
 
         // Check orbital energies
         const auto& evals       = psi.orbitals().diagonalized_matrix();
-        using vector_allocator  = tensorwrapper::allocator::Eigen<double, 1>;
+        using vector_allocator  = tensorwrapper::allocator::Eigen<double>;
         const auto& eval_buffer = vector_allocator::rebind(evals.buffer());
 
         const auto tol = 1E-6;
         using Catch::Matchers::WithinAbs;
-        REQUIRE_THAT(eval_buffer.value()(0), WithinAbs(-1.25330893, tol));
-        REQUIRE_THAT(eval_buffer.value()(1), WithinAbs(-0.47506974, tol));
+        REQUIRE_THAT(eval_buffer.at(0), WithinAbs(-1.25330893, tol));
+        REQUIRE_THAT(eval_buffer.at(1), WithinAbs(-0.47506974, tol));
     }
 }

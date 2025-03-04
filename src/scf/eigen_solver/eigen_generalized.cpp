@@ -38,14 +38,13 @@ MODULE_RUN(EigenGeneralized) {
     auto&& [A, B] = pt::unwrap_inputs(inputs);
 
     // Convert to Eigen buffers
-    using matrix_alloc_t = tensorwrapper::allocator::Eigen<double, 2>;
-    using vector_alloc_t = tensorwrapper::allocator::Eigen<double, 1>;
-    const auto& eigen_A  = matrix_alloc_t::rebind(A.buffer());
-    const auto& eigen_B  = matrix_alloc_t::rebind(B.buffer());
+    tensorwrapper::allocator::Eigen<double> allocator(get_runtime());
+    const auto& eigen_A = allocator.rebind(A.buffer());
+    const auto& eigen_B = allocator.rebind(B.buffer());
 
     // Wrap the tensors in Eigen::Map objects to avoid copy
-    const auto* pA      = eigen_A.value().data();
-    const auto* pB      = eigen_B.value().data();
+    const auto* pA      = eigen_A.data();
+    const auto* pB      = eigen_B.data();
     const auto& shape_A = eigen_A.layout().shape().as_smooth();
     auto rows           = shape_A.extent(0);
     auto cols           = shape_A.extent(1);
@@ -63,23 +62,18 @@ MODULE_RUN(EigenGeneralized) {
     tensorwrapper::layout::Physical vector_layout(vector_shape);
     tensorwrapper::layout::Physical matrix_layout(matrix_shape);
 
-    using matrix_buffer = typename matrix_alloc_t::eigen_buffer_type;
-    using vector_buffer = typename vector_alloc_t::eigen_buffer_type;
+    auto pvalues_buffer  = allocator.allocate(vector_layout);
+    auto pvectors_buffer = allocator.allocate(matrix_layout);
 
-    typename vector_buffer::data_type vector_tensor(rows);
-    typename matrix_buffer::data_type matrix_tensor(rows, cols);
     for(auto i = 0; i < rows; ++i) {
-        vector_tensor(i) = eigen_values(i);
+        pvalues_buffer->at(i) = eigen_values(i);
         for(auto j = 0; j < cols; ++j) {
-            matrix_tensor(i, j) = eigen_vectors(i, j);
+            pvectors_buffer->at(i, j) = eigen_vectors(i, j);
         }
     }
 
-    vector_buffer values_buffer(vector_tensor, vector_layout);
-    matrix_buffer vectors_buffer(matrix_tensor, matrix_layout);
-
-    simde::type::tensor values(vector_shape, values_buffer);
-    simde::type::tensor vectors(matrix_shape, vectors_buffer);
+    simde::type::tensor values(vector_shape, std::move(pvalues_buffer));
+    simde::type::tensor vectors(matrix_shape, std::move(pvectors_buffer));
 
     auto rv = results();
     return pt::wrap_results(rv, values, vectors);

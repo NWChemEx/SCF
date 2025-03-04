@@ -23,18 +23,16 @@ namespace {
 
 void compare_matrices(const tensor& A, const tensor& A_corr) {
     using Catch::Matchers::WithinAbs;
-    using alloc_type          = tensorwrapper::allocator::Eigen<double, 2>;
+    using alloc_type          = tensorwrapper::allocator::Eigen<double>;
     const auto& A_buffer      = alloc_type::rebind(A.buffer());
     const auto& A_corr_buffer = alloc_type::rebind(A_corr.buffer());
-    const auto& A_eigen       = A_buffer.value();
-    const auto& A_corr_eigen  = A_corr_buffer.value();
 
     const auto tol = 1E-6;
 
-    REQUIRE_THAT(A_eigen(0, 0), WithinAbs(A_corr_eigen(0, 0), 1E-6));
-    REQUIRE_THAT(A_eigen(0, 1), WithinAbs(A_corr_eigen(0, 1), 1E-6));
-    REQUIRE_THAT(A_eigen(1, 0), WithinAbs(A_corr_eigen(1, 0), 1E-6));
-    REQUIRE_THAT(A_eigen(1, 1), WithinAbs(A_corr_eigen(1, 1), 1E-6));
+    REQUIRE_THAT(A_buffer.at(0, 0), WithinAbs(A_corr_buffer.at(0, 0), 1E-6));
+    REQUIRE_THAT(A_buffer.at(0, 1), WithinAbs(A_corr_buffer.at(0, 1), 1E-6));
+    REQUIRE_THAT(A_buffer.at(1, 0), WithinAbs(A_corr_buffer.at(1, 0), 1E-6));
+    REQUIRE_THAT(A_buffer.at(1, 1), WithinAbs(A_corr_buffer.at(1, 1), 1E-6));
 }
 
 } // namespace

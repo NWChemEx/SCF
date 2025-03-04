@@ -103,6 +103,7 @@ MODULE_CTOR(DeterminantDriver) {
 }
 
 MODULE_RUN(DeterminantDriver) {
+    using float_type      = double;
     using wf_type         = simde::type::rscf_wf;
     const auto&& [braket] = pt<wf_type>::unwrap_inputs(inputs);
     const auto& bra       = braket.bra();
@@ -126,18 +127,14 @@ MODULE_RUN(DeterminantDriver) {
     const auto& t = visitor.m_pt;
 
     // Step 3: Contract
-    using allocator_type = tensorwrapper::allocator::Eigen<double, 2>;
-    using scalar_type    = tensorwrapper::buffer::Eigen<double, 0>::data_type;
+    tensorwrapper::Tensor x;
+    x("") = rho("i,j") * t("i,j");
 
-    const auto& t_eigen = allocator_type::rebind(t.buffer()).value();
-    const auto& p_eigen = allocator_type::rebind(rho.buffer()).value();
-
-    using index_pair_t = Eigen::IndexPair<int>;
-    Eigen::array<index_pair_t, 2> modes{index_pair_t(0, 0), index_pair_t(1, 1)};
-    scalar_type x = p_eigen.contract(t_eigen, modes);
+    using allocator_type = tensorwrapper::allocator::Eigen<float_type>;
+    auto& x_buffer       = allocator_type::rebind(x.buffer());
 
     auto rv = results();
-    return pt<wf_type>::wrap_results(rv, x());
+    return pt<wf_type>::wrap_results(rv, x_buffer.at());
 }
 
 } // namespace scf::matrix_builder
