@@ -15,6 +15,7 @@
  */
 
 #include "matrix_builder.hpp"
+#include <unsupported/Eigen/CXX11/Tensor>
 
 namespace scf::matrix_builder {
 namespace {
@@ -62,27 +63,34 @@ MODULE_RUN(DensityMatrix) {
               "Please shuffle your orbitals so that the ensemble is a "
               "contiguous slice of the orbitals.");
 
-    // Step 2: Grab the orbitals in the ensemble
-    using allocator_type    = tensorwrapper::allocator::Eigen<double, 2>;
-    using buffer_type       = typename allocator_type::eigen_buffer_type;
-    using eigen_tensor_type = typename buffer_type::data_type;
+    using allocator_type    = tensorwrapper::allocator::Eigen<double>;
+    using tensor_type       = Eigen::Tensor<double, 2, Eigen::RowMajor>;
+    using const_tensor_type = Eigen::Tensor<const double, 2, Eigen::RowMajor>;
+    using map_type          = Eigen::TensorMap<tensor_type>;
+    using const_map_type    = Eigen::TensorMap<const_tensor_type>;
 
-    const auto& c_buffer = allocator_type::rebind(c.buffer());
-    const auto& c_eigen  = c_buffer.value();
+    allocator_type alloc(get_runtime());
+
+    tensorwrapper::shape::Smooth p_shape(n_aos, n_aos);
+    tensorwrapper::layout::Physical l(p_shape);
+    auto pp_buffer = alloc.allocate(l);
+
+    // Step 2: Grab the orbitals in the ensemble
+    const auto& c_buffer = alloc.rebind(c.buffer());
+    const_map_type c_eigen(c_buffer.data(), n_aos, n_aos);
+    map_type p_eigen(pp_buffer->data(), n_aos, n_aos);
 
     using slice_t = Eigen::array<Eigen::Index, 2>;
     slice_t offsets{0, 0};
     slice_t extents{n_aos, Eigen::Index(participants.size())};
-    eigen_tensor_type slice = c_eigen.slice(offsets, extents);
+    auto slice = c_eigen.slice(offsets, extents);
 
     // Step 3: CC_dagger
     using index_pair_t = Eigen::IndexPair<int>;
     Eigen::array<index_pair_t, 1> modes{index_pair_t(1, 1)};
-    eigen_tensor_type p_eigen = slice.contract(slice, modes);
-    tensorwrapper::shape::Smooth p_shape(n_aos, n_aos);
-    tensorwrapper::layout::Physical l(p_shape);
-    buffer_type p_buffer(p_eigen, l);
-    simde::type::tensor p(p_shape, p_buffer);
+    p_eigen = slice.contract(slice, modes);
+
+    simde::type::tensor p(p_shape, std::move(pp_buffer));
 
     auto rv = results();
     return pt::wrap_results(rv, p);

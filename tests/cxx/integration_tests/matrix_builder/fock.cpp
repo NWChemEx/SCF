@@ -35,13 +35,13 @@ TEST_CASE("Fock Matrix Builder") {
         f_e.emplace_back(1.0, std::make_unique<v_en_type>(e, h2));
         const auto& F = mod.run_as<pt>(chemist::braket::BraKet(aos, f_e, aos));
 
-        using alloc_type    = tensorwrapper::allocator::Eigen<double, 2>;
+        using alloc_type    = tensorwrapper::allocator::Eigen<double>;
         const auto& F_eigen = alloc_type::rebind(F.buffer());
         using Catch::Matchers::WithinAbs;
-        REQUIRE_THAT(F_eigen.value()(0, 0), WithinAbs(-1.120958, 1E-6));
-        REQUIRE_THAT(F_eigen.value()(0, 1), WithinAbs(-0.959374, 1E-6));
-        REQUIRE_THAT(F_eigen.value()(1, 0), WithinAbs(-0.959374, 1E-6));
-        REQUIRE_THAT(F_eigen.value()(1, 1), WithinAbs(-1.120958, 1E-6));
+        REQUIRE_THAT(F_eigen.at(0, 0), WithinAbs(-1.120958, 1E-6));
+        REQUIRE_THAT(F_eigen.at(0, 1), WithinAbs(-0.959374, 1E-6));
+        REQUIRE_THAT(F_eigen.at(1, 0), WithinAbs(-0.959374, 1E-6));
+        REQUIRE_THAT(F_eigen.at(1, 1), WithinAbs(-1.120958, 1E-6));
     }
 
     SECTION("With J and K") {
@@ -49,13 +49,13 @@ TEST_CASE("Fock Matrix Builder") {
 
         const auto& F = mod.run_as<pt>(chemist::braket::BraKet(aos, f_e, aos));
 
-        using alloc_type    = tensorwrapper::allocator::Eigen<double, 2>;
+        using alloc_type    = tensorwrapper::allocator::Eigen<double>;
         const auto& F_eigen = alloc_type::rebind(F.buffer());
 
         using Catch::Matchers::WithinAbs;
-        REQUIRE_THAT(F_eigen.value()(0, 0), WithinAbs(-0.319459, 1E-6));
-        REQUIRE_THAT(F_eigen.value()(0, 1), WithinAbs(-0.571781, 1E-6));
-        REQUIRE_THAT(F_eigen.value()(1, 0), WithinAbs(-0.571781, 1E-6));
-        REQUIRE_THAT(F_eigen.value()(1, 1), WithinAbs(-0.319459, 1E-6));
+        REQUIRE_THAT(F_eigen.at(0, 0), WithinAbs(-0.319459, 1E-6));
+        REQUIRE_THAT(F_eigen.at(0, 1), WithinAbs(-0.571781, 1E-6));
+        REQUIRE_THAT(F_eigen.at(1, 0), WithinAbs(-0.571781, 1E-6));
+        REQUIRE_THAT(F_eigen.at(1, 1), WithinAbs(-0.319459, 1E-6));
     }
 }
