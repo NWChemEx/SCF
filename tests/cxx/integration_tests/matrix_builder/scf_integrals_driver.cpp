@@ -21,18 +21,24 @@ using simde::type::tensor;
 
 namespace {
 
+template<typename FloatType>
 void compare_matrices(const tensor& A, const tensor& A_corr) {
     using Catch::Matchers::WithinAbs;
-    using alloc_type          = tensorwrapper::allocator::Eigen<double>;
+    using alloc_type          = tensorwrapper::allocator::Eigen<FloatType>;
     const auto& A_buffer      = alloc_type::rebind(A.buffer());
     const auto& A_corr_buffer = alloc_type::rebind(A_corr.buffer());
 
     const auto tol = 1E-6;
-
-    REQUIRE_THAT(A_buffer.at(0, 0), WithinAbs(A_corr_buffer.at(0, 0), 1E-6));
-    REQUIRE_THAT(A_buffer.at(0, 1), WithinAbs(A_corr_buffer.at(0, 1), 1E-6));
-    REQUIRE_THAT(A_buffer.at(1, 0), WithinAbs(A_corr_buffer.at(1, 0), 1E-6));
-    REQUIRE_THAT(A_buffer.at(1, 1), WithinAbs(A_corr_buffer.at(1, 1), 1E-6));
+    if constexpr(std::is_same_v<FloatType, double>) {
+        REQUIRE_THAT(A_buffer.at(0, 0),
+                     WithinAbs(A_corr_buffer.at(0, 0), 1E-6));
+        REQUIRE_THAT(A_buffer.at(0, 1),
+                     WithinAbs(A_corr_buffer.at(0, 1), 1E-6));
+        REQUIRE_THAT(A_buffer.at(1, 0),
+                     WithinAbs(A_corr_buffer.at(1, 0), 1E-6));
+        REQUIRE_THAT(A_buffer.at(1, 1),
+                     WithinAbs(A_corr_buffer.at(1, 1), 1E-6));
+    }
 }
 
 } // namespace
@@ -41,21 +47,22 @@ using erased_type =
   chemist::braket::BraKet<simde::type::aos, simde::type::op_base_type,
                           simde::type::aos>;
 
-TEST_CASE("SCFIntegralsDriver") {
-    auto mm  = test_scf::load_modules();
-    auto aos = test_scf::h2_aos();
-    auto mod = mm.at("SCF integral driver");
+TEMPLATE_LIST_TEST_CASE("SCFIntegralsDriver", "", test_scf::float_types) {
+    using float_type = TestType;
+    auto mm          = test_scf::load_modules<float_type>();
+    auto aos         = test_scf::h2_aos();
+    auto mod         = mm.at("SCF integral driver");
     simde::type::electron e;
-    auto rho = test_scf::h2_density();
+    auto rho = test_scf::h2_density<float_type>();
 
     SECTION("Calling Kinetic") {
         auto& tmod = mm.at("Kinetic");
         simde::type::t_e_type t_e(e);
         chemist::braket::BraKet braket(aos, t_e, aos);
         erased_type copy_braket(braket);
-        const auto& T      = mod.run_as<pt>(copy_braket);
-        const auto& T_corr = tmod.run_as<simde::aos_t_e_aos>(braket);
-        compare_matrices(T, T_corr);
+        const auto& T      = mod.template run_as<pt>(copy_braket);
+        const auto& T_corr = tmod.template run_as<simde::aos_t_e_aos>(braket);
+        compare_matrices<float_type>(T, T_corr);
     }
 
     SECTION("Calling Electron-Nuclear Attraction") {
@@ -64,9 +71,9 @@ TEST_CASE("SCFIntegralsDriver") {
         simde::type::v_en_type v_en(e, h2_nuclei);
         chemist::braket::BraKet braket(aos, v_en, aos);
         erased_type copy_braket(braket);
-        const auto& V      = mod.run_as<pt>(copy_braket);
-        const auto& V_corr = tmod.run_as<simde::aos_v_en_aos>(braket);
-        compare_matrices(V, V_corr);
+        const auto& V      = mod.template run_as<pt>(copy_braket);
+        const auto& V_corr = tmod.template run_as<simde::aos_v_en_aos>(braket);
+        compare_matrices<float_type>(V, V_corr);
     }
 
     SECTION("Calling J Matrix") {
@@ -74,9 +81,9 @@ TEST_CASE("SCFIntegralsDriver") {
         simde::type::j_e_type j_e(e, rho);
         chemist::braket::BraKet braket(aos, j_e, aos);
         erased_type copy_braket(braket);
-        const auto& J      = mod.run_as<pt>(copy_braket);
-        const auto& J_corr = jmod.run_as<simde::aos_j_e_aos>(braket);
-        compare_matrices(J, J_corr);
+        const auto& J      = mod.template run_as<pt>(copy_braket);
+        const auto& J_corr = jmod.template run_as<simde::aos_j_e_aos>(braket);
+        compare_matrices<float_type>(J, J_corr);
     }
 
     SECTION("Calling K Matrix") {
@@ -84,22 +91,22 @@ TEST_CASE("SCFIntegralsDriver") {
         simde::type::k_e_type k_e(e, rho);
         chemist::braket::BraKet braket(aos, k_e, aos);
         erased_type copy_braket(braket);
-        const auto& K      = mod.run_as<pt>(copy_braket);
-        const auto& K_corr = kmod.run_as<simde::aos_k_e_aos>(braket);
-        compare_matrices(K, K_corr);
+        const auto& K      = mod.template run_as<pt>(copy_braket);
+        const auto& K_corr = kmod.template run_as<simde::aos_k_e_aos>(braket);
+        compare_matrices<float_type>(K, K_corr);
     }
 
     SECTION("Calling density matrix") {
         auto& pmod = mm.at("Density matrix builder");
-        auto cmos  = test_scf::h2_cmos();
+        auto cmos  = test_scf::h2_cmos<float_type>();
         std::vector<int> occs{1, 0};
         simde::type::rho_e<simde::type::cmos> rho_hat(cmos, occs);
         chemist::braket::BraKet braket(aos, rho_hat, aos);
         erased_type copy_braket(braket);
-        const auto& P      = mod.run_as<pt>(copy_braket);
+        const auto& P      = mod.template run_as<pt>(copy_braket);
         using op_pt        = simde::aos_rho_e_aos<simde::type::cmos>;
-        const auto& P_corr = pmod.run_as<op_pt>(braket);
-        compare_matrices(P, P_corr);
+        const auto& P_corr = pmod.template run_as<op_pt>(braket);
+        compare_matrices<float_type>(P, P_corr);
     }
 
     // SECTION("Calling Fock Matrix") {

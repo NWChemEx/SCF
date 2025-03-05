@@ -25,12 +25,13 @@ template<typename WFType>
 using pt = simde::Optimize<egy_pt<WFType>, WFType>;
 
 TEST_CASE("SCFLoop") {
-    using wf_type = simde::type::rscf_wf;
-    auto mm       = test_scf::load_modules();
-    auto& mod     = mm.at("Loop");
+    using float_type = double;
+    using wf_type    = simde::type::rscf_wf;
+    auto mm          = test_scf::load_modules<float_type>();
+    auto& mod        = mm.at("Loop");
 
     using index_set = typename wf_type::orbital_index_set_type;
-    wf_type psi0(index_set{0}, test_scf::h2_cmos());
+    wf_type psi0(index_set{0}, test_scf::h2_cmos<float_type>());
 
     auto H = test_scf::h2_hamiltonian();
 

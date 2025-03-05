@@ -91,29 +91,53 @@ inline auto h2_aos() {
     return simde::type::aos(h_basis(h2));
 }
 
+template<typename FloatType>
 inline auto h2_mos() {
-    using mos_type    = simde::type::mos;
-    using tensor_type = typename mos_type::transform_type;
-    tensor_type c({{-0.565516, -1.07019}, {-0.565516, 1.07019}});
-    return mos_type(h2_aos(), std::move(c));
+    using mos_type       = simde::type::mos;
+    using tensor_type    = typename mos_type::transform_type;
+    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
+    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    tensorwrapper::shape::Smooth shape{2, 2};
+    tensorwrapper::layout::Physical l(shape);
+    auto c_buffer      = alloc.allocate(l);
+    c_buffer->at(0, 0) = -0.565516;
+    c_buffer->at(0, 1) = -1.07019;
+    c_buffer->at(1, 0) = -0.565516;
+    c_buffer->at(1, 1) = 1.07019;
+    tensor_type t(shape, std::move(c_buffer));
+    return mos_type(h2_aos(), std::move(t));
 }
 
+template<typename FloatType>
 inline auto h2_cmos() {
-    using cmos_type   = simde::type::cmos;
-    using tensor_type = typename cmos_type::transform_type;
-    tensor_type e({-1.25330893, -0.47506974});
-    return cmos_type(e, h2_aos(), h2_mos().transform());
+    using cmos_type      = simde::type::cmos;
+    using tensor_type    = typename cmos_type::transform_type;
+    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
+    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    tensorwrapper::shape::Smooth shape{2};
+    tensorwrapper::layout::Physical l(shape);
+    auto e_buffer   = alloc.allocate(l);
+    e_buffer->at(0) = -1.25330893;
+    e_buffer->at(1) = -0.47506974;
+    tensor_type e(shape, std::move(e_buffer));
+    return cmos_type(std::move(e), h2_aos(), h2_mos<FloatType>().transform());
 }
 
+template<typename FloatType>
 inline auto h2_density() {
-    using density_type = simde::type::decomposable_e_density;
-    typename density_type::value_type rho(
-      {{0.31980835, 0.31980835}, {0.31980835, 0.31980835}});
-    return density_type(rho, h2_mos());
+    using density_type   = simde::type::decomposable_e_density;
+    using tensor_type    = typename density_type::value_type;
+    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
+    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    tensorwrapper::shape::Smooth shape{2, 2};
+    tensorwrapper::layout::Physical l(shape);
+    auto pbuffer = alloc.construct(l, 0.31980835);
+    tensor_type t(shape, std::move(pbuffer));
+    return density_type(std::move(t), h2_mos<FloatType>());
 }
 
 /// The Fock matrix consistent with h2_hamiltonian and h2_density
-template<typename ElectronType>
+template<typename ElectronType, typename FloatType = double>
 inline auto h2_fock() {
     ElectronType es;
     if constexpr(std::is_same_v<ElectronType, simde::type::many_electrons>) {
@@ -121,7 +145,7 @@ inline auto h2_fock() {
     }
 
     auto h2  = make_h2<simde::type::nuclei>();
-    auto rho = h2_density();
+    auto rho = h2_density<FloatType>();
     simde::type::fock F;
     using namespace chemist::qm_operator;
     using t_type = Kinetic<ElectronType>;

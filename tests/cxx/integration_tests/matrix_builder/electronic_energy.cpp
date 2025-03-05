@@ -22,13 +22,14 @@ using pt =
   simde::eval_braket<WFType, simde::type::electronic_hamiltonian, WFType>;
 
 TEST_CASE("ElectronicEnergy") {
-    auto mm  = test_scf::load_modules();
-    auto mod = mm.at("Electronic energy");
+    using float_type = double;
+    auto mm          = test_scf::load_modules<float_type>();
+    auto mod         = mm.at("Electronic energy");
 
     using wf_type   = simde::type::rscf_wf;
     using index_set = typename wf_type::orbital_index_set_type;
 
-    wf_type psi(index_set{0}, test_scf::h2_cmos());
+    wf_type psi(index_set{0}, test_scf::h2_cmos<float_type>());
     simde::type::many_electrons es{2};
 
     simde::type::T_e_type T_e(es);
@@ -36,7 +37,7 @@ TEST_CASE("ElectronicEnergy") {
     auto h2_nuclei = test_scf::make_h2<simde::type::nuclei>();
     simde::type::V_en_type V_en(es, h2_nuclei);
 
-    auto rho = test_scf::h2_density();
+    auto rho = test_scf::h2_density<float_type>();
     simde::type::J_e_type J_e(es, rho);
     simde::type::K_e_type K_e(es, rho);
     simde::type::electronic_hamiltonian H_e(T_e * 2.0 + V_en * 2.0 + J_e * 2.0 -

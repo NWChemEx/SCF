@@ -20,23 +20,27 @@ using rscf_wf = simde::type::rscf_wf;
 using pt      = simde::InitialGuess<rscf_wf>;
 using simde::type::tensor;
 
-TEST_CASE("Core") {
-    auto mm  = test_scf::load_modules();
+TEMPLATE_LIST_TEST_CASE("Core", "", test_scf::float_types) {
+    using float_type = TestType;
+
+    auto mm  = test_scf::load_modules<float_type>();
     auto aos = test_scf::h2_aos();
     auto H   = test_scf::h2_hamiltonian();
 
     auto mod = mm.at("Core guess");
-    auto psi = mod.run_as<pt>(H, aos);
+    auto psi = mod.template run_as<pt>(H, aos);
 
     typename rscf_wf::orbital_index_set_type occs{0};
     REQUIRE(psi.orbital_indices() == occs);
     REQUIRE(psi.orbitals().from_space() == aos);
     const auto& evals       = psi.orbitals().diagonalized_matrix();
-    using allocator_type    = tensorwrapper::allocator::Eigen<double>;
+    using allocator_type    = tensorwrapper::allocator::Eigen<float_type>;
     const auto& eval_buffer = allocator_type::rebind(evals.buffer());
 
     const auto tol = 1E-6;
     using Catch::Matchers::WithinAbs;
-    REQUIRE_THAT(eval_buffer.at(0), WithinAbs(-1.25330893, tol));
-    REQUIRE_THAT(eval_buffer.at(1), WithinAbs(-0.47506974, tol));
+    if constexpr(std::is_same_v<float_type, double>) {
+        REQUIRE_THAT(eval_buffer.at(0), WithinAbs(-1.25330893, tol));
+        REQUIRE_THAT(eval_buffer.at(1), WithinAbs(-0.47506974, tol));
+    }
 }

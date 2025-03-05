@@ -21,8 +21,10 @@ using pt = simde::aos_f_e_aos;
 using simde::type::t_e_type;
 using simde::type::v_en_type;
 
-TEST_CASE("Fock Matrix Builder") {
-    auto mm   = test_scf::load_modules();
+TEMPLATE_LIST_TEST_CASE("Fock Matrix Builder", "", test_scf::float_types) {
+    using float_type = TestType;
+    auto mm          = test_scf::load_modules<float_type>();
+
     auto& mod = mm.at("Fock Matrix Builder");
     auto aos  = test_scf::h2_aos();
 
@@ -33,29 +35,34 @@ TEST_CASE("Fock Matrix Builder") {
         simde::type::fock f_e;
         f_e.emplace_back(1.0, std::make_unique<t_e_type>(e));
         f_e.emplace_back(1.0, std::make_unique<v_en_type>(e, h2));
-        const auto& F = mod.run_as<pt>(chemist::braket::BraKet(aos, f_e, aos));
+        chemist::braket::BraKet f_mn(aos, f_e, aos);
+        const auto& F = mod.template run_as<pt>(f_mn);
 
-        using alloc_type    = tensorwrapper::allocator::Eigen<double>;
+        using alloc_type    = tensorwrapper::allocator::Eigen<float_type>;
         const auto& F_eigen = alloc_type::rebind(F.buffer());
         using Catch::Matchers::WithinAbs;
-        REQUIRE_THAT(F_eigen.at(0, 0), WithinAbs(-1.120958, 1E-6));
-        REQUIRE_THAT(F_eigen.at(0, 1), WithinAbs(-0.959374, 1E-6));
-        REQUIRE_THAT(F_eigen.at(1, 0), WithinAbs(-0.959374, 1E-6));
-        REQUIRE_THAT(F_eigen.at(1, 1), WithinAbs(-1.120958, 1E-6));
+        if constexpr(std::is_same_v<float_type, double>) {
+            REQUIRE_THAT(F_eigen.at(0, 0), WithinAbs(-1.120958, 1E-6));
+            REQUIRE_THAT(F_eigen.at(0, 1), WithinAbs(-0.959374, 1E-6));
+            REQUIRE_THAT(F_eigen.at(1, 0), WithinAbs(-0.959374, 1E-6));
+            REQUIRE_THAT(F_eigen.at(1, 1), WithinAbs(-1.120958, 1E-6));
+        }
     }
 
     SECTION("With J and K") {
-        auto f_e = test_scf::h2_fock<simde::type::electron>();
+        auto f_e = test_scf::h2_fock<simde::type::electron, float_type>();
+        chemist::braket::BraKet f_mn(aos, f_e, aos);
+        const auto& F = mod.template run_as<pt>(f_mn);
 
-        const auto& F = mod.run_as<pt>(chemist::braket::BraKet(aos, f_e, aos));
-
-        using alloc_type    = tensorwrapper::allocator::Eigen<double>;
+        using alloc_type    = tensorwrapper::allocator::Eigen<float_type>;
         const auto& F_eigen = alloc_type::rebind(F.buffer());
 
         using Catch::Matchers::WithinAbs;
-        REQUIRE_THAT(F_eigen.at(0, 0), WithinAbs(-0.319459, 1E-6));
-        REQUIRE_THAT(F_eigen.at(0, 1), WithinAbs(-0.571781, 1E-6));
-        REQUIRE_THAT(F_eigen.at(1, 0), WithinAbs(-0.571781, 1E-6));
-        REQUIRE_THAT(F_eigen.at(1, 1), WithinAbs(-0.319459, 1E-6));
+        if constexpr(std::is_same_v<float_type, double>) {
+            REQUIRE_THAT(F_eigen.at(0, 0), WithinAbs(-0.319459, 1E-6));
+            REQUIRE_THAT(F_eigen.at(0, 1), WithinAbs(-0.571781, 1E-6));
+            REQUIRE_THAT(F_eigen.at(1, 0), WithinAbs(-0.571781, 1E-6));
+            REQUIRE_THAT(F_eigen.at(1, 1), WithinAbs(-0.319459, 1E-6));
+        }
     }
 }

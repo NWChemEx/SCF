@@ -23,8 +23,12 @@
 
 namespace test_scf {
 
+/// Floating point types to test
+using float_types = std::tuple<double, tensorwrapper::types::udouble>;
+
 /// Factors out setting submodules for SCF plugin from other plugins
-inline auto load_modules() {
+template<typename FloatType>
+pluginplay::ModuleManager load_modules() {
     auto rv = std::make_shared<parallelzone::runtime::RuntimeView>();
     pluginplay::ModuleManager mm(rv, nullptr);
     scf::load_modules(mm);
@@ -43,6 +47,15 @@ inline auto load_modules() {
 
     mm.change_submod("Diagonalization Fock update", "Overlap matrix builder",
                      "Overlap");
+
+    if constexpr(!std::is_same_v<FloatType, double>) {
+        mm.change_input("Evaluate 2-Index BraKet", "With UQ?", true);
+        mm.change_input("Evaluate 4-Index BraKet", "With UQ?", true);
+        mm.change_input("Overlap", "With UQ?", true);
+        mm.change_input("ERI4", "With UQ?", true);
+        mm.change_input("Kinetic", "With UQ?", true);
+        mm.change_input("Nuclear", "With UQ?", true);
+    }
 
     return mm;
 }

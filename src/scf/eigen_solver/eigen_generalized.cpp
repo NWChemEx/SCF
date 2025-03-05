@@ -22,23 +22,12 @@ namespace scf::eigen_solver {
 
 using pt = simde::GeneralizedEigenSolve;
 
-const auto desc = R"(
-Generalized Eigen Solve via Eigen
----------------------------------
-
-TODO: Write me!!!
-)";
-
-MODULE_CTOR(EigenGeneralized) {
-    description(desc);
-    satisfies_property_type<pt>();
-}
-
-MODULE_RUN(EigenGeneralized) {
-    auto&& [A, B] = pt::unwrap_inputs(inputs);
-
+template<typename FloatType>
+auto eigen_kernel(const tensorwrapper::Tensor& A,
+                  const tensorwrapper::Tensor& B,
+                  parallelzone::runtime::RuntimeView& rv) {
     // Convert to Eigen buffers
-    tensorwrapper::allocator::Eigen<double> allocator(get_runtime());
+    tensorwrapper::allocator::Eigen<FloatType> allocator(rv);
     const auto& eigen_A = allocator.rebind(A.buffer());
     const auto& eigen_B = allocator.rebind(B.buffer());
 
@@ -48,11 +37,17 @@ MODULE_RUN(EigenGeneralized) {
     const auto& shape_A = eigen_A.layout().shape().as_smooth();
     auto rows           = shape_A.extent(0);
     auto cols           = shape_A.extent(1);
-    Eigen::Map<const Eigen::MatrixXd> A_map(pA, rows, cols);
-    Eigen::Map<const Eigen::MatrixXd> B_map(pB, rows, cols);
+
+    constexpr auto rmajor = Eigen::RowMajor;
+    constexpr auto edynam = Eigen::Dynamic;
+    using matrix_type     = Eigen::Matrix<FloatType, edynam, edynam, rmajor>;
+    using map_type        = Eigen::Map<const matrix_type>;
+
+    map_type A_map(pA, rows, cols);
+    map_type B_map(pB, rows, cols);
 
     // Compute
-    Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXd> ges(A_map, B_map);
+    Eigen::GeneralizedSelfAdjointEigenSolver<matrix_type> ges(A_map, B_map);
     auto eigen_values  = ges.eigenvalues();
     auto eigen_vectors = ges.eigenvectors();
 
@@ -74,6 +69,32 @@ MODULE_RUN(EigenGeneralized) {
 
     simde::type::tensor values(vector_shape, std::move(pvalues_buffer));
     simde::type::tensor vectors(matrix_shape, std::move(pvectors_buffer));
+    return std::make_pair(values, vectors);
+}
+
+const auto desc = R"(
+Generalized Eigen Solve via Eigen
+---------------------------------
+
+TODO: Write me!!!
+)";
+
+MODULE_CTOR(EigenGeneralized) {
+    description(desc);
+    satisfies_property_type<pt>();
+}
+
+MODULE_RUN(EigenGeneralized) {
+    auto&& [A, B] = pt::unwrap_inputs(inputs);
+
+    simde::type::tensor values;
+    simde::type::tensor vectors;
+    if(tensorwrapper::allocator::Eigen<double>::can_rebind(A.buffer())) {
+        std::tie(values, vectors) = eigen_kernel<double>(A, B, get_runtime());
+    } else {
+        using udouble             = tensorwrapper::types::udouble;
+        std::tie(values, vectors) = eigen_kernel<udouble>(A, B, get_runtime());
+    }
 
     auto rv = results();
     return pt::wrap_results(rv, values, vectors);

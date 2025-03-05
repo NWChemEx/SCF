@@ -21,9 +21,10 @@ using Catch::Matchers::WithinAbs;
 using pt = simde::AOEnergy;
 
 TEST_CASE("SCFDriver") {
-    auto mm  = test_scf::load_modules();
-    auto h2  = test_scf::make_h2<simde::type::chemical_system>();
-    auto aos = test_scf::h2_aos().ao_basis_set();
+    using float_type = double;
+    auto mm          = test_scf::load_modules<float_type>();
+    auto h2          = test_scf::make_h2<simde::type::chemical_system>();
+    auto aos         = test_scf::h2_aos().ao_basis_set();
 
     const auto e = mm.run_as<pt>("SCF Driver", aos, h2);
     REQUIRE_THAT(e, WithinAbs(-1.1167592336, 1E-6));

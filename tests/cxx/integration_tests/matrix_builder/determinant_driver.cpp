@@ -27,13 +27,14 @@ using erased_type =
   chemist::braket::BraKet<WFType, simde::type::op_base_type, WFType>;
 
 TEST_CASE("DeterminantDriver") {
-    auto mm  = test_scf::load_modules();
-    auto mod = mm.at("Determinant driver");
+    using float_type = double;
+    auto mm          = test_scf::load_modules<float_type>();
+    auto mod         = mm.at("Determinant driver");
 
     using wf_type   = simde::type::rscf_wf;
     using index_set = typename wf_type::orbital_index_set_type;
 
-    wf_type psi(index_set{0}, test_scf::h2_cmos());
+    wf_type psi(index_set{0}, test_scf::h2_cmos<float_type>());
     simde::type::many_electrons es{2};
 
     SECTION("Calling Kinetic") {
@@ -54,7 +55,7 @@ TEST_CASE("DeterminantDriver") {
     }
 
     SECTION("Calling J") {
-        auto rho = test_scf::h2_density();
+        auto rho = test_scf::h2_density<float_type>();
         simde::type::J_e_type J_e(es, rho);
         chemist::braket::BraKet braket(psi, J_e, psi);
         erased_type<wf_type> copy_braket(braket);
@@ -63,7 +64,7 @@ TEST_CASE("DeterminantDriver") {
     }
 
     SECTION("Calling K") {
-        auto rho = test_scf::h2_density();
+        auto rho = test_scf::h2_density<float_type>();
         simde::type::K_e_type K_e(es, rho);
         chemist::braket::BraKet braket(psi, K_e, psi);
         erased_type<wf_type> copy_braket(braket);

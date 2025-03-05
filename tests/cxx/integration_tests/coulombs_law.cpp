@@ -20,8 +20,9 @@ using pt = simde::charge_charge_interaction;
 using Catch::Matchers::WithinAbs;
 
 TEST_CASE("CoulombsLaw") {
-    auto mm   = test_scf::load_modules();
-    auto& mod = mm.at("Coulomb's Law");
+    using float_type = double;
+    auto mm          = test_scf::load_modules<float_type>();
+    auto& mod        = mm.at("Coulomb's Law");
 
     auto h2_nuclei = test_scf::make_h2<simde::type::nuclei>();
     // TODO: Conversions are missing in Chemist. Use those when they're in place

@@ -19,11 +19,12 @@
 using pt = simde::aos_rho_e_aos<simde::type::cmos>;
 
 TEST_CASE("Density Matrix Builder") {
+    using float_type = double;
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
     auto& mod = mm.at("Density matrix builder");
     auto aos  = test_scf::h2_aos();
-    auto cmos = test_scf::h2_cmos();
+    auto cmos = test_scf::h2_cmos<float_type>();
     std::vector<int> occs{1, 0};
     simde::type::rho_e<simde::type::cmos> rho_hat(cmos, occs);
 
