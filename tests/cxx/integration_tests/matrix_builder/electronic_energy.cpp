@@ -21,13 +21,18 @@ template<typename WFType>
 using pt =
   simde::eval_braket<WFType, simde::type::electronic_hamiltonian, WFType>;
 
-TEST_CASE("ElectronicEnergy") {
-    using float_type = double;
+TEMPLATE_LIST_TEST_CASE("ElectronicEnergy", "", test_scf::float_types) {
+    using float_type = TestType;
     auto mm          = test_scf::load_modules<float_type>();
     auto mod         = mm.at("Electronic energy");
 
     using wf_type   = simde::type::rscf_wf;
     using index_set = typename wf_type::orbital_index_set_type;
+
+    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+    tensorwrapper::shape::Smooth shape_corr{};
+    auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
+    using tensorwrapper::operations::approximately_equal;
 
     wf_type psi(index_set{0}, test_scf::h2_cmos<float_type>());
     simde::type::many_electrons es{2};
@@ -44,6 +49,9 @@ TEST_CASE("ElectronicEnergy") {
                                             K_e);
     chemist::braket::BraKet braket(psi, H_e, psi);
 
-    const auto& E_elec = mod.run_as<pt<wf_type>>(braket);
-    REQUIRE_THAT(E_elec, WithinAbs(-1.90066758625308307, 1E-6));
+    const auto& E_elec = mod.template run_as<pt<wf_type>>(braket);
+
+    pcorr->at() = -1.90066758625308307;
+    tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+    REQUIRE(approximately_equal(corr, E_elec, 1E-6));
 }

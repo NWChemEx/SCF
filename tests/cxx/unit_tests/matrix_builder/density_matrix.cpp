@@ -18,8 +18,8 @@
 
 using pt = simde::aos_rho_e_aos<simde::type::cmos>;
 
-TEST_CASE("Density Matrix Builder") {
-    using float_type = double;
+TEMPLATE_LIST_TEST_CASE("Density Matrix Builder", "", test_scf::float_types) {
+    using float_type = TestType;
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
     auto& mod = mm.at("Density matrix builder");
@@ -29,13 +29,13 @@ TEST_CASE("Density Matrix Builder") {
     simde::type::rho_e<simde::type::cmos> rho_hat(cmos, occs);
 
     chemist::braket::BraKet p_mn(aos, rho_hat, aos);
-    const auto& P        = mod.run_as<pt>(p_mn);
-    using allocator_type = tensorwrapper::allocator::Eigen<double>;
-    const auto& P_eigen  = allocator_type::rebind(P.buffer());
+    const auto& P = mod.run_as<pt>(p_mn);
+    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+    tensorwrapper::shape::Smooth corr_shape{2, 2};
+    tensorwrapper::layout::Physical l(corr_shape);
+    auto corr_buffer = alloc.construct(l, 0.31980835);
+    tensorwrapper::Tensor corr(corr_shape, std::move(corr_buffer));
 
-    using Catch::Matchers::WithinAbs;
-    REQUIRE_THAT(P_eigen.at(0, 0), WithinAbs(0.31980835, 1E-6));
-    REQUIRE_THAT(P_eigen.at(0, 1), WithinAbs(0.31980835, 1E-6));
-    REQUIRE_THAT(P_eigen.at(1, 0), WithinAbs(0.31980835, 1E-6));
-    REQUIRE_THAT(P_eigen.at(1, 1), WithinAbs(0.31980835, 1E-6));
+    using tensorwrapper::operations::approximately_equal;
+    REQUIRE(approximately_equal(P, corr, 1E-6));
 }

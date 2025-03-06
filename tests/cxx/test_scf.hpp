@@ -23,6 +23,8 @@
 
 namespace test_scf {
 
+using float_types = std::tuple<double, tensorwrapper::types::udouble>;
+
 /// Makes a H nucleus at the point @p x, @p y, @p z
 inline auto h_nucleus(double x, double y, double z) {
     return simde::type::nucleus("H", 1ul, 1836.15, x, y, z);

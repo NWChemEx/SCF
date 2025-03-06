@@ -16,16 +16,21 @@
 
 #include "../integration_tests.hpp"
 
-using Catch::Matchers::WithinAbs;
-
 using pt = simde::AOEnergy;
 
-TEST_CASE("SCFDriver") {
-    using float_type = double;
+TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
+    using float_type = TestType;
     auto mm          = test_scf::load_modules<float_type>();
     auto h2          = test_scf::make_h2<simde::type::chemical_system>();
     auto aos         = test_scf::h2_aos().ao_basis_set();
 
-    const auto e = mm.run_as<pt>("SCF Driver", aos, h2);
-    REQUIRE_THAT(e, WithinAbs(-1.1167592336, 1E-6));
+    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+    tensorwrapper::shape::Smooth shape_corr{};
+    auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
+    using tensorwrapper::operations::approximately_equal;
+    pcorr->at() = -1.1167592336;
+    tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+
+    const auto e = mm.template run_as<pt>("SCF Driver", aos, h2);
+    REQUIRE(approximately_equal(corr, e, 1E-6));
 }

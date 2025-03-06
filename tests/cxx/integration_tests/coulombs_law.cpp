@@ -19,10 +19,15 @@
 using pt = simde::charge_charge_interaction;
 using Catch::Matchers::WithinAbs;
 
-TEST_CASE("CoulombsLaw") {
+TEMPLATE_LIST_TEST_CASE("CoulombsLaw", "", test_scf::float_types) {
     using float_type = double;
     auto mm          = test_scf::load_modules<float_type>();
     auto& mod        = mm.at("Coulomb's Law");
+
+    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+    tensorwrapper::shape::Smooth shape_corr{};
+    auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
+    using tensorwrapper::operations::approximately_equal;
 
     auto h2_nuclei = test_scf::make_h2<simde::type::nuclei>();
     // TODO: Conversions are missing in Chemist. Use those when they're in place
@@ -31,5 +36,8 @@ TEST_CASE("CoulombsLaw") {
         qs.push_back(nucleus.as_point_charge());
 
     auto e_nuclear = mod.run_as<pt>(qs, qs);
-    REQUIRE_THAT(e_nuclear, WithinAbs(0.71510297482837526, 1E-6));
+
+    pcorr->at() = 0.71510297482837526;
+    tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+    REQUIRE(approximately_equal(corr, e_nuclear, 1E-6));
 }

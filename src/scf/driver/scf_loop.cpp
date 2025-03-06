@@ -107,8 +107,8 @@ MODULE_RUN(SCFLoop) {
     }
     auto e_nuclear = V_nn_mod.run_as<v_nn_pt>(qs_lhs, qs_rhs);
 
-    wf_type psi_old             = psi0;
-    double e_old                = 0;
+    wf_type psi_old = psi0;
+    simde::type::tensor e_old;
     const unsigned int max_iter = 3;
     unsigned int iter           = 0;
 
@@ -154,8 +154,23 @@ MODULE_RUN(SCFLoop) {
         psi_old = new_psi;
         ++iter;
     }
-    auto rv = results();
-    return pt<wf_type>::wrap_results(rv, e_old + e_nuclear, psi_old);
+    simde::type::tensor e_total;
+
+    // e_nuclear is a double. This hack converts it to udouble (if needed)
+    tensorwrapper::allocator::Eigen<double> dalloc(get_runtime());
+    using tensorwrapper::types::udouble;
+    tensorwrapper::allocator::Eigen<udouble> ualloc(get_runtime());
+
+    if(ualloc.can_rebind(e_old.buffer())) {
+        simde::type::tensor temp(e_old);
+        auto val = dalloc.rebind(e_nuclear.buffer()).at();
+        ualloc.rebind(temp.buffer()).at() = val;
+        e_nuclear                         = temp;
+    }
+
+    e_total("") = e_old("") + e_nuclear("");
+    auto rv     = results();
+    return pt<wf_type>::wrap_results(rv, e_total, psi_old);
 }
 
 } // namespace scf::driver

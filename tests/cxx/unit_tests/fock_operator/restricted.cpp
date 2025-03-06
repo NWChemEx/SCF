@@ -18,7 +18,7 @@
 #include <scf/scf.hpp>
 #include <simde/simde.hpp>
 
-TEST_CASE("Restricted") {
+TEMPLATE_LIST_TEST_CASE("Restricted", "", test_scf::float_types) {
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
     using float_type   = double;

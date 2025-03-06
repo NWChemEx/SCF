@@ -28,6 +28,12 @@ TEMPLATE_LIST_TEST_CASE("Fock Matrix Builder", "", test_scf::float_types) {
     auto& mod = mm.at("Fock Matrix Builder");
     auto aos  = test_scf::h2_aos();
 
+    using tensorwrapper::operations::approximately_equal;
+    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+    tensorwrapper::shape::Smooth shape_corr{2, 2};
+    tensorwrapper::layout::Physical l(shape_corr);
+    auto pcorr = alloc.allocate(l);
+
     SECTION("No J or K") {
         auto h2 = test_scf::make_h2<simde::type::nuclei>();
         simde::type::electron e;
@@ -38,15 +44,14 @@ TEMPLATE_LIST_TEST_CASE("Fock Matrix Builder", "", test_scf::float_types) {
         chemist::braket::BraKet f_mn(aos, f_e, aos);
         const auto& F = mod.template run_as<pt>(f_mn);
 
-        using alloc_type    = tensorwrapper::allocator::Eigen<float_type>;
-        const auto& F_eigen = alloc_type::rebind(F.buffer());
-        using Catch::Matchers::WithinAbs;
-        if constexpr(std::is_same_v<float_type, double>) {
-            REQUIRE_THAT(F_eigen.at(0, 0), WithinAbs(-1.120958, 1E-6));
-            REQUIRE_THAT(F_eigen.at(0, 1), WithinAbs(-0.959374, 1E-6));
-            REQUIRE_THAT(F_eigen.at(1, 0), WithinAbs(-0.959374, 1E-6));
-            REQUIRE_THAT(F_eigen.at(1, 1), WithinAbs(-1.120958, 1E-6));
-        }
+        pcorr->at(0, 0) = -1.120958;
+        pcorr->at(0, 1) = -0.959374;
+        pcorr->at(1, 0) = -0.959374;
+        pcorr->at(1, 1) = -1.120958;
+
+        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+
+        REQUIRE(approximately_equal(F, corr, 1E-6));
     }
 
     SECTION("With J and K") {
@@ -54,15 +59,13 @@ TEMPLATE_LIST_TEST_CASE("Fock Matrix Builder", "", test_scf::float_types) {
         chemist::braket::BraKet f_mn(aos, f_e, aos);
         const auto& F = mod.template run_as<pt>(f_mn);
 
-        using alloc_type    = tensorwrapper::allocator::Eigen<float_type>;
-        const auto& F_eigen = alloc_type::rebind(F.buffer());
+        pcorr->at(0, 0) = -0.319459;
+        pcorr->at(0, 1) = -0.571781;
+        pcorr->at(1, 0) = -0.571781;
+        pcorr->at(1, 1) = -0.319459;
 
-        using Catch::Matchers::WithinAbs;
-        if constexpr(std::is_same_v<float_type, double>) {
-            REQUIRE_THAT(F_eigen.at(0, 0), WithinAbs(-0.319459, 1E-6));
-            REQUIRE_THAT(F_eigen.at(0, 1), WithinAbs(-0.571781, 1E-6));
-            REQUIRE_THAT(F_eigen.at(1, 0), WithinAbs(-0.571781, 1E-6));
-            REQUIRE_THAT(F_eigen.at(1, 1), WithinAbs(-0.319459, 1E-6));
-        }
+        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+
+        REQUIRE(approximately_equal(F, corr, 1E-6));
     }
 }

@@ -103,7 +103,6 @@ MODULE_CTOR(DeterminantDriver) {
 }
 
 MODULE_RUN(DeterminantDriver) {
-    using float_type      = double;
     using wf_type         = simde::type::rscf_wf;
     const auto&& [braket] = pt<wf_type>::unwrap_inputs(inputs);
     const auto& bra       = braket.bra();
@@ -130,11 +129,8 @@ MODULE_RUN(DeterminantDriver) {
     tensorwrapper::Tensor x;
     x("") = rho("i,j") * t("i,j");
 
-    using allocator_type = tensorwrapper::allocator::Eigen<float_type>;
-    auto& x_buffer       = allocator_type::rebind(x.buffer());
-
     auto rv = results();
-    return pt<wf_type>::wrap_results(rv, x_buffer.at());
+    return pt<wf_type>::wrap_results(rv, x);
 }
 
 } // namespace scf::matrix_builder

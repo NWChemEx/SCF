@@ -48,7 +48,7 @@ MODULE_RUN(ElectronicEnergy) {
     const auto& ket     = H_ij.ket();
 
     auto& mod = submods.at("determinant driver");
-    double e  = 0.0;
+    simde::type::tensor e;
 
     auto n_ops = H.size();
     for(decltype(n_ops) i = 0; i < n_ops; ++i) {
@@ -57,7 +57,11 @@ MODULE_RUN(ElectronicEnergy) {
 
         chemist::braket::BraKet O_ij(bra, O_i, ket);
         const auto o = mod.run_as<det_pt<wf_type>>(O_ij);
-        e += ci * o;
+        simde::type::tensor temp;
+        temp("") = o("") * ci;
+        if(i == 0)
+            e = temp;
+        else { e("") = e("") + temp(""); }
     }
 
     auto rv = results();

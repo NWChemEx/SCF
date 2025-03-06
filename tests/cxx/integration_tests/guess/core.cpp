@@ -33,14 +33,12 @@ TEMPLATE_LIST_TEST_CASE("Core", "", test_scf::float_types) {
     typename rscf_wf::orbital_index_set_type occs{0};
     REQUIRE(psi.orbital_indices() == occs);
     REQUIRE(psi.orbitals().from_space() == aos);
-    const auto& evals       = psi.orbitals().diagonalized_matrix();
-    using allocator_type    = tensorwrapper::allocator::Eigen<float_type>;
-    const auto& eval_buffer = allocator_type::rebind(evals.buffer());
+    const auto& evals = psi.orbitals().diagonalized_matrix();
+    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+    tensorwrapper::shape::Smooth shape_corr{2};
+    auto pbuffer = alloc.construct({-1.25330893, -0.47506974});
+    tensorwrapper::Tensor corr(shape_corr, std::move(pbuffer));
 
-    const auto tol = 1E-6;
-    using Catch::Matchers::WithinAbs;
-    if constexpr(std::is_same_v<float_type, double>) {
-        REQUIRE_THAT(eval_buffer.at(0), WithinAbs(-1.25330893, tol));
-        REQUIRE_THAT(eval_buffer.at(1), WithinAbs(-0.47506974, tol));
-    }
+    using tensorwrapper::operations::approximately_equal;
+    REQUIRE(approximately_equal(corr, evals, 1E-6));
 }

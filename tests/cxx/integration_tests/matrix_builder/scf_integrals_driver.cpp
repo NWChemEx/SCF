@@ -19,30 +19,6 @@
 using pt = simde::aos_op_base_aos;
 using simde::type::tensor;
 
-namespace {
-
-template<typename FloatType>
-void compare_matrices(const tensor& A, const tensor& A_corr) {
-    using Catch::Matchers::WithinAbs;
-    using alloc_type          = tensorwrapper::allocator::Eigen<FloatType>;
-    const auto& A_buffer      = alloc_type::rebind(A.buffer());
-    const auto& A_corr_buffer = alloc_type::rebind(A_corr.buffer());
-
-    const auto tol = 1E-6;
-    if constexpr(std::is_same_v<FloatType, double>) {
-        REQUIRE_THAT(A_buffer.at(0, 0),
-                     WithinAbs(A_corr_buffer.at(0, 0), 1E-6));
-        REQUIRE_THAT(A_buffer.at(0, 1),
-                     WithinAbs(A_corr_buffer.at(0, 1), 1E-6));
-        REQUIRE_THAT(A_buffer.at(1, 0),
-                     WithinAbs(A_corr_buffer.at(1, 0), 1E-6));
-        REQUIRE_THAT(A_buffer.at(1, 1),
-                     WithinAbs(A_corr_buffer.at(1, 1), 1E-6));
-    }
-}
-
-} // namespace
-
 using erased_type =
   chemist::braket::BraKet<simde::type::aos, simde::type::op_base_type,
                           simde::type::aos>;
@@ -55,6 +31,8 @@ TEMPLATE_LIST_TEST_CASE("SCFIntegralsDriver", "", test_scf::float_types) {
     simde::type::electron e;
     auto rho = test_scf::h2_density<float_type>();
 
+    using tensorwrapper::operations::approximately_equal;
+
     SECTION("Calling Kinetic") {
         auto& tmod = mm.at("Kinetic");
         simde::type::t_e_type t_e(e);
@@ -62,7 +40,7 @@ TEMPLATE_LIST_TEST_CASE("SCFIntegralsDriver", "", test_scf::float_types) {
         erased_type copy_braket(braket);
         const auto& T      = mod.template run_as<pt>(copy_braket);
         const auto& T_corr = tmod.template run_as<simde::aos_t_e_aos>(braket);
-        compare_matrices<float_type>(T, T_corr);
+        REQUIRE(approximately_equal(T, T_corr, 1E-6));
     }
 
     SECTION("Calling Electron-Nuclear Attraction") {
@@ -73,7 +51,7 @@ TEMPLATE_LIST_TEST_CASE("SCFIntegralsDriver", "", test_scf::float_types) {
         erased_type copy_braket(braket);
         const auto& V      = mod.template run_as<pt>(copy_braket);
         const auto& V_corr = tmod.template run_as<simde::aos_v_en_aos>(braket);
-        compare_matrices<float_type>(V, V_corr);
+        REQUIRE(approximately_equal(V, V_corr, 1E-6));
     }
 
     SECTION("Calling J Matrix") {
@@ -83,7 +61,7 @@ TEMPLATE_LIST_TEST_CASE("SCFIntegralsDriver", "", test_scf::float_types) {
         erased_type copy_braket(braket);
         const auto& J      = mod.template run_as<pt>(copy_braket);
         const auto& J_corr = jmod.template run_as<simde::aos_j_e_aos>(braket);
-        compare_matrices<float_type>(J, J_corr);
+        REQUIRE(approximately_equal(J, J_corr, 1E-6));
     }
 
     SECTION("Calling K Matrix") {
@@ -93,7 +71,7 @@ TEMPLATE_LIST_TEST_CASE("SCFIntegralsDriver", "", test_scf::float_types) {
         erased_type copy_braket(braket);
         const auto& K      = mod.template run_as<pt>(copy_braket);
         const auto& K_corr = kmod.template run_as<simde::aos_k_e_aos>(braket);
-        compare_matrices<float_type>(K, K_corr);
+        REQUIRE(approximately_equal(K, K_corr, 1E-6));
     }
 
     SECTION("Calling density matrix") {
@@ -106,7 +84,7 @@ TEMPLATE_LIST_TEST_CASE("SCFIntegralsDriver", "", test_scf::float_types) {
         const auto& P      = mod.template run_as<pt>(copy_braket);
         using op_pt        = simde::aos_rho_e_aos<simde::type::cmos>;
         const auto& P_corr = pmod.template run_as<op_pt>(braket);
-        compare_matrices<float_type>(P, P_corr);
+        REQUIRE(approximately_equal(P, P_corr, 1E-6));
     }
 
     // SECTION("Calling Fock Matrix") {
