@@ -23,9 +23,10 @@ using orbital_index_set = typename wf_t::orbital_index_set_type;
 using simde::type::t_e_type;
 using simde::type::v_en_type;
 
-TEST_CASE("Diagaonalization") {
-    auto mm   = test_scf::load_modules();
-    auto& mod = mm.at("Diagonalization Fock update");
+TEMPLATE_LIST_TEST_CASE("Diagaonalization", "", test_scf::float_types) {
+    using float_type = TestType;
+    auto mm          = test_scf::load_modules<float_type>();
+    auto& mod        = mm.at("Diagonalization Fock update");
 
     auto aos = test_scf::h2_aos();
     auto h2  = test_scf::make_h2<simde::type::nuclei>();
@@ -41,18 +42,18 @@ TEST_CASE("Diagaonalization") {
         simde::type::cmos cmos(empty, aos, empty);
         simde::type::rscf_wf core_guess(occs, cmos);
 
-        const auto& psi = mod.run_as<pt>(f_e, core_guess);
+        const auto& psi = mod.template run_as<pt>(f_e, core_guess);
         REQUIRE(psi.orbital_indices() == occs);
         REQUIRE(psi.orbitals().from_space() == aos);
 
         // Check orbital energies
-        const auto& evals       = psi.orbitals().diagonalized_matrix();
-        using vector_allocator  = tensorwrapper::allocator::Eigen<double>;
-        const auto& eval_buffer = vector_allocator::rebind(evals.buffer());
+        const auto& evals = psi.orbitals().diagonalized_matrix();
+        tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+        auto corr_buffer = alloc.construct({-1.25330893, -0.47506974});
+        tensorwrapper::shape::Smooth corr_shape{2};
+        tensorwrapper::Tensor corr(corr_shape, std::move(corr_buffer));
 
-        const auto tol = 1E-6;
-        using Catch::Matchers::WithinAbs;
-        REQUIRE_THAT(eval_buffer.at(0), WithinAbs(-1.25330893, tol));
-        REQUIRE_THAT(eval_buffer.at(1), WithinAbs(-0.47506974, tol));
+        using tensorwrapper::operations::approximately_equal;
+        REQUIRE(approximately_equal(evals, corr, 1E-6));
     }
 }

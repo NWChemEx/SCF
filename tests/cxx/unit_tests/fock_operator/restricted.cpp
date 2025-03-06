@@ -18,22 +18,22 @@
 #include <scf/scf.hpp>
 #include <simde/simde.hpp>
 
-TEST_CASE("Restricted") {
+TEMPLATE_LIST_TEST_CASE("Restricted", "", test_scf::float_types) {
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
-
+    using float_type   = double;
     using density_type = simde::type::decomposable_e_density;
     using pt           = simde::FockOperator<density_type>;
     auto H             = test_scf::h2_hamiltonian();
     auto h2            = test_scf::make_h2<simde::type::nuclei>();
-    auto rho           = test_scf::h2_density();
+    auto rho           = test_scf::h2_density<float_type>();
 
     SECTION("Many-electron version") {
         auto& mod = mm.at("Restricted Fock Op");
 
         SECTION("No density") {
-            density_type rho;
-            auto F = mod.run_as<pt>(H, rho);
+            density_type rho_empty;
+            auto F = mod.run_as<pt>(H, rho_empty);
             simde::type::many_electrons es(2);
 
             simde::type::fock F_corr;
@@ -45,8 +45,6 @@ TEST_CASE("Restricted") {
         }
 
         SECTION("Density") {
-            auto rho = test_scf::h2_density();
-
             auto F      = mod.run_as<pt>(H, rho);
             auto F_corr = test_scf::h2_fock<simde::type::many_electrons>();
             REQUIRE(F == F_corr);
@@ -56,8 +54,8 @@ TEST_CASE("Restricted") {
         auto& mod = mm.at("Restricted One-Electron Fock Op");
 
         SECTION(" No density") {
-            density_type rho;
-            auto f = mod.run_as<pt>(H, rho);
+            density_type rho_empty;
+            auto f = mod.run_as<pt>(H, rho_empty);
             simde::type::fock f_corr;
             simde::type::electron e;
             using simde::type::t_e_type;
@@ -68,8 +66,6 @@ TEST_CASE("Restricted") {
         }
 
         SECTION("Density") {
-            auto rho = test_scf::h2_density();
-
             auto f      = mod.run_as<pt>(H, rho);
             auto f_corr = test_scf::h2_fock<simde::type::electron>();
             REQUIRE(f == f_corr);

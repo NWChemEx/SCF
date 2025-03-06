@@ -23,7 +23,40 @@ namespace {
 const auto desc = R"(
 )";
 
-}
+struct Kernel {
+    template<typename FloatType>
+    auto run(const tensorwrapper::buffer::BufferBase& c, std::size_t n_aos,
+             std::size_t n_occ) {
+        constexpr auto rmajor = Eigen::RowMajor;
+        constexpr auto edynam = Eigen::Dynamic;
+        using allocator_type  = tensorwrapper::allocator::Eigen<FloatType>;
+        using tensor_type    = Eigen::Matrix<FloatType, edynam, edynam, rmajor>;
+        using map_type       = Eigen::Map<tensor_type>;
+        using const_map_type = Eigen::Map<const tensor_type>;
+        auto rv              = c.allocator().runtime();
+        allocator_type alloc(rv);
+
+        tensorwrapper::shape::Smooth p_shape(n_aos, n_aos);
+        tensorwrapper::layout::Physical l(p_shape);
+        auto pp_buffer = alloc.allocate(l);
+
+        // Step 2: Grab the orbitals in the ensemble
+        auto& c_buffer = alloc.rebind(c);
+
+        const_map_type c_eigen(c_buffer.data(), n_aos, n_aos);
+        map_type p_eigen(pp_buffer->data(), n_aos, n_aos);
+        auto slice = c_eigen.block(0, 0, n_aos, n_occ);
+
+        // Step 3: CC_dagger
+        using index_pair_t = Eigen::IndexPair<int>;
+        Eigen::array<index_pair_t, 1> modes{index_pair_t(1, 1)};
+        p_eigen = slice * slice.transpose();
+
+        return simde::type::tensor(p_shape, std::move(pp_buffer));
+    }
+};
+
+} // namespace
 
 using pt = simde::aos_rho_e_aos<simde::type::cmos>;
 
@@ -63,35 +96,10 @@ MODULE_RUN(DensityMatrix) {
               "Please shuffle your orbitals so that the ensemble is a "
               "contiguous slice of the orbitals.");
 
-    using allocator_type    = tensorwrapper::allocator::Eigen<double>;
-    using tensor_type       = Eigen::Tensor<double, 2, Eigen::RowMajor>;
-    using const_tensor_type = Eigen::Tensor<const double, 2, Eigen::RowMajor>;
-    using map_type          = Eigen::TensorMap<tensor_type>;
-    using const_map_type    = Eigen::TensorMap<const_tensor_type>;
-
-    allocator_type alloc(get_runtime());
-
-    tensorwrapper::shape::Smooth p_shape(n_aos, n_aos);
-    tensorwrapper::layout::Physical l(p_shape);
-    auto pp_buffer = alloc.allocate(l);
-
-    // Step 2: Grab the orbitals in the ensemble
-    const auto& c_buffer = alloc.rebind(c.buffer());
-    const_map_type c_eigen(c_buffer.data(), n_aos, n_aos);
-    map_type p_eigen(pp_buffer->data(), n_aos, n_aos);
-
-    using slice_t = Eigen::array<Eigen::Index, 2>;
-    slice_t offsets{0, 0};
-    slice_t extents{n_aos, Eigen::Index(participants.size())};
-    auto slice = c_eigen.slice(offsets, extents);
-
-    // Step 3: CC_dagger
-    using index_pair_t = Eigen::IndexPair<int>;
-    Eigen::array<index_pair_t, 1> modes{index_pair_t(1, 1)};
-    p_eigen = slice.contract(slice, modes);
-
-    simde::type::tensor p(p_shape, std::move(pp_buffer));
-
+    // TODO: The need to dispatch like this goes away when TW supports slicing
+    using tensorwrapper::utilities::floating_point_dispatch;
+    Kernel k;
+    auto p = floating_point_dispatch(k, c.buffer(), n_aos, participants.size());
     auto rv = results();
     return pt::wrap_results(rv, p);
 }

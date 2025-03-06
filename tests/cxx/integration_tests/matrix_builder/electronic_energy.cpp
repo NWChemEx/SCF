@@ -21,14 +21,20 @@ template<typename WFType>
 using pt =
   simde::eval_braket<WFType, simde::type::electronic_hamiltonian, WFType>;
 
-TEST_CASE("ElectronicEnergy") {
-    auto mm  = test_scf::load_modules();
-    auto mod = mm.at("Electronic energy");
+TEMPLATE_LIST_TEST_CASE("ElectronicEnergy", "", test_scf::float_types) {
+    using float_type = TestType;
+    auto mm          = test_scf::load_modules<float_type>();
+    auto mod         = mm.at("Electronic energy");
 
     using wf_type   = simde::type::rscf_wf;
     using index_set = typename wf_type::orbital_index_set_type;
 
-    wf_type psi(index_set{0}, test_scf::h2_cmos());
+    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+    tensorwrapper::shape::Smooth shape_corr{};
+    auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
+    using tensorwrapper::operations::approximately_equal;
+
+    wf_type psi(index_set{0}, test_scf::h2_cmos<float_type>());
     simde::type::many_electrons es{2};
 
     simde::type::T_e_type T_e(es);
@@ -36,13 +42,16 @@ TEST_CASE("ElectronicEnergy") {
     auto h2_nuclei = test_scf::make_h2<simde::type::nuclei>();
     simde::type::V_en_type V_en(es, h2_nuclei);
 
-    auto rho = test_scf::h2_density();
+    auto rho = test_scf::h2_density<float_type>();
     simde::type::J_e_type J_e(es, rho);
     simde::type::K_e_type K_e(es, rho);
     simde::type::electronic_hamiltonian H_e(T_e * 2.0 + V_en * 2.0 + J_e * 2.0 -
                                             K_e);
     chemist::braket::BraKet braket(psi, H_e, psi);
 
-    const auto& E_elec = mod.run_as<pt<wf_type>>(braket);
-    REQUIRE_THAT(E_elec, WithinAbs(-1.90066758625308307, 1E-6));
+    const auto& E_elec = mod.template run_as<pt<wf_type>>(braket);
+
+    pcorr->at() = -1.90066758625308307;
+    tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+    REQUIRE(approximately_equal(corr, E_elec, 1E-6));
 }

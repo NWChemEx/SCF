@@ -24,17 +24,26 @@ using egy_pt = simde::eval_braket<WFType, simde::type::hamiltonian, WFType>;
 template<typename WFType>
 using pt = simde::Optimize<egy_pt<WFType>, WFType>;
 
-TEST_CASE("SCFLoop") {
-    using wf_type = simde::type::rscf_wf;
-    auto mm       = test_scf::load_modules();
-    auto& mod     = mm.at("Loop");
+TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
+    using float_type = TestType;
+    using wf_type    = simde::type::rscf_wf;
+    auto mm          = test_scf::load_modules<float_type>();
+    auto& mod        = mm.at("Loop");
+
+    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+    tensorwrapper::shape::Smooth shape_corr{};
+    auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
+    using tensorwrapper::operations::approximately_equal;
 
     using index_set = typename wf_type::orbital_index_set_type;
-    wf_type psi0(index_set{0}, test_scf::h2_cmos());
+    wf_type psi0(index_set{0}, test_scf::h2_cmos<float_type>());
 
     auto H = test_scf::h2_hamiltonian();
 
     chemist::braket::BraKet H_00(psi0, H, psi0);
-    const auto& [e, psi] = mod.run_as<pt<wf_type>>(H_00, psi0);
-    REQUIRE_THAT(e, WithinAbs(-1.1167592336, 1E-6));
+    const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
+
+    pcorr->at() = -1.1167592336;
+    tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+    REQUIRE(approximately_equal(corr, e, 1E-6));
 }

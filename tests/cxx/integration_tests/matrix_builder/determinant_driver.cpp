@@ -26,22 +26,31 @@ template<typename WFType>
 using erased_type =
   chemist::braket::BraKet<WFType, simde::type::op_base_type, WFType>;
 
-TEST_CASE("DeterminantDriver") {
-    auto mm  = test_scf::load_modules();
-    auto mod = mm.at("Determinant driver");
+TEMPLATE_LIST_TEST_CASE("DeterminantDriver", "", test_scf::float_types) {
+    using float_type = TestType;
+    auto mm          = test_scf::load_modules<float_type>();
+    auto mod         = mm.at("Determinant driver");
 
     using wf_type   = simde::type::rscf_wf;
     using index_set = typename wf_type::orbital_index_set_type;
 
-    wf_type psi(index_set{0}, test_scf::h2_cmos());
+    wf_type psi(index_set{0}, test_scf::h2_cmos<float_type>());
     simde::type::many_electrons es{2};
+
+    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+    tensorwrapper::shape::Smooth shape_corr{};
+    auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
+    using tensorwrapper::operations::approximately_equal;
 
     SECTION("Calling Kinetic") {
         simde::type::T_e_type T_e(es);
         chemist::braket::BraKet braket(psi, T_e, psi);
         erased_type<wf_type> copy_braket(braket);
-        const auto& T = mod.run_as<pt<wf_type>>(copy_braket);
-        REQUIRE_THAT(T, WithinAbs(0.637692, 1E-6));
+        const auto& T = mod.template run_as<pt<wf_type>>(copy_braket);
+
+        pcorr->at() = 0.637692;
+        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+        REQUIRE(approximately_equal(corr, T, 1E-6));
     }
 
     SECTION("Calling Electron-Nuclear Attraction") {
@@ -49,25 +58,34 @@ TEST_CASE("DeterminantDriver") {
         simde::type::V_en_type V_en(es, h2_nuclei);
         chemist::braket::BraKet braket(psi, V_en, psi);
         erased_type<wf_type> copy_braket(braket);
-        const auto& V = mod.run_as<pt<wf_type>>(copy_braket);
-        REQUIRE_THAT(V, WithinAbs(-1.96830777255516853, 1E-6));
+        const auto& V = mod.template run_as<pt<wf_type>>(copy_braket);
+
+        pcorr->at() = -1.96830777255516853;
+        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+        REQUIRE(approximately_equal(corr, V, 1E-6));
     }
 
     SECTION("Calling J") {
-        auto rho = test_scf::h2_density();
+        auto rho = test_scf::h2_density<float_type>();
         simde::type::J_e_type J_e(es, rho);
         chemist::braket::BraKet braket(psi, J_e, psi);
         erased_type<wf_type> copy_braket(braket);
-        const auto& J = mod.run_as<pt<wf_type>>(copy_braket);
-        REQUIRE_THAT(J, WithinAbs(0.76056339681664897, 1E-6));
+        const auto& J = mod.template run_as<pt<wf_type>>(copy_braket);
+
+        pcorr->at() = 0.76056339681664897;
+        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+        REQUIRE(approximately_equal(corr, J, 1E-6));
     }
 
     SECTION("Calling K") {
-        auto rho = test_scf::h2_density();
+        auto rho = test_scf::h2_density<float_type>();
         simde::type::K_e_type K_e(es, rho);
         chemist::braket::BraKet braket(psi, K_e, psi);
         erased_type<wf_type> copy_braket(braket);
-        const auto& K = mod.run_as<pt<wf_type>>(copy_braket);
-        REQUIRE_THAT(K, WithinAbs(0.76056339681664897, 1E-6));
+        const auto& K = mod.template run_as<pt<wf_type>>(copy_braket);
+
+        pcorr->at() = 0.76056339681664897;
+        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+        REQUIRE(approximately_equal(corr, K, 1E-6));
     }
 }

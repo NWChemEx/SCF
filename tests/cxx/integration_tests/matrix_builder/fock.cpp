@@ -21,10 +21,18 @@ using pt = simde::aos_f_e_aos;
 using simde::type::t_e_type;
 using simde::type::v_en_type;
 
-TEST_CASE("Fock Matrix Builder") {
-    auto mm   = test_scf::load_modules();
+TEMPLATE_LIST_TEST_CASE("Fock Matrix Builder", "", test_scf::float_types) {
+    using float_type = TestType;
+    auto mm          = test_scf::load_modules<float_type>();
+
     auto& mod = mm.at("Fock Matrix Builder");
     auto aos  = test_scf::h2_aos();
+
+    using tensorwrapper::operations::approximately_equal;
+    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+    tensorwrapper::shape::Smooth shape_corr{2, 2};
+    tensorwrapper::layout::Physical l(shape_corr);
+    auto pcorr = alloc.allocate(l);
 
     SECTION("No J or K") {
         auto h2 = test_scf::make_h2<simde::type::nuclei>();
@@ -33,29 +41,31 @@ TEST_CASE("Fock Matrix Builder") {
         simde::type::fock f_e;
         f_e.emplace_back(1.0, std::make_unique<t_e_type>(e));
         f_e.emplace_back(1.0, std::make_unique<v_en_type>(e, h2));
-        const auto& F = mod.run_as<pt>(chemist::braket::BraKet(aos, f_e, aos));
+        chemist::braket::BraKet f_mn(aos, f_e, aos);
+        const auto& F = mod.template run_as<pt>(f_mn);
 
-        using alloc_type    = tensorwrapper::allocator::Eigen<double>;
-        const auto& F_eigen = alloc_type::rebind(F.buffer());
-        using Catch::Matchers::WithinAbs;
-        REQUIRE_THAT(F_eigen.at(0, 0), WithinAbs(-1.120958, 1E-6));
-        REQUIRE_THAT(F_eigen.at(0, 1), WithinAbs(-0.959374, 1E-6));
-        REQUIRE_THAT(F_eigen.at(1, 0), WithinAbs(-0.959374, 1E-6));
-        REQUIRE_THAT(F_eigen.at(1, 1), WithinAbs(-1.120958, 1E-6));
+        pcorr->at(0, 0) = -1.120958;
+        pcorr->at(0, 1) = -0.959374;
+        pcorr->at(1, 0) = -0.959374;
+        pcorr->at(1, 1) = -1.120958;
+
+        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+
+        REQUIRE(approximately_equal(F, corr, 1E-6));
     }
 
     SECTION("With J and K") {
-        auto f_e = test_scf::h2_fock<simde::type::electron>();
+        auto f_e = test_scf::h2_fock<simde::type::electron, float_type>();
+        chemist::braket::BraKet f_mn(aos, f_e, aos);
+        const auto& F = mod.template run_as<pt>(f_mn);
 
-        const auto& F = mod.run_as<pt>(chemist::braket::BraKet(aos, f_e, aos));
+        pcorr->at(0, 0) = -0.319459;
+        pcorr->at(0, 1) = -0.571781;
+        pcorr->at(1, 0) = -0.571781;
+        pcorr->at(1, 1) = -0.319459;
 
-        using alloc_type    = tensorwrapper::allocator::Eigen<double>;
-        const auto& F_eigen = alloc_type::rebind(F.buffer());
+        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
 
-        using Catch::Matchers::WithinAbs;
-        REQUIRE_THAT(F_eigen.at(0, 0), WithinAbs(-0.319459, 1E-6));
-        REQUIRE_THAT(F_eigen.at(0, 1), WithinAbs(-0.571781, 1E-6));
-        REQUIRE_THAT(F_eigen.at(1, 0), WithinAbs(-0.571781, 1E-6));
-        REQUIRE_THAT(F_eigen.at(1, 1), WithinAbs(-0.319459, 1E-6));
+        REQUIRE(approximately_equal(F, corr, 1E-6));
     }
 }
