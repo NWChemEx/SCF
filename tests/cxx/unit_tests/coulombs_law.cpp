@@ -42,8 +42,10 @@ TEST_CASE("CoulombsLaw") {
     simde::type::charges qs{q0, q1, q2};
 
     SECTION("empty points") {
-        auto e = mod.run_as<pt>(empty, empty);
-        REQUIRE(e == 0.0);
+        auto e      = mod.run_as<pt>(empty, empty);
+        pcorr->at() = 0.0;
+        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+        REQUIRE(approximately_equal(corr, e, 1E-6));
     }
 
     SECTION("charges w/ itself") {
