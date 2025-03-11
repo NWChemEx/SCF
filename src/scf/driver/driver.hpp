@@ -35,6 +35,7 @@ inline void set_defaults(pluginplay::ModuleManager& mm) {
                      "Restricted One-Electron Fock op");
     mm.change_submod("Loop", "Fock operator", "Restricted Fock Op");
     mm.change_submod("Loop", "Charge-charge", "Coulomb's Law");
+    mm.change_submod("Loop", "Fock matrix builder", "Fock matrix builder");
 
     mm.change_submod("SCF Driver", "Guess", "Core guess");
     mm.change_submod("SCF Driver", "Optimizer", "Loop");
