@@ -48,8 +48,6 @@ struct Kernel {
         auto slice = c_eigen.block(0, 0, n_aos, n_occ);
 
         // Step 3: CC_dagger
-        using index_pair_t = Eigen::IndexPair<int>;
-        Eigen::array<index_pair_t, 1> modes{index_pair_t(1, 1)};
         p_eigen = slice * slice.transpose();
 
         return simde::type::tensor(p_shape, std::move(pp_buffer));
@@ -71,17 +69,16 @@ MODULE_CTOR(DensityMatrix) {
 
 MODULE_RUN(DensityMatrix) {
     const auto&& [braket] = pt::unwrap_inputs(inputs);
-    const auto& bra_aos   = braket.bra();
-    const auto& op        = braket.op();
-    const auto& ket_aos   = braket.ket();
-    const auto& cutoff    = inputs.at("cutoff").value<double>();
+    // TODO: Compare the aos and make sure they're all the same
+    // const auto& bra_aos   = braket.bra();
+    // const auto& ket_aos   = braket.ket();
+    const auto& op     = braket.op();
+    const auto& cutoff = inputs.at("cutoff").value<double>();
 
     const auto& mos     = op.orbitals();
     const auto& c       = mos.transform();
     const auto& weights = op.weights();
     auto n_aos          = c.logical_layout().shape().as_smooth().extent(0);
-
-    // TODO: Compare the aos and make sure they're all the same
 
     // Step 1: Figure out which orbitals we need to grab
     using size_type = std::size_t;
