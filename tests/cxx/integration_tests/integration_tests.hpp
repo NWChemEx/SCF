@@ -48,6 +48,8 @@ pluginplay::ModuleManager load_modules() {
     mm.change_submod("Diagonalization Fock update", "Overlap matrix builder",
                      "Overlap");
 
+    mm.change_submod("Loop", "Overlap matrix builder", "Overlap");
+
     if constexpr(!std::is_same_v<FloatType, double>) {
         mm.change_input("Evaluate 2-Index BraKet", "With UQ?", true);
         mm.change_input("Evaluate 4-Index BraKet", "With UQ?", true);
