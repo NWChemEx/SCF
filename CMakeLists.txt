@@ -112,7 +112,7 @@ if("${BUILD_TESTING}")
             integration_test_scf
             "${PYTHON_TEST_DIR}/integration_tests/run_integration_tests.py"
             SUBMODULES nwchemex chemcache simde chemist pluginplay parallelzone
-                       friendzone
+                       friendzone tensorwrapper
         )
     endif()
 endif()
