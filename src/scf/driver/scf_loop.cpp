@@ -141,8 +141,7 @@ MODULE_RUN(SCFLoop) {
 
     // Compute S
     chemist::braket::BraKet s_mn(aos, simde::type::s_e_type{}, aos);
-    auto& s_mod   = submods.at("Overlap matrix builder");
-    const auto& S = s_mod.run_as<s_pt>(s_mn);
+    const auto& S = S_mod.run_as<s_pt>(s_mn);
 
     wf_type psi_old = psi0;
     simde::type::tensor e_old;
@@ -166,9 +165,8 @@ MODULE_RUN(SCFLoop) {
 
         // Step 3: New Fock operator is used to compute the new wavefunction
         auto psi_new = update_mod.run_as<update_pt<wf_type>>(f_new, psi_old);
-        const auto& cmos_new  = psi_new.orbitals();
-        const auto& evals_new = cmos_new.diagonalized_matrix();
-        const auto& c_new     = cmos_new.transform();
+        const auto& cmos_new = psi_new.orbitals();
+        const auto& c_new    = cmos_new.transform();
 
         // Step 4: New electronic energy
         // Step 4a: New Fock operator to new electronic Hamiltonian
@@ -182,15 +180,16 @@ MODULE_RUN(SCFLoop) {
                                F_new.get_operator(i).clone());
 
         // Step 4b: New electronic hamiltonian to new electronic energy
-        chemist::braket::BraKet H_00(new_psi, H_new, new_psi);
+        chemist::braket::BraKet H_00(psi_new, H_new, psi_new);
         auto e_new = egy_mod.run_as<elec_egy_pt<wf_type>>(H_00);
 
         // Step 5: New density
-        density_op_type rho_hat_new(new_psi.orbitals(), new_psi.occupations());
+        density_op_type rho_hat_new(psi_new.orbitals(), psi_new.occupations());
         chemist::braket::BraKet P_mn_new(aos, rho_hat_new, aos);
         const auto& P_new = density_mod.run_as<density_pt>(P_mn_new);
-        density_t rho_new(P_new, new_psi.orbitals());
+        density_t rho_new(P_new, psi_new.orbitals());
 
+        bool converged = false;
         // Step 6: Converged?
         if(iter > 1) {
             simde::type::tensor de;
@@ -203,7 +202,7 @@ MODULE_RUN(SCFLoop) {
             simde::type::tensor FPS;
             FPS("m,l") = F_matrix("m,n") * P_new("n,l");
             FPS("m,l") = FPS("m,n") * S("n,l");
-            
+
             simde::type::tensor SPF;
             SPF("m,l") = P_new("m,n") * F_matrix("n,l");
             SPF("m,l") = S("m,n") * SPF("n,l");
@@ -228,17 +227,13 @@ MODULE_RUN(SCFLoop) {
             auto msg = "itr = " + s_iter + " dE = " + s_de + " dG = " + s_dg;
             logger.log(msg);
 
-            if(e_conv && g_conv) {
-                e_old   = e_new;
-                psi_old = new_psi;
-                rho_old = rho_new;
-                break;
-            }
+            if(e_conv && g_conv) converged = true;
         }
         // Step 7: Not converged so reset
         e_old   = e_new;
-        psi_old = new_psi;
+        psi_old = psi_new;
         rho_old = rho_new;
+        if(converged) break;
         ++iter;
     }
     if(iter == max_iter) throw std::runtime_error("SCF failed to converge");
