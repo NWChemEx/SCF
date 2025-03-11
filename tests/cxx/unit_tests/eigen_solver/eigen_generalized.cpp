@@ -47,8 +47,6 @@ TEMPLATE_LIST_TEST_CASE("EigenGeneralized", "", test_scf::float_types) {
 
     auto&& [values, vector] = mod.run_as<pt>(A, B);
 
-    const auto& eigen_values = alloc.rebind(values.buffer());
-
     auto corr_buffer = alloc.construct({-0.236068, 4.236068});
     tensorwrapper::shape::Smooth corr_shape{2};
     simde::type::tensor corr(corr_shape, std::move(corr_buffer));
