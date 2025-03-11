@@ -90,11 +90,11 @@ columns respectively are:
    Additional results can be accessed by using other property types or by using
    the Module class's advanced API.
 
-+-----------------------+--------+-------------+
-| Key                   | Type   | Description |
-+=======================+========+=============+
-| tensor representation | double | N/A         |
-+-----------------------+--------+-------------+
++-----------------------+-----------------------+-------------+
+| Key                   | Type                  | Description |
++=======================+=======================+=============+
+| tensor representation | tensorwrapper::Tensor | N/A         |
++-----------------------+-----------------------+-------------+
 
 
 **********

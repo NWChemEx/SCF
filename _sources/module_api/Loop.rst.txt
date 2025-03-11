@@ -46,6 +46,12 @@ module. The columns are:
 +===========================================================+=========+=============+
 | BraKet                                                    | N/A     | N/A         |
 +-----------------------------------------------------------+---------+-------------+
+| energy tolerance                                          | 1e-06   | N/A         |
++-----------------------------------------------------------+---------+-------------+
+| gradient tolerance                                        | 1e-06   | N/A         |
++-----------------------------------------------------------+---------+-------------+
+| max iterations                                            | 20      | N/A         |
++-----------------------------------------------------------+---------+-------------+
 | Object to optimize the objective function with respect to | N/A     | N/A         |
 +-----------------------------------------------------------+---------+-------------+
 
@@ -73,6 +79,39 @@ BraKet
 - Domain Restrictions :
 
   - Type == chemist::braket::BraKet<chemist::wavefunction::Determinant<chemist::wavefunction::CMOs>, chemist::qm_operator::Hamiltonian, chemist::wavefunction::Determinant<chemist::wavefunction::CMOs>>
+
+energy tolerance
+----------------
+
+- Description : N/A
+- Default Value : 1e-06
+- Optional? : False
+- Opaque? : True
+- Domain Restrictions :
+
+  - Type == double
+
+gradient tolerance
+------------------
+
+- Description : N/A
+- Default Value : 1e-06
+- Optional? : False
+- Opaque? : True
+- Domain Restrictions :
+
+  - Type == double
+
+max iterations
+--------------
+
+- Description : N/A
+- Default Value : 20
+- Optional? : False
+- Opaque? : True
+- Domain Restrictions :
+
+  - Type == unsigned int
 
 Object to optimize the objective function with respect to
 ---------------------------------------------------------
@@ -108,7 +147,7 @@ columns respectively are:
 +==============================================+=================================================================+=============+
 | Object that optimizes the objective function | chemist::wavefunction::Determinant<chemist::wavefunction::CMOs> | N/A         |
 +----------------------------------------------+-----------------------------------------------------------------+-------------+
-| tensor representation                        | double                                                          | N/A         |
+| tensor representation                        | tensorwrapper::Tensor                                           | N/A         |
 +----------------------------------------------+-----------------------------------------------------------------+-------------+
 
 
@@ -132,9 +171,13 @@ submodule we have listed:
 +----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+
 | Electronic energy          | simde::EvaluateBraKet<chemist::braket::BraKet<chemist::wavefunction::Determinant<chemist::wavefunction::CMOs>, chemist::qm_operator::ElectronicHamiltonian, chemist::wavefunction::Determinant<chemist::wavefunction::CMOs>>> | N/A         |
 +----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+
+| Fock matrix builder        | simde::EvaluateBraKet<chemist::braket::BraKet<chemist::wavefunction::AOs, chemist::qm_operator::Fock, chemist::wavefunction::AOs>>                                                                                            | N/A         |
++----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+
 | Fock operator              | simde::FockOperator<chemist::DecomposableDensity<chemist::Electron>>                                                                                                                                                          | N/A         |
 +----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+
 | Guess update               | simde::UpdateGuess<chemist::wavefunction::Determinant<chemist::wavefunction::CMOs>>                                                                                                                                           | N/A         |
 +----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+
 | One-electron Fock operator | simde::FockOperator<chemist::DecomposableDensity<chemist::Electron>>                                                                                                                                                          | N/A         |
++----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+
+| Overlap matrix builder     | simde::EvaluateBraKet<chemist::braket::BraKet<chemist::wavefunction::AOs, chemist::qm_operator::Identity, chemist::wavefunction::AOs>>                                                                                        | N/A         |
 +----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+
