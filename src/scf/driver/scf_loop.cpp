@@ -163,9 +163,12 @@ MODULE_RUN(SCFLoop) {
         const auto& f_new = fock_mod.run_as<fock_pt>(H, rho_old);
         const auto& F_new = Fock_mod.run_as<fock_pt>(H, rho_old);
 
-        // Step 3: New Fock operator is used to compute the new wavefunction
+        // Step 3: New Fock operator used to compute new wavefunction/density
         auto psi_new = update_mod.run_as<update_pt<wf_type>>(f_new, psi_old);
-        const auto& cmos_new = psi_new.orbitals();
+        density_op_type rho_hat_new(psi_new.orbitals(), psi_new.occupations());
+        chemist::braket::BraKet P_mn_new(aos, rho_hat_new, aos);
+        const auto& P_new = density_mod.run_as<density_pt>(P_mn_new);
+        density_t rho_new(P_new, psi_new.orbitals());
 
         // Step 4: New electronic energy
         // Step 4a: New Fock operator to new electronic Hamiltonian
@@ -182,14 +185,8 @@ MODULE_RUN(SCFLoop) {
         chemist::braket::BraKet H_00(psi_new, H_new, psi_new);
         auto e_new = egy_mod.run_as<elec_egy_pt<wf_type>>(H_00);
 
-        // Step 5: New density
-        density_op_type rho_hat_new(psi_new.orbitals(), psi_new.occupations());
-        chemist::braket::BraKet P_mn_new(aos, rho_hat_new, aos);
-        const auto& P_new = density_mod.run_as<density_pt>(P_mn_new);
-        density_t rho_new(P_new, psi_new.orbitals());
-
         bool converged = false;
-        // Step 6: Converged?
+        // Step 5: Converged?
         if(iter > 1) {
             simde::type::tensor de;
             de("") = e_new("") - e_old("");
@@ -228,7 +225,8 @@ MODULE_RUN(SCFLoop) {
 
             if(e_conv && g_conv) converged = true;
         }
-        // Step 7: Not converged so reset
+
+        // Step 6: Not converged so reset
         e_old   = e_new;
         psi_old = psi_new;
         rho_old = rho_new;
