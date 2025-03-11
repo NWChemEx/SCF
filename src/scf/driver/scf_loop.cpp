@@ -200,15 +200,13 @@ MODULE_RUN(SCFLoop) {
             // TODO: module satisfying BraKet(aos, Commutator(F,P), aos)
             chemist::braket::BraKet F_mn(aos, f_new, aos);
             const auto& F_matrix = F_mod.run_as<fock_matrix_pt>(F_mn);
-            simde::type::tensor FP;
-            simde::type::tensor PF;
-            FP("m,l") = F_matrix("m,n") * P_new("n,l");
-            PF("m,l") = P_new("m,n") * F_matrix("n,l");
-
             simde::type::tensor FPS;
+            FPS("m,l") = F_matrix("m,n") * P_new("n,l");
+            FPS("m,l") = FPS("m,n") * S("n,l");
+            
             simde::type::tensor SPF;
-            FPS("m,l") = FP("m,n") * S("n,l");
-            SPF("m,l") = S("m,n") * PF("n,l");
+            SPF("m,l") = P_new("m,n") * F_matrix("n,l");
+            SPF("m,l") = S("m,n") * SPF("n,l");
 
             simde::type::tensor grad;
             simde::type::tensor grad_norm;
