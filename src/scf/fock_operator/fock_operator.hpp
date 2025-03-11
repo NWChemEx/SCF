@@ -39,8 +39,8 @@ inline void load_modules(pluginplay::ModuleManager& mm) {
 }
 
 #define EXTERN_RESTRICTED(density)                                          \
-    extern template class Restricted<density, simde::type::many_electrons>; \
-    extern template class Restricted<density, simde::type::electron>
+    extern template struct Restricted<density, simde::type::many_electrons>; \
+    extern template struct Restricted<density, simde::type::electron>
 
 EXTERN_RESTRICTED(simde::type::e_density);
 EXTERN_RESTRICTED(simde::type::decomposable_e_density);

@@ -105,9 +105,9 @@ TEMPLATED_MODULE_RUN(Restricted, DensityType, ElectronType) {
     return pt::wrap_results(rv, F);
 }
 
-#define RESTRICTED(density)                                          \
-    template class Restricted<density, simde::type::many_electrons>; \
-    template class Restricted<density, simde::type::electron>
+#define RESTRICTED(density)                                           \
+    template struct Restricted<density, simde::type::many_electrons>; \
+    template struct Restricted<density, simde::type::electron>
 
 RESTRICTED(simde::type::e_density);
 RESTRICTED(simde::type::decomposable_e_density);
