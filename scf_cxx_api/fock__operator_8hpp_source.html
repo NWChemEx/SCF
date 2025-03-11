@@ -111,8 +111,8 @@ $(function() {
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;}</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#define EXTERN_RESTRICTED(density)                                          \</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">    extern template class Restricted&lt;density, simde::type::many_electrons&gt;; \</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">    extern template class Restricted&lt;density, simde::type::electron&gt;</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">    extern template struct Restricted&lt;density, simde::type::many_electrons&gt;; \</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">    extern template struct Restricted&lt;density, simde::type::electron&gt;</span></div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;EXTERN_RESTRICTED(simde::type::e_density);</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;EXTERN_RESTRICTED(simde::type::decomposable_e_density);</div>
