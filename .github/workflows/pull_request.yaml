@@ -28,7 +28,6 @@ jobs:
       source_dir: ''
       compilers: '["gcc-11"]'
       doc_target: 'scf_cxx_api'
-      build_fail_on_warning: false
     secrets: inherit
   optional_modules:
     uses: NWChemEx/.github/.github/workflows/common_pull_request.yaml@master
@@ -37,6 +36,5 @@ jobs:
       source_dir: ''
       compilers: '["gcc-11"]'
       doc_target: 'scf_cxx_api'
-      build_fail_on_warning: false
       repo_toolchain: '.github/optional_modules.cmake'
     secrets: inherit
