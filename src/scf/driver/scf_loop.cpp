@@ -166,7 +166,6 @@ MODULE_RUN(SCFLoop) {
         // Step 3: New Fock operator is used to compute the new wavefunction
         auto psi_new = update_mod.run_as<update_pt<wf_type>>(f_new, psi_old);
         const auto& cmos_new = psi_new.orbitals();
-        const auto& c_new    = cmos_new.transform();
 
         // Step 4: New electronic energy
         // Step 4a: New Fock operator to new electronic Hamiltonian
