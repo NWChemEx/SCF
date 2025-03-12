@@ -111,8 +111,21 @@ if("${BUILD_TESTING}")
         python_mpi_test(
             integration_test_scf
             "${PYTHON_TEST_DIR}/integration_tests/run_integration_tests.py"
-            SUBMODULES nwchemex chemcache simde chemist pluginplay parallelzone
-                       friendzone tensorwrapper
+            SUBMODULES nwchemex chemcache integrals simde chemist pluginplay 
+                       parallelzone friendzone tensorwrapper nux
+        )
+
+        # Workaround for the NWX being pure python
+        get_test_property(
+            py_integration_test_scf
+            ENVIRONMENT py_path
+        )
+        set(
+            py_path "${py_path}:${nwchemex_SOURCE_DIR}/src/python"
+        )
+        set_tests_properties(
+            py_integration_test_scf
+            PROPERTIES ENVIRONMENT "${py_path}"
         )
     endif()
 endif()
