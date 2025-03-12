@@ -45,6 +45,7 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
         simde::type::chemical_system h2_dimer_sys(h2_dimer_mol);
         const auto e =
           mm.template run_as<pt>("SCF Driver", ao_bs, h2_dimer_sys);
-        std::cout << e << std::endl;
+        alloc.rebind(corr.buffer()).at() = -2.2260535919670001;
+        REQUIRE(approximately_equal(corr, e, 1E-6));
     }
 }
