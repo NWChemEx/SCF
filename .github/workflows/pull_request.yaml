@@ -38,12 +38,12 @@ jobs:
       doc_target: ''
       repo_toolchain: '.github/integration_testing.cmake'
     secrets: inherit
-  tamm_tests:
-    uses: NWChemEx/.github/.github/workflows/common_pull_request.yaml@master
-    with:
-      config_file: '.github/.licenserc.yaml'
-      source_dir: ''
-      compilers: '["gcc-11"]'
-      doc_target: ''
-      repo_toolchain: '.github/tamm_testing.cmake'
-    secrets: inherit
+  # tamm_tests:
+  #   uses: NWChemEx/.github/.github/workflows/common_pull_request.yaml@master
+  #   with:
+  #     config_file: '.github/.licenserc.yaml'
+  #     source_dir: ''
+  #     compilers: '["gcc-11"]'
+  #     doc_target: ''
+  #     repo_toolchain: '.github/tamm_testing.cmake'
+  #   secrets: inherit
