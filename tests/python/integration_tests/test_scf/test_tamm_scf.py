@@ -42,6 +42,7 @@ class TestTAMMSCF(unittest.TestCase):
         self.has_TAMM = self.mm.count(self.key) != 0
         if self.has_TAMM:
             nwchemex.load_modules(self.mm)
-            mol = self.mm.run_as(MoleculeFromString(), "NWX Molecules", "water")
+            mol = self.mm.run_as(MoleculeFromString(), "NWX Molecules",
+                                 "water")
             self.aos = self.mm.run_as(MolecularBasisSet(), 'sto-3g', mol)
             self.cs = ChemicalSystem(mol)
