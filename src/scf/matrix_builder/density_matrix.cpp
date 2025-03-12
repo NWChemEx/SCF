@@ -36,7 +36,7 @@ struct Kernel {
         auto rv              = c.allocator().runtime();
         allocator_type alloc(rv);
 
-        tensorwrapper::shape::Smooth p_shape(n_aos, n_aos);
+        tensorwrapper::shape::Smooth p_shape{n_aos, n_aos};
         tensorwrapper::layout::Physical l(p_shape);
         auto pp_buffer = alloc.allocate(l);
 

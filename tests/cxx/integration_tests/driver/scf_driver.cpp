@@ -33,4 +33,18 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
 
     const auto e = mm.template run_as<pt>("SCF Driver", aos, h2);
     REQUIRE(approximately_equal(corr, e, 1E-6));
+
+    SECTION("H2 Dimer") {
+        simde::type::nucleus h0("H", 1ul, 1836.15, 0.0, 0.0, 0.0);
+        simde::type::nucleus h1("H", 1ul, 1836.15, 0.0, 0.0, 1.39839);
+        simde::type::nucleus h2("H", 1ul, 1836.15, 0.0, 0.0, 4.39839);
+        simde::type::nucleus h3("H", 1ul, 1836.15, 0.0, 0.0, 5.79678);
+        simde::type::nuclei h2_dimer_nuclei{h0, h1, h2, h3};
+        auto ao_bs = test_scf::h_basis(h2_dimer_nuclei);
+        simde::type::molecule h2_dimer_mol(0, 1, h2_dimer_nuclei);
+        simde::type::chemical_system h2_dimer_sys(h2_dimer_mol);
+        const auto e =
+          mm.template run_as<pt>("SCF Driver", ao_bs, h2_dimer_sys);
+        std::cout << e << std::endl;
+    }
 }
