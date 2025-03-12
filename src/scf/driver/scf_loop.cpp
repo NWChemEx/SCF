@@ -156,6 +156,8 @@ MODULE_RUN(SCFLoop) {
     const auto g_tol    = inputs.at("gradient tolerance").value<double>();
     unsigned int iter   = 0;
 
+    auto& logger = get_runtime().logger();
+
     while(iter < max_iter) {
         // Step 2: Old density is used to create the new Fock operator
         // TODO: Make easier to go from many-electron to one-electron
@@ -164,10 +166,13 @@ MODULE_RUN(SCFLoop) {
         const auto& F_new = Fock_mod.run_as<fock_pt>(H, rho_old);
 
         // Step 3: New Fock operator used to compute new wavefunction/density
-        auto psi_new = update_mod.run_as<update_pt<wf_type>>(f_new, psi_old);
+        const auto& psi_new =
+          update_mod.run_as<update_pt<wf_type>>(f_new, psi_old);
+
         density_op_type rho_hat_new(psi_new.orbitals(), psi_new.occupations());
         chemist::braket::BraKet P_mn_new(aos, rho_hat_new, aos);
         const auto& P_new = density_mod.run_as<density_pt>(P_mn_new);
+
         density_t rho_new(P_new, psi_new.orbitals());
 
         // Step 4: New electronic energy
@@ -185,9 +190,12 @@ MODULE_RUN(SCFLoop) {
         chemist::braket::BraKet H_00(psi_new, H_new, psi_new);
         auto e_new = egy_mod.run_as<elec_egy_pt<wf_type>>(H_00);
 
+        logger.log("SCF iteration = " + std::to_string(iter) + ":");
+        logger.log("  Electronic Energy = " + e_new.to_string());
+
         bool converged = false;
         // Step 5: Converged?
-        if(iter > 1) {
+        if(iter > 0) {
             simde::type::tensor de;
             de("") = e_new("") - e_old("");
 
@@ -216,12 +224,8 @@ MODULE_RUN(SCFLoop) {
             auto g_conv =
               floating_point_dispatch(g_kernel, grad_norm.buffer(), g_tol);
 
-            auto& logger      = get_runtime().logger();
-            const auto s_iter = std::to_string(iter);
-            const auto s_de   = de.to_string();
-            const auto s_dg   = grad_norm.to_string();
-            auto msg = "itr = " + s_iter + " dE = " + s_de + " dG = " + s_dg;
-            logger.log(msg);
+            logger.log("  dE = " + de.to_string());
+            logger.log("  dG = " + grad_norm.to_string());
 
             if(e_conv && g_conv) converged = true;
         }
