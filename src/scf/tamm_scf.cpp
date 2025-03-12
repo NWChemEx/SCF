@@ -57,7 +57,7 @@ make_libint_basis(const simde::type::ao_basis_set &bs) {
   std::array<double, 3> origin = {0.0, 0.0, 0.0};
 
   /// Convert centers and their shells to libint equivalents.
-  for (auto abs_i = 0; abs_i < bs.size(); ++abs_i) {
+  for (decltype(bs.size()) abs_i = 0; abs_i < bs.size(); ++abs_i) {
     /// Add current center to atoms list
     const auto &abs = bs[abs_i];
     centers.push_back(
@@ -243,7 +243,7 @@ MODULE_RUN(TAMMEnergy) {
   coptions.basis = aos[0].basis_set_name().value_or("sto-3g");
 
   std::cout << std::endl;
-  for (int i = 0; i < mol.size(); i++) {
+  for (decltype(mol.size()) i = 0; i < mol.size(); i++) {
     auto atom_i = mol[i];
     chem_env.atoms[i] = {(int)atom_i.Z(), atom_i.x() * convert_units,
                          atom_i.y() * convert_units,
