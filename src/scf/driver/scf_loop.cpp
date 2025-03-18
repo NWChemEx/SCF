@@ -24,14 +24,8 @@ struct Kernel {
     template<typename FloatType>
     auto run(const tensorwrapper::buffer::BufferBase& a, double tol) {
         tensorwrapper::allocator::Eigen<FloatType> allocator(m_rv);
-        const auto& eigen_a      = allocator.rebind(a);
-        constexpr bool is_float  = std::is_same_v<FloatType, float>;
-        constexpr bool is_double = std::is_same_v<FloatType, double>;
-        if constexpr(is_float || is_double) {
-            return std::fabs(eigen_a.at()) < tol;
-        } else {
-            return std::fabs(eigen_a.at().mean()) < tol;
-        }
+        const auto& eigen_a = allocator.rebind(a);
+        return tensorwrapper::types::fabs(eigen_a.at()) < FloatType(tol);
     }
 
     parallelzone::runtime::RuntimeView m_rv;
@@ -87,6 +81,7 @@ MODULE_CTOR(SCFLoop) {
     const unsigned int max_itr = 20;
     add_input<unsigned int>("max iterations").set_default(max_itr);
     add_input<double>("energy tolerance").set_default(1.0E-6);
+    add_input<double>("density tolerance").set_default(1.0E-6);
     add_input<double>("gradient tolerance").set_default(1.0E-6);
 
     add_submodule<elec_egy_pt<wf_type>>("Electronic energy");
@@ -153,6 +148,7 @@ MODULE_RUN(SCFLoop) {
 
     const auto max_iter = inputs.at("max iterations").value<unsigned int>();
     const auto e_tol    = inputs.at("energy tolerance").value<double>();
+    const auto dp_tol   = inputs.at("density tolerance").value<double>();
     const auto g_tol    = inputs.at("gradient tolerance").value<double>();
     unsigned int iter   = 0;
 
@@ -190,14 +186,21 @@ MODULE_RUN(SCFLoop) {
         chemist::braket::BraKet H_00(psi_new, H_new, psi_new);
         auto e_new = egy_mod.run_as<elec_egy_pt<wf_type>>(H_00);
 
-        logger.log("SCF iteration = " + std::to_string(iter) + ":");
-        logger.log("  Electronic Energy = " + e_new.to_string());
+        auto e_msg = "SCF iteration = " + std::to_string(iter) + ":";
+        e_msg += "  Electronic Energy = " + e_new.to_string();
+        logger.log(e_msg);
 
         bool converged = false;
         // Step 5: Converged?
         if(iter > 0) {
+            // Change in the energy
             simde::type::tensor de;
             de("") = e_new("") - e_old("");
+
+            // Change in the density
+            simde::type::tensor dp;
+            dp("m,n")    = rho_new.value()("m,n") - rho_old.value()("m,n");
+            auto dp_norm = tensorwrapper::operations::infinity_norm(dp);
 
             // Orbital gradient: FPS-SPF
             // TODO: module satisfying BraKet(aos, Commutator(F,P), aos)
@@ -216,18 +219,18 @@ MODULE_RUN(SCFLoop) {
             grad("m,n")   = FPS("m,n") - SPF("m,n");
             grad_norm("") = grad("m,n") * grad("n,m");
 
-            Kernel e_kernel(get_runtime());
-            Kernel g_kernel(get_runtime());
+            Kernel k(get_runtime());
 
             using tensorwrapper::utilities::floating_point_dispatch;
-            auto e_conv = floating_point_dispatch(e_kernel, de.buffer(), e_tol);
-            auto g_conv =
-              floating_point_dispatch(g_kernel, grad_norm.buffer(), g_tol);
+            auto e_conv = floating_point_dispatch(k, de.buffer(), e_tol);
+            auto g_conv = floating_point_dispatch(k, grad_norm.buffer(), g_tol);
+            auto dp_conv = floating_point_dispatch(k, dp_norm.buffer(), dp_tol);
 
             logger.log("  dE = " + de.to_string());
+            logger.log("  dP = " + dp_norm.to_string());
             logger.log("  dG = " + grad_norm.to_string());
 
-            if(e_conv && g_conv) converged = true;
+            if(e_conv && g_conv && dp_conv) converged = true;
         }
 
         // Step 6: Not converged so reset
