@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Loop &mdash; SCF v0.0.15 documentation</title>
+  <title>Loop &mdash; SCF v0.0.16 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=5b1ff522"></script>
+      <script src="../_static/documentation_options.js?v=6ce77f48"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -141,19 +141,23 @@ module. The columns are:</p>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-odd"><td><p>energy tolerance</p></td>
+<tr class="row-odd"><td><p>density tolerance</p></td>
 <td><p>1e-06</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-even"><td><p>gradient tolerance</p></td>
+<tr class="row-even"><td><p>energy tolerance</p></td>
 <td><p>1e-06</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-odd"><td><p>max iterations</p></td>
+<tr class="row-odd"><td><p>gradient tolerance</p></td>
+<td><p>1e-06</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>max iterations</p></td>
 <td><p>20</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-even"><td><p>Object to optimize the objective function with respect to</p></td>
+<tr class="row-odd"><td><p>Object to optimize the objective function with respect to</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
@@ -182,6 +186,20 @@ subsection we list:</p>
 <li><p>Domain Restrictions :</p>
 <ul>
 <li><p>Type == chemist::braket::BraKet&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;, chemist::qm_operator::Hamiltonian, chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="density-tolerance">
+<h4>density tolerance<a class="headerlink" href="#density-tolerance" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Description : N/A</p></li>
+<li><p>Default Value : 1e-06</p></li>
+<li><p>Optional? : False</p></li>
+<li><p>Opaque? : True</p></li>
+<li><p>Domain Restrictions :</p>
+<ul>
+<li><p>Type == double</p></li>
 </ul>
 </li>
 </ul>

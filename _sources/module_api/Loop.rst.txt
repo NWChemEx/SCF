@@ -46,6 +46,8 @@ module. The columns are:
 +===========================================================+=========+=============+
 | BraKet                                                    | N/A     | N/A         |
 +-----------------------------------------------------------+---------+-------------+
+| density tolerance                                         | 1e-06   | N/A         |
++-----------------------------------------------------------+---------+-------------+
 | energy tolerance                                          | 1e-06   | N/A         |
 +-----------------------------------------------------------+---------+-------------+
 | gradient tolerance                                        | 1e-06   | N/A         |
@@ -79,6 +81,17 @@ BraKet
 - Domain Restrictions :
 
   - Type == chemist::braket::BraKet<chemist::wavefunction::Determinant<chemist::wavefunction::CMOs>, chemist::qm_operator::Hamiltonian, chemist::wavefunction::Determinant<chemist::wavefunction::CMOs>>
+
+density tolerance
+-----------------
+
+- Description : N/A
+- Default Value : 1e-06
+- Optional? : False
+- Opaque? : True
+- Domain Restrictions :
+
+  - Type == double
 
 energy tolerance
 ----------------
