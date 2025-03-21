@@ -35,15 +35,19 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
     auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
     using tensorwrapper::operations::approximately_equal;
 
-    using index_set = typename wf_type::orbital_index_set_type;
-    wf_type psi0(index_set{0}, test_scf::h2_cmos<float_type>());
+    SECTION("H2") {
+        using index_set = typename wf_type::orbital_index_set_type;
+        wf_type psi0(index_set{0}, test_scf::h2_cmos<float_type>());
 
-    auto H = test_scf::h2_hamiltonian();
+        auto H = test_scf::h2_hamiltonian();
 
-    chemist::braket::BraKet H_00(psi0, H, psi0);
-    const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
+        chemist::braket::BraKet H_00(psi0, H, psi0);
+        const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
 
-    pcorr->at() = -1.1167592336;
-    tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
-    REQUIRE(approximately_equal(corr, e, 1E-6));
+        pcorr->at() = -1.1167592336;
+        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+        REQUIRE(approximately_equal(corr, e, 1E-6));
+    }
+
+    SECTION("He") {}
 }
