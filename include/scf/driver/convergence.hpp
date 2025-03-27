@@ -44,16 +44,35 @@ DECLARE_PROPERTY_TYPE(ConvergenceProp);
 
 PROPERTY_TYPE_INPUTS(ConvergenceProp) {
     using wf_type = simde::type::rscf_wf;
-    auto rv     = pluginplay::declare_input().add_field<elec_egy_pt<wf_type>>("Energy");
-    rv.at("String").set_description(
+    auto rv     = pluginplay::declare_input()
+                    .add_field<BraKet::result_type>("New Energy")
+                    .add_field<elec_egy_pt<wf_type>>("Old Energy")
+                    .add_field<elec_egy_pt<wf_type>>("Fock Operator")
+                    .add_field<elec_egy_pt<wf_type>>("Wave Function")
+                    .add_field<double>("Energy Tolerance")
+                    .add_field<double>("Density Tolerance")
+                    .add_field<double>("Gradient Tolerance");
+
+    rv.at("New Energy").set_description(
+      "The string identifying the desired molecule");
+    rv.at("Old Energy").set_description(
+      "The string identifying the desired molecule");
+    rv.at("Fock Operator").set_description(
+      "The string identifying the desired molecule");
+    rv.at("Wave Function").set_description(
+      "The string identifying the desired molecule");
+    rv.at("Energy Tolerance").set_description(
+      "The string identifying the desired molecule");
+    rv.at("Density Tolerance").set_description(
+      "The string identifying the desired molecule");
+    rv.at("Gradient Tolerance").set_description(
       "The string identifying the desired molecule");
     return rv;
 }
 
 PROPERTY_TYPE_RESULTS(ConvergenceProp) {
-    using mol_t = type::molecule;
-    auto rv     = pluginplay::declare_result().add_field<mol_t>("Molecule");
-    rv.at("Molecule")
+    auto rv     = pluginplay::declare_result().add_field<bool>("Convergence Status");
+    rv.at("Convergence Status")
       .set_description("The molecule corresponding to the input string");
     return rv;
 }

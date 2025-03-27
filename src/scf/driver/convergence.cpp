@@ -45,17 +45,8 @@ using v_nn_pt = simde::charge_charge_interaction;
 using fock_matrix_pt = simde::aos_f_e_aos;
 using s_pt           = simde::aos_s_e_aos;
 
-struct GrabNuclear : chemist::qm_operator::OperatorVisitor {
-    using V_nn_type = simde::type::V_nn_type;
 
-    GrabNuclear() : chemist::qm_operator::OperatorVisitor(false) {}
-
-    void run(const V_nn_type& V_nn) { m_pv = &V_nn; }
-
-    const V_nn_type* m_pv;
-};
-
-MODULE_CTOR(SCFLoop) {
+MODULE_CTOR(ConvergenceMod) {
     using wf_type = simde::type::rscf_wf;
     description(desc);
     satisfies_property_type<pt<wf_type>>();
@@ -76,7 +67,7 @@ MODULE_CTOR(SCFLoop) {
     add_submodule<s_pt>("Overlap matrix builder");
 }
 
-MODULE_RUN(SCFLoop) {
+MODULE_RUN(ConvergenceMod) {
     using wf_type               = simde::type::rscf_wf;
     using density_op_type       = simde::type::rho_e<simde::type::cmos>;
     const auto&& [braket, psi0] = pt<wf_type>::unwrap_inputs(inputs);
