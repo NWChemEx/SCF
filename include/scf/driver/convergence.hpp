@@ -1,5 +1,4 @@
 #pragma once
-#include <simde/simde.hpp>
 #include <pluginplay/pluginplay.hpp>
 
 namespace scf {
@@ -18,7 +17,6 @@ DECLARE_TEMPLATED_PROPERTY_TYPE(ConvergenceProp, EnergyProp, FockProp, WfProp);
 
 template<typename EnergyProp, typename FockProp, typename WfProp>
 TEMPLATED_PROPERTY_TYPE_INPUTS(ConvergenceProp, EnergyProp, FockProp, WfProp) {
-    using wf_type = simde::type::rscf_wf;
     auto rv     = pluginplay::declare_input()
                     .add_field<EnergyProp>("New Energy")
                     .template add_field<EnergyProp>("Old Energy")

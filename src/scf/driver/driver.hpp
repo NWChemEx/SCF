@@ -16,6 +16,7 @@
 
 #pragma once
 #include <simde/simde.hpp>
+#include <driver/convergence.hpp>
 
 namespace scf::driver {
 

@@ -15,41 +15,13 @@
  */
 
 #include "driver.hpp"
+#include <driver/convergence.hpp>
 
 namespace scf::driver {
-
-using simde::type::electronic_hamiltonian;
-using simde::type::hamiltonian;
-using simde::type::op_base_type;
-
-template<typename WfType>
-using egy_pt = simde::eval_braket<WfType, hamiltonian, WfType>;
-
-template<typename WfType>
-using elec_egy_pt = simde::eval_braket<WfType, electronic_hamiltonian, WfType>;
-
-template<typename WfType>
-using pt = simde::Optimize<egy_pt<WfType>, WfType>;
-
-template<typename WfType>
-using update_pt = simde::UpdateGuess<WfType>;
-
-using density_t = simde::type::decomposable_e_density;
-
-using fock_pt = simde::FockOperator<density_t>;
-
-using density_pt = simde::aos_rho_e_aos<simde::type::cmos>;
-
-using v_nn_pt = simde::charge_charge_interaction;
-
-using fock_matrix_pt = simde::aos_f_e_aos;
-using s_pt           = simde::aos_s_e_aos;
-
-
-MODULE_CTOR(ConvergenceMod) {
+template<typename EnergyProp, typename FockProp, typename WfProp>
+TEMPLATED_MODULE_CTOR(ConvergenceMod, EnergyProp, FockProp, WfProp) {
     using wf_type = simde::type::rscf_wf;
-    description(desc);
-    satisfies_property_type<pt<wf_type>>();
+    satisfies_property_type<ConvergenceProp>();
 
     const unsigned int max_itr = 20;
     add_input<unsigned int>("max iterations").set_default(max_itr);
