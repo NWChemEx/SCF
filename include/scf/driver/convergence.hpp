@@ -1,5 +1,5 @@
 #pragma once
-#include "simde/simde.hpp"
+#include <simde/simde.hpp>
 #include <pluginplay/pluginplay.hpp>
 
 namespace scf {
@@ -13,45 +13,20 @@ namespace scf {
  *
  */
 
-using simde::type::electronic_hamiltonian;
-using simde::type::hamiltonian;
-using simde::type::op_base_type;
+template<typename EnergyProp, typename FockProp, typename WfProp>
+DECLARE_TEMPLATED_PROPERTY_TYPE(ConvergenceProp, EnergyProp, FockProp, WfProp);
 
-template<typename WfType>
-using egy_pt = simde::eval_braket<WfType, hamiltonian, WfType>;
-
-template<typename WfType>
-using elec_egy_pt = simde::eval_braket<WfType, electronic_hamiltonian, WfType>;
-
-template<typename WfType>
-using pt = simde::Optimize<egy_pt<WfType>, WfType>;
-
-template<typename WfType>
-using update_pt = simde::UpdateGuess<WfType>;
-
-using density_t = simde::type::decomposable_e_density;
-
-using fock_pt = simde::FockOperator<density_t>;
-
-using density_pt = simde::aos_rho_e_aos<simde::type::cmos>;
-
-using v_nn_pt = simde::charge_charge_interaction;
-
-using fock_matrix_pt = simde::aos_f_e_aos;
-using s_pt           = simde::aos_s_e_aos;
- 
-DECLARE_PROPERTY_TYPE(ConvergenceProp);
-
-PROPERTY_TYPE_INPUTS(ConvergenceProp) {
+template<typename EnergyProp, typename FockProp, typename WfProp>
+TEMPLATED_PROPERTY_TYPE_INPUTS(ConvergenceProp, EnergyProp, FockProp, WfProp) {
     using wf_type = simde::type::rscf_wf;
     auto rv     = pluginplay::declare_input()
-                    .add_field<BraKet::result_type>("New Energy")
-                    .add_field<elec_egy_pt<wf_type>>("Old Energy")
-                    .add_field<elec_egy_pt<wf_type>>("Fock Operator")
-                    .add_field<elec_egy_pt<wf_type>>("Wave Function")
-                    .add_field<double>("Energy Tolerance")
-                    .add_field<double>("Density Tolerance")
-                    .add_field<double>("Gradient Tolerance");
+                    .add_field<EnergyProp>("New Energy")
+                    .template add_field<EnergyProp>("Old Energy")
+                    .template add_field<FockProp>("Fock Operator")
+                    .template add_field<WfProp>("Wave Function")
+                    .template add_field<double>("Energy Tolerance")
+                    .template add_field<double>("Density Tolerance")
+                    .template add_field<double>("Gradient Tolerance");
 
     rv.at("New Energy").set_description(
       "The string identifying the desired molecule");
@@ -70,7 +45,8 @@ PROPERTY_TYPE_INPUTS(ConvergenceProp) {
     return rv;
 }
 
-PROPERTY_TYPE_RESULTS(ConvergenceProp) {
+template<typename EnergyProp, typename FockProp, typename WfProp>
+TEMPLATED_PROPERTY_TYPE_RESULTS(ConvergenceProp, EnergyProp, FockProp, WfProp) {
     auto rv     = pluginplay::declare_result().add_field<bool>("Convergence Status");
     rv.at("Convergence Status")
       .set_description("The molecule corresponding to the input string");
