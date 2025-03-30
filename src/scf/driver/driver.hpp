@@ -22,6 +22,8 @@ namespace scf::driver {
 
 DECLARE_MODULE(SCFDriver);
 DECLARE_MODULE(SCFLoop);
+
+template<typename KernelType>
 DECLARE_MODULE(ConvergenceMod);
 
 inline void load_modules(pluginplay::ModuleManager& mm) {

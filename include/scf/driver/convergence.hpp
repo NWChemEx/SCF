@@ -5,9 +5,11 @@
 
 namespace scf {
 
-DECLARE_PROPERTY_TYPE(ConvergenceProp);
+template<typename KernelType>
+DECLARE_TEMPLATED_PROPERTY_TYPE(ConvergenceProp, KernelType);
 
-PROPERTY_TYPE_INPUTS(ConvergenceProp) {
+template<typename KernelType>
+TEMPLATED_PROPERTY_TYPE_INPUTS(ConvergenceProp, KernelType) {
     auto rv     = pluginplay::declare_input()
                     .add_field<simde::type::tensor>("New Energy")
                     .template add_field<simde::type::tensor>("Old Energy")
@@ -38,7 +40,8 @@ PROPERTY_TYPE_INPUTS(ConvergenceProp) {
     return rv;
 }
 
-PROPERTY_TYPE_RESULTS(ConvergenceProp) {
+template<typename KernelType>
+TEMPLATED_PROPERTY_TYPE_RESULTS(ConvergenceProp, KernelType) {
     auto rv     = pluginplay::declare_result().add_field<bool>("Convergence Status");
     rv.at("Convergence Status")
       .set_description("The molecule corresponding to the input string");
