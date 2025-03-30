@@ -19,24 +19,10 @@ TEMPLATED_PROPERTY_TYPE_INPUTS(ConvergenceProp, KernelType) {
                     .template add_field<simde::type::tensor>("S")
                     .template add_field<simde::type::fock>("Fock Operator")
                     .template add_field<chemist::wavefunction::AOs>("Wave Function")
+                    .template add_field<KernelType>("K")
                     .template add_field<double>("Energy Tolerance")
                     .template add_field<double>("Density Tolerance")
                     .template add_field<double>("Gradient Tolerance");
-
-    rv.at("New Energy").set_description(
-      "The string identifying the desired molecule");
-    rv.at("Old Energy").set_description(
-      "The string identifying the desired molecule");
-    rv.at("Fock Operator").set_description(
-      "The string identifying the desired molecule");
-    rv.at("Wave Function").set_description(
-      "The string identifying the desired molecule");
-    rv.at("Energy Tolerance").set_description(
-      "The string identifying the desired molecule");
-    rv.at("Density Tolerance").set_description(
-      "The string identifying the desired molecule");
-    rv.at("Gradient Tolerance").set_description(
-      "The string identifying the desired molecule");
     return rv;
 }
 

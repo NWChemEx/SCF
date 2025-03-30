@@ -20,21 +20,9 @@
 
 namespace scf::driver {
 
-struct Kernel {
-    explicit Kernel(parallelzone::runtime::RuntimeView rv) : m_rv(rv) {}
-    template<typename FloatType>
-    auto run(const tensorwrapper::buffer::BufferBase& a, double tol) {
-        tensorwrapper::allocator::Eigen<FloatType> allocator(m_rv);
-        const auto& eigen_a = allocator.rebind(a);
-        return tensorwrapper::types::fabs(eigen_a.at()) < FloatType(tol);
-    }
-
-    parallelzone::runtime::RuntimeView m_rv;
-};
-
-template<typename Kernel>
-TEMPLATED_MODULE_CTOR(ConvergenceMod, Kernel) {
-    satisfies_property_type<scf::ConvergenceProp<Kernel>>();
+template<typename KernelType>
+TEMPLATED_MODULE_CTOR(ConvergenceMod, KernelType) {
+    satisfies_property_type<scf::ConvergenceProp<KernelType>>();
 
     add_input<double>("energy tolerance").set_default(1.0E-6);
     add_input<double>("density tolerance").set_default(1.0E-6);
@@ -42,9 +30,9 @@ TEMPLATED_MODULE_CTOR(ConvergenceMod, Kernel) {
     add_submodule<simde::aos_f_e_aos>("Fock matrix builder");
 }
 
-template<typename Kernel>
-TEMPLATED_MODULE_RUN(ConvergenceMod, Kernel) {
-    const auto&& [e_new, e_old, rho_new, rho_old, P_new, S, f_new, aos, e_tol, dp_tol, g_tol] = ConvergenceProp<Kernel>::unwrap_inputs(inputs);
+template<typename KernelType>
+TEMPLATED_MODULE_RUN(ConvergenceMod, KernelType) {
+    const auto&& [e_new, e_old, rho_new, rho_old, P_new, S, f_new, aos, k, e_tol, dp_tol, g_tol] = ConvergenceProp<KernelType>::unwrap_inputs(inputs);
 
     bool converged = false;
 
@@ -75,8 +63,6 @@ TEMPLATED_MODULE_RUN(ConvergenceMod, Kernel) {
     grad("m,n")   = FPS("m,n") - SPF("m,n");
     grad_norm("") = grad("m,n") * grad("n,m");
 
-    Kernel k(get_runtime());
-
     using tensorwrapper::utilities::floating_point_dispatch;
     auto e_conv = floating_point_dispatch(k, de.buffer(), e_tol);
     auto g_conv = floating_point_dispatch(k, grad_norm.buffer(), g_tol);
@@ -89,7 +75,7 @@ TEMPLATED_MODULE_RUN(ConvergenceMod, Kernel) {
     if(e_conv && g_conv && dp_conv) converged = true;
 
     auto rv = results();
-    return scf::ConvergenceProp<Kernel>::wrap_inputs(rv, converged);
+    return scf::ConvergenceProp<KernelType>::wrap_inputs(rv, converged);
 }
 }
     //     // Step 6: Not converged so reset
