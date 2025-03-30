@@ -92,6 +92,7 @@ MODULE_CTOR(SCFLoop) {
     add_submodule<fock_matrix_pt>("Fock matrix builder");
     add_submodule<v_nn_pt>("Charge-charge");
     add_submodule<s_pt>("Overlap matrix builder");
+    add_submodule<ConvergenceProp<Kernel>>("Converged Mod");
 }
 
 MODULE_RUN(SCFLoop) {
@@ -110,6 +111,7 @@ MODULE_RUN(SCFLoop) {
     auto& fock_mod    = submods.at("One-electron Fock operator");
     auto& Fock_mod    = submods.at("Fock operator");
     auto& V_nn_mod    = submods.at("Charge-charge");
+    auto& conv_mod    = submods.at("Converged Mod");
 
     // TODO: should be split off into orbital gradient module
     auto& F_mod = submods.at("Fock matrix builder");
@@ -191,53 +193,54 @@ MODULE_RUN(SCFLoop) {
         logger.log(e_msg);
 
         bool converged = false;
-        // Step 5: Converged?
+        // // Step 5: Converged?
         if(iter > 0) {
             // Change in the energy
-            simde::type::tensor de;
-            de("") = e_new("") - e_old("");
+            // simde::type::tensor de;
+            // de("") = e_new("") - e_old("");
 
-            // Change in the density
-            simde::type::tensor dp;
-            dp("m,n")    = rho_new.value()("m,n") - rho_old.value()("m,n");
-            auto dp_norm = tensorwrapper::operations::infinity_norm(dp);
+            // // Change in the density
+            // simde::type::tensor dp;
+            // dp("m,n")    = rho_new.value()("m,n") - rho_old.value()("m,n");
+            // auto dp_norm = tensorwrapper::operations::infinity_norm(dp);
 
-            // Orbital gradient: FPS-SPF
-            // TODO: module satisfying BraKet(aos, Commutator(F,P), aos)
-            chemist::braket::BraKet F_mn(aos, f_new, aos);
-            const auto& F_matrix = F_mod.run_as<fock_matrix_pt>(F_mn);
-            simde::type::tensor FPS;
-            FPS("m,l") = F_matrix("m,n") * P_new("n,l");
-            FPS("m,l") = FPS("m,n") * S("n,l");
+            // // Orbital gradient: FPS-SPF
+            // // TODO: module satisfying BraKet(aos, Commutator(F,P), aos)
+            // chemist::braket::BraKet F_mn(aos, f_new, aos);
+            // const auto& F_matrix = F_mod.run_as<fock_matrix_pt>(F_mn);
+            // simde::type::tensor FPS;
+            // FPS("m,l") = F_matrix("m,n") * P_new("n,l");
+            // FPS("m,l") = FPS("m,n") * S("n,l");
 
-            simde::type::tensor SPF;
-            SPF("m,l") = P_new("m,n") * F_matrix("n,l");
-            SPF("m,l") = S("m,n") * SPF("n,l");
+            // simde::type::tensor SPF;
+            // SPF("m,l") = P_new("m,n") * F_matrix("n,l");
+            // SPF("m,l") = S("m,n") * SPF("n,l");
 
-            simde::type::tensor grad;
-            simde::type::tensor grad_norm;
-            grad("m,n")   = FPS("m,n") - SPF("m,n");
-            grad_norm("") = grad("m,n") * grad("n,m");
+            // simde::type::tensor grad;
+            // simde::type::tensor grad_norm;
+            // grad("m,n")   = FPS("m,n") - SPF("m,n");
+            // grad_norm("") = grad("m,n") * grad("n,m");
 
             Kernel k(get_runtime());
 
-            using tensorwrapper::utilities::floating_point_dispatch;
-            auto e_conv = floating_point_dispatch(k, de.buffer(), e_tol);
-            auto g_conv = floating_point_dispatch(k, grad_norm.buffer(), g_tol);
-            auto dp_conv = floating_point_dispatch(k, dp_norm.buffer(), dp_tol);
+            // using tensorwrapper::utilities::floating_point_dispatch;
+            // auto e_conv = floating_point_dispatch(k, de.buffer(), e_tol);
+            // auto g_conv = floating_point_dispatch(k, grad_norm.buffer(), g_tol);
+            // auto dp_conv = floating_point_dispatch(k, dp_norm.buffer(), dp_tol);
 
-            logger.log("  dE = " + de.to_string());
-            logger.log("  dP = " + dp_norm.to_string());
-            logger.log("  dG = " + grad_norm.to_string());
+            // logger.log("  dE = " + de.to_string());
+            // logger.log("  dP = " + dp_norm.to_string());
+            // logger.log("  dG = " + grad_norm.to_string());
 
-            if(e_conv && g_conv && dp_conv) converged = true;
+            // // if(e_conv && g_conv && dp_conv) converged = true;
+            auto converged = conv_mod.run_as<ConvergenceProp<Kernel>>(e_new, e_old, rho_new, rho_old, P_new, S, f_new, aos, k, e_tol, dp_tol, g_tol);
         }
+        if (converged) break;
 
         // Step 6: Not converged so reset
         e_old   = e_new;
         psi_old = psi_new;
         rho_old = rho_new;
-        if(converged) break;
         ++iter;
     }
     if(iter == max_iter) throw std::runtime_error("SCF failed to converge");
