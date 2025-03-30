@@ -1,27 +1,22 @@
 #pragma once
 #include <pluginplay/pluginplay.hpp>
+#include <simde/types.hpp>
+
 
 namespace scf {
 
-/** @brief The property type for modules that return a molecule from a string
- *         input.
- *
- * The usage of this property type can be pretty varied. Modules that satisfy
- * this property type could potentially produce a molecule from a string with
- * XYZ inputs, a SMILES string, or a molecule name outright.
- *
- */
+DECLARE_PROPERTY_TYPE(ConvergenceProp);
 
-template<typename EnergyProp, typename FockProp, typename WfProp>
-DECLARE_TEMPLATED_PROPERTY_TYPE(ConvergenceProp, EnergyProp, FockProp, WfProp);
-
-template<typename EnergyProp, typename FockProp, typename WfProp>
-TEMPLATED_PROPERTY_TYPE_INPUTS(ConvergenceProp, EnergyProp, FockProp, WfProp) {
+PROPERTY_TYPE_INPUTS(ConvergenceProp) {
     auto rv     = pluginplay::declare_input()
-                    .add_field<EnergyProp>("New Energy")
-                    .template add_field<EnergyProp>("Old Energy")
-                    .template add_field<FockProp>("Fock Operator")
-                    .template add_field<WfProp>("Wave Function")
+                    .add_field<simde::type::tensor>("New Energy")
+                    .template add_field<simde::type::tensor>("Old Energy")
+                    .template add_field<chemist::DecomposableDensity<chemist::Electron>>("New Rho")
+                    .template add_field<chemist::DecomposableDensity<chemist::Electron>>("Old Rho")
+                    .template add_field<simde::type::tensor>("P_new")
+                    .template add_field<simde::type::tensor>("S")
+                    .template add_field<simde::type::fock>("Fock Operator")
+                    .template add_field<chemist::wavefunction::AOs>("Wave Function")
                     .template add_field<double>("Energy Tolerance")
                     .template add_field<double>("Density Tolerance")
                     .template add_field<double>("Gradient Tolerance");
@@ -43,8 +38,7 @@ TEMPLATED_PROPERTY_TYPE_INPUTS(ConvergenceProp, EnergyProp, FockProp, WfProp) {
     return rv;
 }
 
-template<typename EnergyProp, typename FockProp, typename WfProp>
-TEMPLATED_PROPERTY_TYPE_RESULTS(ConvergenceProp, EnergyProp, FockProp, WfProp) {
+PROPERTY_TYPE_RESULTS(ConvergenceProp) {
     auto rv     = pluginplay::declare_result().add_field<bool>("Convergence Status");
     rv.at("Convergence Status")
       .set_description("The molecule corresponding to the input string");

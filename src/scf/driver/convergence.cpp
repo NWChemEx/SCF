@@ -18,71 +18,59 @@
 #include <driver/convergence.hpp>
 
 namespace scf::driver {
-template<typename EnergyProp, typename FockProp, typename WfProp>
-TEMPLATED_MODULE_CTOR(ConvergenceMod, EnergyProp, FockProp, WfProp) {
-    using wf_type = simde::type::rscf_wf;
+
+MODULE_CTOR(ConvergenceMod) {
     satisfies_property_type<ConvergenceProp>();
 
-    const unsigned int max_itr = 20;
-    add_input<unsigned int>("max iterations").set_default(max_itr);
     add_input<double>("energy tolerance").set_default(1.0E-6);
     add_input<double>("density tolerance").set_default(1.0E-6);
     add_input<double>("gradient tolerance").set_default(1.0E-6);
-
-    add_submodule<elec_egy_pt<wf_type>>("Electronic energy");
-    add_submodule<density_pt>("Density matrix");
-    add_submodule<update_pt<wf_type>>("Guess update");
-    add_submodule<fock_pt>("One-electron Fock operator");
-    add_submodule<fock_pt>("Fock operator");
-    add_submodule<fock_matrix_pt>("Fock matrix builder");
-    add_submodule<v_nn_pt>("Charge-charge");
-    add_submodule<s_pt>("Overlap matrix builder");
+    add_submodule<simde::aos_f_e_aos>("Fock matrix builder");
 }
 
 MODULE_RUN(ConvergenceMod) {
-    using wf_type               = simde::type::rscf_wf;
-    using density_op_type       = simde::type::rho_e<simde::type::cmos>;
-    const auto&& [braket, psi0] = pt<wf_type>::unwrap_inputs(inputs);
-        // Step 5: Converged?
-            // Change in the energy
-            simde::type::tensor de;
-            de("") = e_new("") - e_old("");
+    const auto&& [e_new, e_old, rho_new, rho_old, P_new, S, f_new, aos, e_tol, dp_tol, g_tol] = ConvergenceProp::unwrap_inputs(inputs);
 
-            // Change in the density
-            simde::type::tensor dp;
-            dp("m,n")    = rho_new.value()("m,n") - rho_old.value()("m,n");
-            auto dp_norm = tensorwrapper::operations::infinity_norm(dp);
+    auto& F_mod = submods.at("Fock matrix builder");
 
-            // Orbital gradient: FPS-SPF
-            // TODO: module satisfying BraKet(aos, Commutator(F,P), aos)
-            chemist::braket::BraKet F_mn(aos, f_new, aos);
-            const auto& F_matrix = F_mod.run_as<fock_matrix_pt>(F_mn);
-            simde::type::tensor FPS;
-            FPS("m,l") = F_matrix("m,n") * P_new("n,l");
-            FPS("m,l") = FPS("m,n") * S("n,l");
+    simde::type::tensor de;
+    de("") = e_new("") - e_old("");
 
-            simde::type::tensor SPF;
-            SPF("m,l") = P_new("m,n") * F_matrix("n,l");
-            SPF("m,l") = S("m,n") * SPF("n,l");
+    // Change in the density
+    simde::type::tensor dp;
+    dp("m,n")    = rho_new.value()("m,n") - rho_old.value()("m,n");
+    auto dp_norm = tensorwrapper::operations::infinity_norm(dp);
 
-            simde::type::tensor grad;
-            simde::type::tensor grad_norm;
-            grad("m,n")   = FPS("m,n") - SPF("m,n");
-            grad_norm("") = grad("m,n") * grad("n,m");
+    // Orbital gradient: FPS-SPF
+    // TODO: module satisfying BraKet(aos, Commutator(F,P), aos)
+    chemist::braket::BraKet F_mn(aos, f_new, aos);
+    const auto& F_matrix = F_mod.run_as<simde::aos_f_e_aos>(F_mn);
+    simde::type::tensor FPS;
+    FPS("m,l") = F_matrix("m,n") * P_new("n,l");
+    FPS("m,l") = FPS("m,n") * S("n,l");
 
-            Kernel k(get_runtime());
+    simde::type::tensor SPF;
+    SPF("m,l") = P_new("m,n") * F_matrix("n,l");
+    SPF("m,l") = S("m,n") * SPF("n,l");
 
-            using tensorwrapper::utilities::floating_point_dispatch;
-            auto e_conv = floating_point_dispatch(k, de.buffer(), e_tol);
-            auto g_conv = floating_point_dispatch(k, grad_norm.buffer(), g_tol);
-            auto dp_conv = floating_point_dispatch(k, dp_norm.buffer(), dp_tol);
+    simde::type::tensor grad;
+    simde::type::tensor grad_norm;
+    grad("m,n")   = FPS("m,n") - SPF("m,n");
+    grad_norm("") = grad("m,n") * grad("n,m");
 
-            logger.log("  dE = " + de.to_string());
-            logger.log("  dP = " + dp_norm.to_string());
-            logger.log("  dG = " + grad_norm.to_string());
+    Kernel k(get_runtime());
 
-            if(e_conv && g_conv && dp_conv) converged = true;
-        }
+    using tensorwrapper::utilities::floating_point_dispatch;
+    auto e_conv = floating_point_dispatch(k, de.buffer(), e_tol);
+    auto g_conv = floating_point_dispatch(k, grad_norm.buffer(), g_tol);
+    auto dp_conv = floating_point_dispatch(k, dp_norm.buffer(), dp_tol);
+
+    logger.log("  dE = " + de.to_string());
+    logger.log("  dP = " + dp_norm.to_string());
+    logger.log("  dG = " + grad_norm.to_string());
+
+    if(e_conv && g_conv && dp_conv) converged = true;
+}
 
         // Step 6: Not converged so reset
         e_old   = e_new;
