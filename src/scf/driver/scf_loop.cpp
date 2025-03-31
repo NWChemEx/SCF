@@ -118,7 +118,7 @@ MODULE_RUN(SCFLoop) {
     // Step 1: Nuclear-nuclear repulsion
     GrabNuclear visitor;
     H.visit(visitor);
-    bool has_nn = (H.m_pv != nullptr);
+    bool has_nn = (visitor.m_pv != nullptr);
 
     // TODO: Clean up charges class to make this easier...
     simde::type::tensor e_nuclear(0.0);

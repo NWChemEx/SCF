@@ -147,12 +147,16 @@ inline auto he_hamiltonian() {
     simde::type::V_en_type V_en(es, he);
     simde::type::V_ee_type V_ee(es, es);
     return simde::type::hamiltonian(T_e + V_en + V_ee);
-    ;
 }
 
 inline auto h2_aos() {
     auto h2 = make_h2<simde::type::nuclei>();
     return simde::type::aos(h_basis(h2));
+}
+
+inline auto he_aos() {
+    auto he = make_he<simde::type::nuclei>();
+    return simde::type::aos(he_basis(he));
 }
 
 template<typename FloatType>
@@ -173,6 +177,20 @@ inline auto h2_mos() {
 }
 
 template<typename FloatType>
+inline auto he_mos() {
+    using mos_type       = simde::type::mos;
+    using tensor_type    = typename mos_type::transform_type;
+    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
+    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    tensorwrapper::shape::Smooth shape{1, 1};
+    tensorwrapper::layout::Physical l(shape);
+    auto c_buffer      = alloc.allocate(l);
+    c_buffer->at(0, 0) = 1.0000;
+    tensor_type t(shape, std::move(c_buffer));
+    return mos_type(he_aos(), std::move(t));
+}
+
+template<typename FloatType>
 inline auto h2_cmos() {
     using cmos_type      = simde::type::cmos;
     using tensor_type    = typename cmos_type::transform_type;
@@ -185,6 +203,20 @@ inline auto h2_cmos() {
     e_buffer->at(1) = -0.47506974;
     tensor_type e(shape, std::move(e_buffer));
     return cmos_type(std::move(e), h2_aos(), h2_mos<FloatType>().transform());
+}
+
+template<typename FloatType>
+inline auto he_cmos() {
+    using cmos_type      = simde::type::cmos;
+    using tensor_type    = typename cmos_type::transform_type;
+    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
+    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    tensorwrapper::shape::Smooth shape{1};
+    tensorwrapper::layout::Physical l(shape);
+    auto e_buffer   = alloc.allocate(l);
+    e_buffer->at(0) = -0.876036;
+    tensor_type e(shape, std::move(e_buffer));
+    return cmos_type(std::move(e), he_aos(), he_mos<FloatType>().transform());
 }
 
 template<typename FloatType>
