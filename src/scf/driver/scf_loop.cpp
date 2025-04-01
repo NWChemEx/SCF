@@ -70,7 +70,7 @@ struct GrabNuclear : chemist::qm_operator::OperatorVisitor {
 
     void run(const V_nn_type& V_nn) { m_pv = &V_nn; }
 
-    const V_nn_type* m_pv;
+    const V_nn_type* m_pv = nullptr;
 };
 
 MODULE_CTOR(SCFLoop) {
