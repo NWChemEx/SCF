@@ -18,7 +18,6 @@
 
 simde::type::tensor commutator(simde::type::tensor Fock_Matrix, simde::type::tensor Density_Matrix, simde::type::tensor Overlap_Matrix) {
     
-    // chemist::braket::BraKet F_mn(aos, f_new, aos);
     simde::type::tensor FPS;
     FPS("m,l") = Fock_Matrix("m,n") * Density_Matrix("n,l");
     FPS("m,l") = FPS("m,n") * Overlap_Matrix("n,l");

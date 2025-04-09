@@ -211,7 +211,6 @@ MODULE_RUN(SCFLoop) {
             auto grad =  commutator(F_matrix, P_new, S);
             simde::type::tensor grad_norm;
             grad_norm("") = grad("m,n") * grad("n,m");
-            std::cout << grad << std::endl;
             
             Kernel k(get_runtime());
 
