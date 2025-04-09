@@ -42,7 +42,7 @@ if("${BUILD_TAMM_SCF}")
     set(DEPENDENCIES simde gauxc tamm exachem chemcache)
     include(get_libint2)
 else()
-    set(DEPENDENCIES simde gauxc)
+    set(DEPENDENCIES simde)
 endif()
 
 foreach(dependency_i ${DEPENDENCIES})
