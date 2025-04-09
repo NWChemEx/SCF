@@ -15,6 +15,7 @@
  */
 
 #include "driver.hpp"
+#include <scf/driver/commutator.hpp>
 
 namespace scf::driver {
 namespace {
@@ -72,25 +73,6 @@ struct GrabNuclear : chemist::qm_operator::OperatorVisitor {
 
     const V_nn_type* m_pv;
 };
-
-simde::type::tensor Commutator(simde::type::tensor F, simde::type::tensor P, simde::type::tensor S) {
-    
-    // chemist::braket::BraKet F_mn(aos, f_new, aos);
-    simde::type::tensor FPS;
-    FPS("m,l") = F("m,n") * P("n,l");
-    FPS("m,l") = FPS("m,n") * S("n,l");
-
-    simde::type::tensor SPF;
-    SPF("m,l") = P("m,n") * F("n,l");
-    SPF("m,l") = S("m,n") * SPF("n,l");
-
-    simde::type::tensor grad;
-    simde::type::tensor grad_norm;
-    grad("m,n")   = FPS("m,n") - SPF("m,n");
-    grad_norm("") = grad("m,n") * grad("n,m");
-
-    return grad_norm;
-}
 
 MODULE_CTOR(SCFLoop) {
     using wf_type = simde::type::rscf_wf;
@@ -225,20 +207,11 @@ MODULE_RUN(SCFLoop) {
             // TODO: module satisfying BraKet(aos, Commutator(F,P), aos)
             chemist::braket::BraKet F_mn(aos, f_new, aos);
             const auto& F_matrix = F_mod.run_as<fock_matrix_pt>(F_mn);
-            // simde::type::tensor FPS;
-            // FPS("m,l") = F_matrix("m,n") * P_new("n,l");
-            // FPS("m,l") = FPS("m,n") * S("n,l");
 
-            // simde::type::tensor SPF;
-            // SPF("m,l") = P_new("m,n") * F_matrix("n,l");
-            // SPF("m,l") = S("m,n") * SPF("n,l");
-
-            // simde::type::tensor grad;
-            // simde::type::tensor grad_norm;
-            // grad("m,n")   = FPS("m,n") - SPF("m,n");
-            // grad_norm("") = grad("m,n") * grad("n,m");
-
-            auto grad_norm =  Commutator(F_matrix, P_new, S);
+            auto grad =  commutator(F_matrix, P_new, S);
+            simde::type::tensor grad_norm;
+            grad_norm("") = grad("m,n") * grad("n,m");
+            std::cout << grad << std::endl;
             
             Kernel k(get_runtime());
 

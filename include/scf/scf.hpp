@@ -17,6 +17,7 @@
 #pragma once
 #include <scf/scf_mm.hpp>
 #include <simde/simde.hpp>
+#include <scf/driver/commutator.hpp>
 #ifdef BUILD_TAMM_SCF
 #include <tamm/tamm.hpp>
 #endif
