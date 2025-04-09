@@ -23,9 +23,6 @@
 
 namespace test_scf {
 
-/// Floating point types to test
-using float_types = std::tuple<double, tensorwrapper::types::udouble>;
-
 /// Factors out setting submodules for SCF plugin from other plugins
 template<typename FloatType>
 pluginplay::ModuleManager load_modules() {
