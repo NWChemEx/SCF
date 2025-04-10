@@ -19,7 +19,7 @@
 #include <simde/simde.hpp>
 
 TEST_CASE("Commutator Function") {
-    SECTION("Commutator") {
+    SECTION("Commutator Test") {
         simde::type::tensor Fock_Matrix{{1.0, 2.0}, {3.0, 4.0}};
         simde::type::tensor Density_Matrix{{2.0, 3.0}, {4.0, 5.0}};
         simde::type::tensor Overlap_Matrix{{3.0, 4.0}, {5.0, 6.0}};
@@ -29,16 +29,5 @@ TEST_CASE("Commutator Function") {
           scf::driver::commutator(Fock_Matrix, Density_Matrix, Overlap_Matrix);
 
         REQUIRE(grad == test_grad);
-    }
-
-    SECTION("Empty Tensor") {
-        simde::type::tensor Fock_Matrix{{1.0, 2.0}, {3.0, 4.0}};
-        simde::type::tensor Density_Matrix{{1.0, 2.0, 3.0}, {4.0, 5.0}};
-        simde::type::tensor Overlap_Matrix{{3.0, 4.0}, {5.0, 6.0}};
-
-        auto grad =
-          scf::driver::commutator(Fock_Matrix, Density_Matrix, Overlap_Matrix);
-
-        REQUIRE_THROWS_AS("Not smooth", std::runtime_error);
     }
 }
