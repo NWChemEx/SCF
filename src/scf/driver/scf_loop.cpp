@@ -208,10 +208,10 @@ MODULE_RUN(SCFLoop) {
             chemist::braket::BraKet F_mn(aos, f_new, aos);
             const auto& F_matrix = F_mod.run_as<fock_matrix_pt>(F_mn);
 
-            auto grad =  commutator(F_matrix, P_new, S);
+            auto grad = commutator(F_matrix, P_new, S);
             simde::type::tensor grad_norm;
             grad_norm("") = grad("m,n") * grad("n,m");
-            
+
             Kernel k(get_runtime());
 
             using tensorwrapper::utilities::floating_point_dispatch;

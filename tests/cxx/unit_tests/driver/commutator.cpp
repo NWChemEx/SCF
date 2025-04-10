@@ -19,18 +19,26 @@
 #include <simde/simde.hpp>
 
 TEST_CASE("Commutator Function") {
- simde::type::tensor Fock_Matrix{{1.0, 2.0}, {3.0, 4.0}};
- simde::type::tensor Density_Matrix{{2.0, 3.0}, {4.0, 5.0}};
- simde::type::tensor Overlap_Matrix{{3.0, 4.0}, {5.0, 6.0}};
+    SECTION("Commutator") {
+        simde::type::tensor Fock_Matrix{{1.0, 2.0}, {3.0, 4.0}};
+        simde::type::tensor Density_Matrix{{2.0, 3.0}, {4.0, 5.0}};
+        simde::type::tensor Overlap_Matrix{{3.0, 4.0}, {5.0, 6.0}};
 
- simde::type::tensor FP, PF, FPS, SPF, test_grad;
- FP("m, l") = Fock_Matrix("m,n") * Density_Matrix("n,l");
- FPS("m, l") = FP("m,n") * Overlap_Matrix("n,l");
- PF("m,l") = Density_Matrix("m,n") * Fock_Matrix("n,l");
- SPF("m,l") = Overlap_Matrix("m,n") * PF("n,l");
- test_grad("m,n") = FPS("m,n") - SPF("m,n");
+        simde::type::tensor test_grad{{-14, -42}, {42, 14}};
+        auto grad =
+          scf::driver::commutator(Fock_Matrix, Density_Matrix, Overlap_Matrix);
 
- auto grad = commutator(Fock_Matrix, Density_Matrix, Overlap_Matrix);
+        REQUIRE(grad == test_grad);
+    }
 
- REQUIRE(grad == test_grad);
+    SECTION("Empty Tensor") {
+        simde::type::tensor Fock_Matrix{{1.0, 2.0}, {3.0, 4.0}};
+        simde::type::tensor Density_Matrix{{1.0, 2.0, 3.0}, {4.0, 5.0}};
+        simde::type::tensor Overlap_Matrix{{3.0, 4.0}, {5.0, 6.0}};
+
+        auto grad =
+          scf::driver::commutator(Fock_Matrix, Density_Matrix, Overlap_Matrix);
+
+        REQUIRE_THROWS_AS("Not smooth", std::runtime_error);
+    }
 }

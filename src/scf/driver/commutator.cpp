@@ -14,20 +14,27 @@
  * limitations under the License.
  */
 
-#include "driver.hpp"
+#include <scf/driver/commutator.hpp>
 
-simde::type::tensor commutator(simde::type::tensor Fock_Matrix, simde::type::tensor Density_Matrix, simde::type::tensor Overlap_Matrix) {
-    
-    simde::type::tensor FPS;
-    FPS("m,l") = Fock_Matrix("m,n") * Density_Matrix("n,l");
-    FPS("m,l") = FPS("m,n") * Overlap_Matrix("n,l");
+namespace scf::driver {
 
-    simde::type::tensor SPF;
-    SPF("m,l") = Density_Matrix("m,n") * Fock_Matrix("n,l");
-    SPF("m,l") = Overlap_Matrix("m,n") * SPF("n,l");
+simde::type::tensor commutator(simde::type::tensor A, simde::type::tensor B,
+                               simde::type::tensor S) {
+    if(A.rank() != B.rank() && A.rank() != S.rank()) {
+        std::cout << "A: " << A.rank() << "\nB: " << B.rank()
+                  << "\nC: " << S.rank() << std::endl;
+        throw std::runtime_error("This did not work");
+    }
+    simde::type::tensor AB, BA, ABC, CBA;
+    AB("m,l")  = A("m,n") * B("n,l");
+    ABC("m,l") = AB("m,n") * S("n,l");
+
+    BA("m,l")  = B("m,n") * A("n,l");
+    CBA("m,l") = S("m,n") * BA("n,l");
 
     simde::type::tensor grad;
-    grad("m,n")   = FPS("m,n") - SPF("m,n");
+    grad("m,n") = ABC("m,n") - CBA("m,n");
 
     return grad;
 }
+} // namespace scf::driver
