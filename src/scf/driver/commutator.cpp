@@ -20,22 +20,21 @@ namespace scf::driver {
 
 simde::type::tensor commutator(simde::type::tensor A, simde::type::tensor B,
                                simde::type::tensor S) {
-    // This doesn't quite work. Errors are better handled by TensorWrapper
-    if(A.rank() != B.rank() && A.rank() != S.rank()) {
+    if(A.rank() != 2 || B.rank() != 2 || S.rank() != 2) {
         std::stringstream ss;
         ss << "Matrix 1 Rank: " << A.rank() << "\nMatrix 2 Rank: " << B.rank()
            << "\nMatrix 3 Rank: " << S.rank() << std::endl;
-        throw std::runtime_error("Ranks do not match!\n" + ss.str());
+        throw std::runtime_error("Input matrix rank not 2!\n" + ss.str());
     }
-    simde::type::tensor AB, BA, ABC, CBA;
+    simde::type::tensor AB, BA, ABS, SBA;
     AB("m,l")  = A("m,n") * B("n,l");
-    ABC("m,l") = AB("m,n") * S("n,l");
+    ABS("m,l") = AB("m,n") * S("n,l");
 
     BA("m,l")  = B("m,n") * A("n,l");
-    CBA("m,l") = S("m,n") * BA("n,l");
+    SBA("m,l") = S("m,n") * BA("n,l");
 
     simde::type::tensor grad;
-    grad("m,n") = ABC("m,n") - CBA("m,n");
+    grad("m,n") = ABS("m,n") - SBA("m,n");
 
     return grad;
 }

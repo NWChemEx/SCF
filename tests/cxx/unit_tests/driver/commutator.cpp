@@ -20,14 +20,23 @@
 
 TEST_CASE("Commutator Function") {
     SECTION("Commutator Test") {
-        simde::type::tensor Fock_Matrix{{1.0, 2.0}, {3.0, 4.0}};
-        simde::type::tensor Density_Matrix{{2.0, 3.0}, {4.0, 5.0}};
-        simde::type::tensor Overlap_Matrix{{3.0, 4.0}, {5.0, 6.0}};
+        simde::type::tensor A{{1.0, 2.0}, {3.0, 4.0}};
+        simde::type::tensor B{{2.0, 3.0}, {4.0, 5.0}};
+        simde::type::tensor S{{3.0, 4.0}, {5.0, 6.0}};
 
         simde::type::tensor test_grad{{-14, -42}, {42, 14}};
-        auto grad =
-          scf::driver::commutator(Fock_Matrix, Density_Matrix, Overlap_Matrix);
+        auto grad = scf::driver::commutator(A, B, S);
 
         REQUIRE(grad == test_grad);
+    }
+
+    SECTION("Input not Matrix Rank") {
+        simde::type::tensor A{{1.0, 2.0}, {3.0, 4.0}};
+        simde::type::tensor B{4.0, 5.0};
+        simde::type::tensor S{{3.0, 4.0}, {5.0, 6.0}};
+        // auto grad =
+        //   scf::driver::commutator(Fock_Matrix, Density_Matrix,
+        //   Overlap_Matrix);
+        REQUIRE_THROWS(scf::driver::commutator(A, B, S));
     }
 }
