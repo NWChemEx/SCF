@@ -34,9 +34,6 @@ TEST_CASE("Commutator Function") {
         simde::type::tensor A{{1.0, 2.0}, {3.0, 4.0}};
         simde::type::tensor B{4.0, 5.0};
         simde::type::tensor S{{3.0, 4.0}, {5.0, 6.0}};
-        // auto grad =
-        //   scf::driver::commutator(Fock_Matrix, Density_Matrix,
-        //   Overlap_Matrix);
         REQUIRE_THROWS(scf::driver::commutator(A, B, S));
     }
 }
