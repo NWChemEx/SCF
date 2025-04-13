@@ -12,7 +12,7 @@ namespace scf::driver {
  *
  *  @param[in] A: matrix A, a tensor of rank 2.
  *  @param[in] B: matrix B, a tensor of rank 2.
- *  @param[in] S: matrix S, a tensor of rank 2. The overlap matrix of A and B.
+ *  @param[in] S: Overlap matrix S, a tensor of rank 2.
  *
  *  @return simde::type::tensor
  */
