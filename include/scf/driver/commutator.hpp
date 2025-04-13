@@ -8,7 +8,6 @@ namespace scf::driver {
  *  The commutator function evaluates the commutator between matrix A, matrix B,
  *  and the Overlap matrix S. This requires that all of the matrices are square.
  *
- *  @tparam simde::type::tensor
  *
  *  @param[in] A: matrix A, a tensor of rank 2.
  *  @param[in] B: matrix B, a tensor of rank 2.
