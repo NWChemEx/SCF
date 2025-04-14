@@ -15,6 +15,7 @@
  */
 
 #include "driver.hpp"
+#include <scf/driver/commutator.hpp>
 
 namespace scf::driver {
 namespace {
@@ -212,17 +213,10 @@ MODULE_RUN(SCFLoop) {
             // TODO: module satisfying BraKet(aos, Commutator(F,P), aos)
             chemist::braket::BraKet F_mn(aos, f_new, aos);
             const auto& F_matrix = F_mod.run_as<fock_matrix_pt>(F_mn);
-            simde::type::tensor FPS;
-            FPS("m,l") = F_matrix("m,n") * P_old("n,l");
-            FPS("m,l") = FPS("m,n") * S("n,l");
 
-            simde::type::tensor SPF;
-            SPF("m,l") = P_old("m,n") * F_matrix("n,l");
-            SPF("m,l") = S("m,n") * SPF("n,l");
+            auto grad = commutator(F_matrix, P_new, S);
 
-            simde::type::tensor grad;
             simde::type::tensor grad_norm;
-            grad("m,n")   = FPS("m,n") - SPF("m,n");
             grad_norm("") = grad("m,n") * grad("n,m");
 
             Kernel k(get_runtime());
