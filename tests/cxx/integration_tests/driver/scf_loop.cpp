@@ -27,23 +27,38 @@ using pt = simde::Optimize<egy_pt<WFType>, WFType>;
 TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
     using float_type = TestType;
     using wf_type    = simde::type::rscf_wf;
-    auto mm          = test_scf::load_modules<float_type>();
-    auto& mod        = mm.at("Loop");
+    using index_set  = typename wf_type::orbital_index_set_type;
+
+    auto mm   = test_scf::load_modules<float_type>();
+    auto& mod = mm.at("Loop");
 
     tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
     tensorwrapper::shape::Smooth shape_corr{};
     auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
     using tensorwrapper::operations::approximately_equal;
 
-    using index_set = typename wf_type::orbital_index_set_type;
-    wf_type psi0(index_set{0}, test_scf::h2_cmos<float_type>());
+    SECTION("H2") {
+        wf_type psi0(index_set{0}, test_scf::h2_cmos<float_type>());
+        auto H = test_scf::h2_hamiltonian();
 
-    auto H = test_scf::h2_hamiltonian();
+        chemist::braket::BraKet H_00(psi0, H, psi0);
+        const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
 
-    chemist::braket::BraKet H_00(psi0, H, psi0);
-    const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
+        pcorr->at() = -1.1167592336;
+        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+        REQUIRE(approximately_equal(corr, e, 1E-6));
+    }
 
-    pcorr->at() = -1.1167592336;
-    tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
-    REQUIRE(approximately_equal(corr, e, 1E-6));
+    SECTION("He") {
+        wf_type psi0(index_set{0}, test_scf::he_cmos<float_type>());
+
+        auto H = test_scf::he_hamiltonian();
+
+        chemist::braket::BraKet H_00(psi0, H, psi0);
+        const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
+
+        pcorr->at() = -2.807783957539;
+        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+        REQUIRE(approximately_equal(corr, e, 1E-6));
+    }
 }

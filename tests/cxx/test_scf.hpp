@@ -30,6 +30,10 @@ inline auto h_nucleus(double x, double y, double z) {
     return simde::type::nucleus("H", 1ul, 1836.15, x, y, z);
 }
 
+inline auto he_nucleus(double x, double y, double z) {
+    return simde::type::nucleus("He", 2ul, 7344.61, x, y, z);
+}
+
 template<typename ResultType>
 ResultType make_h2() {
     using simde::type::chemical_system;
@@ -43,6 +47,25 @@ ResultType make_h2() {
         return molecule(0, 1, make_h2<nuclei>());
     } else if constexpr(std::is_same_v<ResultType, chemical_system>) {
         return chemical_system(make_h2<molecule>());
+    } else {
+        // We know this assert fails if we're in the else statement
+        // Getting here means you provided a bad type.
+        static_assert(std::is_same_v<ResultType, nuclei>);
+    }
+}
+
+template<typename ResultType>
+ResultType make_he() {
+    using simde::type::chemical_system;
+    using simde::type::molecule;
+    using simde::type::nuclei;
+    if constexpr(std::is_same_v<ResultType, nuclei>) {
+        auto he0 = he_nucleus(0.0, 0.0, 0.0);
+        return nuclei{he0};
+    } else if constexpr(std::is_same_v<ResultType, molecule>) {
+        return molecule(0, 1, make_he<nuclei>());
+    } else if constexpr(std::is_same_v<ResultType, chemical_system>) {
+        return chemical_system(make_he<molecule>());
     } else {
         // We know this assert fails if we're in the else statement
         // Getting here means you provided a bad type.
@@ -78,6 +101,35 @@ inline auto h_basis(NucleiType& hydrogens) {
     return rv;
 }
 
+template<typename NucleiType>
+inline auto he_basis(NucleiType& heliums) {
+    using ao_basis_type            = chemist::basis_set::AOBasisSetD;
+    using atomic_basis_type        = typename ao_basis_type::value_type;
+    using shell_type               = typename atomic_basis_type::value_type;
+    using contracted_gaussian_type = typename shell_type::cg_type;
+    using center_type = typename atomic_basis_type::shell_traits::center_type;
+
+    std::vector<double> he_coefs{1.5432896730e-01, 5.3532814230e-01,
+                                 4.4463454220e-01};
+    std::vector<double> he_exps{6.3624213940e+00, 1.1589229990e+00,
+                                3.1364979150e-01};
+    auto cartesian = shell_type::pure_type::cartesian;
+    shell_type::angular_momentum_type l0{0};
+
+    ao_basis_type rv;
+    for(std::size_t i = 0; i < heliums.size(); ++i) {
+        const auto& hi = heliums[i];
+        center_type coords(hi.x(), hi.y(), hi.z());
+        contracted_gaussian_type he_cg(he_coefs.begin(), he_coefs.end(),
+                                       he_exps.begin(), he_exps.end(), coords);
+        atomic_basis_type he_basis("STO-3G", 1, coords);
+        he_basis.add_shell(cartesian, l0, he_cg);
+        rv.add_center(he_basis);
+    }
+
+    return rv;
+}
+
 inline auto h2_hamiltonian() {
     simde::type::many_electrons es(2);
     auto h2 = make_h2<simde::type::nuclei>();
@@ -88,9 +140,23 @@ inline auto h2_hamiltonian() {
     return simde::type::hamiltonian(T_e + V_en + V_ee + V_nn);
 }
 
+inline auto he_hamiltonian() {
+    simde::type::many_electrons es(2);
+    auto he = make_he<simde::type::nuclei>();
+    simde::type::T_e_type T_e(es);
+    simde::type::V_en_type V_en(es, he);
+    simde::type::V_ee_type V_ee(es, es);
+    return simde::type::hamiltonian(T_e + V_en + V_ee);
+}
+
 inline auto h2_aos() {
     auto h2 = make_h2<simde::type::nuclei>();
     return simde::type::aos(h_basis(h2));
+}
+
+inline auto he_aos() {
+    auto he = make_he<simde::type::nuclei>();
+    return simde::type::aos(he_basis(he));
 }
 
 template<typename FloatType>
@@ -111,6 +177,20 @@ inline auto h2_mos() {
 }
 
 template<typename FloatType>
+inline auto he_mos() {
+    using mos_type       = simde::type::mos;
+    using tensor_type    = typename mos_type::transform_type;
+    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
+    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    tensorwrapper::shape::Smooth shape{1, 1};
+    tensorwrapper::layout::Physical l(shape);
+    auto c_buffer      = alloc.allocate(l);
+    c_buffer->at(0, 0) = 1.0000;
+    tensor_type t(shape, std::move(c_buffer));
+    return mos_type(he_aos(), std::move(t));
+}
+
+template<typename FloatType>
 inline auto h2_cmos() {
     using cmos_type      = simde::type::cmos;
     using tensor_type    = typename cmos_type::transform_type;
@@ -123,6 +203,20 @@ inline auto h2_cmos() {
     e_buffer->at(1) = -0.47506974;
     tensor_type e(shape, std::move(e_buffer));
     return cmos_type(std::move(e), h2_aos(), h2_mos<FloatType>().transform());
+}
+
+template<typename FloatType>
+inline auto he_cmos() {
+    using cmos_type      = simde::type::cmos;
+    using tensor_type    = typename cmos_type::transform_type;
+    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
+    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    tensorwrapper::shape::Smooth shape{1};
+    tensorwrapper::layout::Physical l(shape);
+    auto e_buffer   = alloc.allocate(l);
+    e_buffer->at(0) = -0.876036;
+    tensor_type e(shape, std::move(e_buffer));
+    return cmos_type(std::move(e), he_aos(), he_mos<FloatType>().transform());
 }
 
 template<typename FloatType>

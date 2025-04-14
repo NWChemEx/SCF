@@ -71,7 +71,7 @@ struct GrabNuclear : chemist::qm_operator::OperatorVisitor {
 
     void run(const V_nn_type& V_nn) { m_pv = &V_nn; }
 
-    const V_nn_type* m_pv;
+    const V_nn_type* m_pv = nullptr;
 };
 
 MODULE_CTOR(SCFLoop) {
@@ -119,21 +119,26 @@ MODULE_RUN(SCFLoop) {
     // Step 1: Nuclear-nuclear repulsion
     GrabNuclear visitor;
     H.visit(visitor);
+    bool has_nn = (visitor.m_pv != nullptr);
+
     // TODO: Clean up charges class to make this easier...
-    const auto& V_nn       = *visitor.m_pv;
-    const auto n_lhs       = V_nn.lhs_particle().as_nuclei();
-    const auto qs_lhs_view = n_lhs.charges();
-    const auto n_rhs       = V_nn.rhs_particle().as_nuclei();
-    const auto qs_rhs_view = n_rhs.charges();
-    simde::type::charges qs_lhs;
-    simde::type::charges qs_rhs;
-    for(const auto q_i : qs_lhs_view) {
-        qs_lhs.push_back(q_i.as_point_charge());
+    simde::type::tensor e_nuclear(0.0);
+    if(has_nn) {
+        const auto& V_nn       = *visitor.m_pv;
+        const auto n_lhs       = V_nn.lhs_particle().as_nuclei();
+        const auto qs_lhs_view = n_lhs.charges();
+        const auto n_rhs       = V_nn.rhs_particle().as_nuclei();
+        const auto qs_rhs_view = n_rhs.charges();
+        simde::type::charges qs_lhs;
+        simde::type::charges qs_rhs;
+        for(const auto q_i : qs_lhs_view) {
+            qs_lhs.push_back(q_i.as_point_charge());
+        }
+        for(const auto q_i : qs_rhs_view) {
+            qs_rhs.push_back(q_i.as_point_charge());
+        }
+        e_nuclear = V_nn_mod.run_as<v_nn_pt>(qs_lhs, qs_rhs);
     }
-    for(const auto q_i : qs_rhs_view) {
-        qs_rhs.push_back(q_i.as_point_charge());
-    }
-    auto e_nuclear = V_nn_mod.run_as<v_nn_pt>(qs_lhs, qs_rhs);
 
     // Compute S
     chemist::braket::BraKet s_mn(aos, simde::type::s_e_type{}, aos);
@@ -200,8 +205,9 @@ MODULE_RUN(SCFLoop) {
 
             // Change in the density
             simde::type::tensor dp;
-            dp("m,n")    = rho_new.value()("m,n") - rho_old.value()("m,n");
-            auto dp_norm = tensorwrapper::operations::infinity_norm(dp);
+            const auto& P_old = rho_old.value();
+            dp("m,n")         = rho_new.value()("m,n") - P_old("m,n");
+            auto dp_norm      = tensorwrapper::operations::infinity_norm(dp);
 
             // Orbital gradient: FPS-SPF
             // TODO: module satisfying BraKet(aos, Commutator(F,P), aos)
@@ -209,6 +215,7 @@ MODULE_RUN(SCFLoop) {
             const auto& F_matrix = F_mod.run_as<fock_matrix_pt>(F_mn);
 
             auto grad = commutator(F_matrix, P_new, S);
+
             simde::type::tensor grad_norm;
             grad_norm("") = grad("m,n") * grad("n,m");
 
@@ -248,9 +255,9 @@ MODULE_RUN(SCFLoop) {
         ualloc.rebind(temp.buffer()).at() = val;
         e_nuclear                         = temp;
     }
-
     e_total("") = e_old("") + e_nuclear("");
-    auto rv     = results();
+
+    auto rv = results();
     return pt<wf_type>::wrap_results(rv, e_total, psi_old);
 }
 
