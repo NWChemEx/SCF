@@ -30,17 +30,17 @@ TEMPLATE_LIST_TEST_CASE("EigenGeneralized", "", test_scf::float_types) {
     tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
     tensorwrapper::shape::Smooth shape{2, 2};
     tensorwrapper::layout::Physical l(shape);
-    auto A_buffer      = alloc.allocate(l);
-    A_buffer->at(0, 0) = 1.0;
-    A_buffer->at(0, 1) = 2.0;
-    A_buffer->at(1, 0) = 2.0;
-    A_buffer->at(1, 1) = 3.0;
+    auto A_buffer = alloc.allocate(l);
+    A_buffer->set_elem({0, 0}, 1.0);
+    A_buffer->set_elem({0, 1}, 2.0);
+    A_buffer->set_elem({1, 0}, 2.0);
+    A_buffer->set_elem({1, 1}, 3.0);
 
-    auto B_buffer      = alloc.allocate(l);
-    B_buffer->at(0, 0) = 1.0;
-    B_buffer->at(0, 1) = 0.0;
-    B_buffer->at(1, 0) = 0.0;
-    B_buffer->at(1, 1) = 1.0;
+    auto B_buffer = alloc.allocate(l);
+    B_buffer->set_elem({0, 0}, 1.0);
+    B_buffer->set_elem({0, 1}, 0.0);
+    B_buffer->set_elem({1, 0}, 0.0);
+    B_buffer->set_elem({1, 1}, 1.0);
 
     simde::type::tensor A(shape, std::move(A_buffer));
     simde::type::tensor B(shape, std::move(B_buffer));

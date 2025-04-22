@@ -42,22 +42,22 @@ TEST_CASE("CoulombsLaw") {
     simde::type::charges qs{q0, q1, q2};
 
     SECTION("empty points") {
-        auto e      = mod.run_as<pt>(empty, empty);
-        pcorr->at() = 0.0;
+        auto e = mod.run_as<pt>(empty, empty);
+        pcorr->set_elem({}, 0.0);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, e, 1E-6));
     }
 
     SECTION("charges w/ itself") {
-        auto e      = mod.run_as<pt>(qs, qs);
-        pcorr->at() = -1.0103629710818451;
+        auto e = mod.run_as<pt>(qs, qs);
+        pcorr->set_elem({}, -1.0103629710818451);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, e, 1E-6));
     }
 
     SECTION("charges w/ empty") {
-        auto e      = mod.run_as<pt>(qs, empty);
-        pcorr->at() = 0.0;
+        auto e = mod.run_as<pt>(qs, empty);
+        pcorr->set_elem({}, 0.0);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, e, 1E-6));
     }
@@ -65,8 +65,8 @@ TEST_CASE("CoulombsLaw") {
     SECTION("charges w/ different charges") {
         simde::type::charges qs0{q0};
         simde::type::charges qs12{q1, q2};
-        auto e      = mod.run_as<pt>(qs0, qs12);
-        pcorr->at() = -0.1443375672974065;
+        auto e = mod.run_as<pt>(qs0, qs12);
+        pcorr->set_elem({}, -0.1443375672974065);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, e, 1E-6));
     }

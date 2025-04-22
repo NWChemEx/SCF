@@ -32,8 +32,8 @@ struct Kernel {
         const auto& eigen_B = allocator.rebind(B);
 
         // Wrap the tensors in Eigen::Map objects to avoid copy
-        const auto* pA      = eigen_A.data();
-        const auto* pB      = eigen_B.data();
+        const auto* pA      = eigen_A.get_immutable_data();
+        const auto* pB      = eigen_B.get_immutable_data();
         const auto& shape_A = eigen_A.layout().shape().as_smooth();
         auto rows           = shape_A.extent(0);
         auto cols           = shape_A.extent(1);
@@ -60,10 +60,10 @@ struct Kernel {
         auto pvalues_buffer  = allocator.allocate(vector_layout);
         auto pvectors_buffer = allocator.allocate(matrix_layout);
 
-        for(auto i = 0; i < rows; ++i) {
-            pvalues_buffer->at(i) = eigen_values(i);
-            for(auto j = 0; j < cols; ++j) {
-                pvectors_buffer->at(i, j) = eigen_vectors(i, j);
+        for(decltype(rows) i = 0; i < rows; ++i) {
+            pvalues_buffer->set_elem({i}, eigen_values(i));
+            for(decltype(cols) j = 0; j < cols; ++j) {
+                pvectors_buffer->set_elem({i, j}, eigen_vectors(i, j));
             }
         }
 

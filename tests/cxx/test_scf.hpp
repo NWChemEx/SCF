@@ -167,11 +167,11 @@ inline auto h2_mos() {
     allocator_type alloc(parallelzone::runtime::RuntimeView{});
     tensorwrapper::shape::Smooth shape{2, 2};
     tensorwrapper::layout::Physical l(shape);
-    auto c_buffer      = alloc.allocate(l);
-    c_buffer->at(0, 0) = -0.565516;
-    c_buffer->at(0, 1) = -1.07019;
-    c_buffer->at(1, 0) = -0.565516;
-    c_buffer->at(1, 1) = 1.07019;
+    auto c_buffer = alloc.allocate(l);
+    c_buffer->set_elem({0, 0}, -0.565516);
+    c_buffer->set_elem({0, 1}, -1.07019);
+    c_buffer->set_elem({1, 0}, -0.565516);
+    c_buffer->set_elem({1, 1}, 1.07019);
     tensor_type t(shape, std::move(c_buffer));
     return mos_type(h2_aos(), std::move(t));
 }
@@ -184,8 +184,8 @@ inline auto he_mos() {
     allocator_type alloc(parallelzone::runtime::RuntimeView{});
     tensorwrapper::shape::Smooth shape{1, 1};
     tensorwrapper::layout::Physical l(shape);
-    auto c_buffer      = alloc.allocate(l);
-    c_buffer->at(0, 0) = 1.0000;
+    auto c_buffer = alloc.allocate(l);
+    c_buffer->set_elem({0, 0}, 1.0000);
     tensor_type t(shape, std::move(c_buffer));
     return mos_type(he_aos(), std::move(t));
 }
@@ -198,9 +198,9 @@ inline auto h2_cmos() {
     allocator_type alloc(parallelzone::runtime::RuntimeView{});
     tensorwrapper::shape::Smooth shape{2};
     tensorwrapper::layout::Physical l(shape);
-    auto e_buffer   = alloc.allocate(l);
-    e_buffer->at(0) = -1.25330893;
-    e_buffer->at(1) = -0.47506974;
+    auto e_buffer = alloc.allocate(l);
+    e_buffer->set_elem({0}, -1.25330893);
+    e_buffer->set_elem({1}, -0.47506974);
     tensor_type e(shape, std::move(e_buffer));
     return cmos_type(std::move(e), h2_aos(), h2_mos<FloatType>().transform());
 }
@@ -213,8 +213,8 @@ inline auto he_cmos() {
     allocator_type alloc(parallelzone::runtime::RuntimeView{});
     tensorwrapper::shape::Smooth shape{1};
     tensorwrapper::layout::Physical l(shape);
-    auto e_buffer   = alloc.allocate(l);
-    e_buffer->at(0) = -0.876036;
+    auto e_buffer = alloc.allocate(l);
+    e_buffer->set_elem({0}, -0.876036);
     tensor_type e(shape, std::move(e_buffer));
     return cmos_type(std::move(e), he_aos(), he_mos<FloatType>().transform());
 }

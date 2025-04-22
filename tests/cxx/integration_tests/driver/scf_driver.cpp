@@ -28,7 +28,7 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
     tensorwrapper::shape::Smooth shape_corr{};
     auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
     using tensorwrapper::operations::approximately_equal;
-    pcorr->at() = -1.1167592336;
+    pcorr->set_elem({}, -1.1167592336);
     tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
 
     const auto e = mm.template run_as<pt>("SCF Driver", aos, h2);
@@ -45,7 +45,7 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
         simde::type::chemical_system h2_dimer_sys(h2_dimer_mol);
         const auto e =
           mm.template run_as<pt>("SCF Driver", ao_bs, h2_dimer_sys);
-        alloc.rebind(corr.buffer()).at() = -2.2260535919670001;
+        alloc.rebind(corr.buffer()).set_elem({}, -2.2260535919670001);
         REQUIRE(approximately_equal(corr, e, 1E-6));
     }
 }

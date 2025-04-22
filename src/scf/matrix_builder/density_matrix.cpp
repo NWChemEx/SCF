@@ -31,7 +31,6 @@ struct Kernel {
         constexpr auto edynam = Eigen::Dynamic;
         using allocator_type  = tensorwrapper::allocator::Eigen<FloatType>;
         using tensor_type    = Eigen::Matrix<FloatType, edynam, edynam, rmajor>;
-        using map_type       = Eigen::Map<tensor_type>;
         using const_map_type = Eigen::Map<const tensor_type>;
         auto rv              = c.allocator().runtime();
         allocator_type alloc(rv);
@@ -43,13 +42,16 @@ struct Kernel {
         // Step 2: Grab the orbitals in the ensemble
         auto& c_buffer = alloc.rebind(c);
 
-        const_map_type c_eigen(c_buffer.data(), n_aos, n_aos);
-        map_type p_eigen(pp_buffer->data(), n_aos, n_aos);
+        const_map_type c_eigen(c_buffer.get_immutable_data(), n_aos, n_aos);
         auto slice = c_eigen.block(0, 0, n_aos, n_occ);
 
         // Step 3: CC_dagger
-        p_eigen = slice * slice.transpose();
-
+        tensor_type p_eigen = slice * slice.transpose();
+        for(std::size_t i = 0; i < n_aos; ++i) {
+            for(std::size_t j = 0; j < n_aos; ++j) {
+                pp_buffer->set_elem({i, j}, p_eigen(i, j));
+            }
+        }
         return simde::type::tensor(p_shape, std::move(pp_buffer));
     }
 };
