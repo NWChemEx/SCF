@@ -31,7 +31,6 @@ struct Kernel {
         constexpr auto edynam = Eigen::Dynamic;
         using allocator_type  = tensorwrapper::allocator::Eigen<FloatType>;
         using tensor_type    = Eigen::Matrix<FloatType, edynam, edynam, rmajor>;
-        using map_type       = Eigen::Map<tensor_type>;
         using const_map_type = Eigen::Map<const tensor_type>;
         auto rv              = c.allocator().runtime();
         allocator_type alloc(rv);
