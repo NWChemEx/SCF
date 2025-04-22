@@ -37,7 +37,7 @@ TEMPLATE_LIST_TEST_CASE("CoulombsLaw", "", test_scf::float_types) {
 
     auto e_nuclear = mod.run_as<pt>(qs, qs);
 
-    pcorr->at() = 0.71510297482837526;
+    pcorr->set_elem({}, 0.71510297482837526);
     tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
     REQUIRE(approximately_equal(corr, e_nuclear, 1E-6));
 }

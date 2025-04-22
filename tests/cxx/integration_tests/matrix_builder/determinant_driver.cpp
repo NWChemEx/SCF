@@ -48,7 +48,7 @@ TEMPLATE_LIST_TEST_CASE("DeterminantDriver", "", test_scf::float_types) {
         erased_type<wf_type> copy_braket(braket);
         const auto& T = mod.template run_as<pt<wf_type>>(copy_braket);
 
-        pcorr->at() = 0.637692;
+        pcorr->set_elem({}, 0.637692);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, T, 1E-6));
     }
@@ -60,7 +60,7 @@ TEMPLATE_LIST_TEST_CASE("DeterminantDriver", "", test_scf::float_types) {
         erased_type<wf_type> copy_braket(braket);
         const auto& V = mod.template run_as<pt<wf_type>>(copy_braket);
 
-        pcorr->at() = -1.96830777255516853;
+        pcorr->set_elem({}, -1.96830777255516853);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, V, 1E-6));
     }
@@ -72,7 +72,7 @@ TEMPLATE_LIST_TEST_CASE("DeterminantDriver", "", test_scf::float_types) {
         erased_type<wf_type> copy_braket(braket);
         const auto& J = mod.template run_as<pt<wf_type>>(copy_braket);
 
-        pcorr->at() = 0.76056339681664897;
+        pcorr->set_elem({}, 0.76056339681664897);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, J, 1E-6));
     }
@@ -84,7 +84,7 @@ TEMPLATE_LIST_TEST_CASE("DeterminantDriver", "", test_scf::float_types) {
         erased_type<wf_type> copy_braket(braket);
         const auto& K = mod.template run_as<pt<wf_type>>(copy_braket);
 
-        pcorr->at() = 0.76056339681664897;
+        pcorr->set_elem({}, 0.76056339681664897);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, K, 1E-6));
     }

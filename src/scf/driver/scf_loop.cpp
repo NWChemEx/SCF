@@ -26,7 +26,7 @@ struct Kernel {
     auto run(const tensorwrapper::buffer::BufferBase& a, double tol) {
         tensorwrapper::allocator::Eigen<FloatType> allocator(m_rv);
         const auto& eigen_a = allocator.rebind(a);
-        return tensorwrapper::types::fabs(eigen_a.at()) < FloatType(tol);
+        return tensorwrapper::types::fabs(eigen_a.get_data(0)) < FloatType(tol);
     }
 
     parallelzone::runtime::RuntimeView m_rv;
@@ -251,9 +251,9 @@ MODULE_RUN(SCFLoop) {
 
     if(ualloc.can_rebind(e_old.buffer())) {
         simde::type::tensor temp(e_old);
-        auto val = dalloc.rebind(e_nuclear.buffer()).at();
-        ualloc.rebind(temp.buffer()).at() = val;
-        e_nuclear                         = temp;
+        auto val = dalloc.rebind(e_nuclear.buffer()).get_data(0);
+        ualloc.rebind(temp.buffer()).set_data(0, val);
+        e_nuclear = temp;
     }
     e_total("") = e_old("") + e_nuclear("");
 
