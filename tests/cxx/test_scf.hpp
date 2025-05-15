@@ -122,7 +122,7 @@ inline auto he_basis(NucleiType& heliums) {
         center_type coords(hi.x(), hi.y(), hi.z());
         contracted_gaussian_type he_cg(he_coefs.begin(), he_coefs.end(),
                                        he_exps.begin(), he_exps.end(), coords);
-        atomic_basis_type he_basis("STO-3G", 1, coords);
+        atomic_basis_type he_basis("STO-3G", 2, coords);
         he_basis.add_shell(cartesian, l0, he_cg);
         rv.add_center(he_basis);
     }
