@@ -15,13 +15,23 @@
  */
 
 #include "gauxc.hpp"
-#include "gauxc_property_types.hpp"
 
 namespace scf::xc::gauxc {
+namespace {
+
+const auto desc = R"(
+Chemist AOBasisSet to GauXC BasisSet
+====================================
+
+TODO: Write me!!
+)";
+
+}
 
 // Module to convert NWX Basis -> GauXC Basis
 MODULE_CTOR(BasisConversion) {
     satisfies_property_type<gauxc_basis_conversion_t>();
+    description(desc);
 }
 MODULE_RUN(BasisConversion) {
     const auto& [nwx_basis] = gauxc_basis_conversion_t::unwrap_inputs(inputs);

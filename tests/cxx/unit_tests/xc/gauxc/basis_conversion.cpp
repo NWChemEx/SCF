@@ -18,12 +18,12 @@
 #include <scf/scf.hpp>
 #include <scf/xc/gauxc/gauxc_property_types.hpp>
 
-using pt = scf::xc::gauxc::basis_to_gauxc_molecule_conversion_t;
+using pt = scf::xc::gauxc::gauxc_basis_conversion_t;
 
-TEST_CASE("MoleculeConversion") {
+TEST_CASE("BasisConversion") {
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
-    auto& mod = mm.at("GauXC Molecule Converter");
+    auto& mod = mm.at("GauXC Basis Converter");
 
     using nuclei_type = simde::type::nuclei;
 
@@ -32,8 +32,9 @@ TEST_CASE("MoleculeConversion") {
         auto bs  = test_scf::he_basis(mol);
 
         auto rv = mod.run_as<pt>(bs);
-        REQUIRE(rv.natoms() == 1);
-        REQUIRE(rv.maxZ() == 2);
+        REQUIRE(rv.nbf() == 1);
+        REQUIRE(rv.nshells() == 1);
+        REQUIRE(rv.max_l() == 0);
     }
 
     SECTION("h2") {
@@ -41,7 +42,8 @@ TEST_CASE("MoleculeConversion") {
         auto bs  = test_scf::h_basis(mol);
 
         auto rv = mod.run_as<pt>(bs);
-        REQUIRE(rv.natoms() == 2);
-        REQUIRE(rv.maxZ() == 1);
+        REQUIRE(rv.nbf() == 2);
+        REQUIRE(rv.nshells() == 2);
+        REQUIRE(rv.max_l() == 0);
     }
 }
