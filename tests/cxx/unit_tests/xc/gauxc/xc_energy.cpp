@@ -34,8 +34,7 @@ TEST_CASE("XCEnergy") {
 
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
-    auto& mod         = mm.at("GauXC XC Energy");
-    using nuclei_type = simde::type::nuclei;
+    auto& mod = mm.at("GauXC XC Energy");
 
     auto func = chemist::qm_operator::xc_functional::PBE0;
 

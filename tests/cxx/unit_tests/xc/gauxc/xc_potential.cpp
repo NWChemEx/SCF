@@ -26,8 +26,7 @@ using tensorwrapper::operations::approximately_equal;
 TEST_CASE("XCPotential") {
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
-    auto& mod         = mm.at("GauXC XC Potential");
-    using nuclei_type = simde::type::nuclei;
+    auto& mod = mm.at("GauXC XC Potential");
 
     simde::type::electron e;
     auto func = chemist::qm_operator::xc_functional::PBE0;
