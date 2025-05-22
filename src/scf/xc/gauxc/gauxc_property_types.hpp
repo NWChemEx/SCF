@@ -23,8 +23,6 @@
 
 namespace scf::xc::gauxc {
 
-using xc_grid_type = GauXC::AtomicGridSizeDefault;
-
 using gauxc_basis_conversion_t =
   simde::Convert<GauXC::BasisSet<double>, simde::type::ao_basis_set>;
 
@@ -56,15 +54,10 @@ PROPERTY_TYPE_RESULTS(XCDriver) {
 DECLARE_PROPERTY_TYPE(XCQuadratureBatches);
 
 PROPERTY_TYPE_INPUTS(XCQuadratureBatches) {
-    using basis_type          = simde::type::ao_basis_set;
-    using pruning_scheme_type = GauXC::PruningScheme;
-    using radial_quad_type    = GauXC::RadialQuad;
+    using basis_type = simde::type::ao_basis_set;
 
-    auto rv = pluginplay::declare_input()
-                .add_field<const basis_type&>("AO Basis")
-                .add_field<const pruning_scheme_type&>("Pruning Scheme")
-                .add_field<const radial_quad_type&>("Radial Quadrature")
-                .add_field<const xc_grid_type&>("XC Grid Specification");
+    auto rv =
+      pluginplay::declare_input().add_field<const basis_type&>("AO Basis");
     return rv;
 }
 

@@ -16,7 +16,7 @@ void load_modules(pluginplay::ModuleManager& mm) {
     mm.add_module<XCEnergy>("GauXC XC Energy");
 
     // sn-LinK Integration
-    // mm.add_module<snLinK>("snLinK");
+    mm.add_module<snLinK>("snLinK");
 }
 
 void set_defaults(pluginplay::ModuleManager& mm) {
@@ -34,8 +34,8 @@ void set_defaults(pluginplay::ModuleManager& mm) {
     mm.change_submod("GauXC XC Energy", "XC Driver", "GauXC Driver");
 
     // sn-LinK Integration
-    // mm.change_submod("snLinK", "Quadrature Batches",
-    //                 "GauXC Quadrature Batches");
+    mm.change_submod("snLinK", "Quadrature Batches",
+                     "GauXC Quadrature Batches");
 }
 
 } // namespace scf::xc::gauxc

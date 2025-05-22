@@ -16,27 +16,24 @@
 
 #include "../../../test_scf.hpp"
 
+using k_pt = simde::aos_k_e_aos;
+using tensorwrapper::operations::approximately_equal;
+
 TEST_CASE("snLinK") {
-    // pluginplay::ModuleManager mm;
-    // scf::load_modules(mm);
+    pluginplay::ModuleManager mm;
+    scf::load_modules(mm);
+    auto& mod = mm.at("snLinK");
 
-    // auto mod = mm.at("snLinK");
+    SECTION("h2") {
+        auto rho        = test_scf::h2_density<double>();
+        const auto& aos = rho.basis_set();
+        simde::type::electron e;
+        simde::type::k_e_type k(e, rho);
+        simde::type::braket k_ij(aos, k, aos);
+        const auto& K = mod.run_as<k_pt>(k_ij);
 
-    // const auto name = molecule::h2o;
-    // const auto bs   = basis_set::sto3g;
-    // auto mol        = get_molecule(name);
-    // auto aos        = get_bases(name, bs);
-
-    // // Build density and j operator
-    // auto occ = get_space(property::occupied, name, bs);
-
-    // simde::type::tensor rho;
-    // rho("mu,nu") = occ.C()("mu, i") * occ.C()("nu, i");
-    // simde::type::el_density P(rho, aos);
-    // simde::type::el e;
-    // simde::type::el_scf_k k(e, P);
-
-    // auto corr_k = get_ao_data(name, {bs, bs}, property::exchange);
-    // auto K      = mod.run_as<k_pt>(aos, k, aos);
-    // REQUIRE(tensorwrapper::tensor::allclose(K, corr_k));
+        simde::type::tensor corr_k(
+          {{0.627264, 0.561828}, {0.561828, 0.627264}});
+        REQUIRE(approximately_equal(K, corr_k, 1E-5));
+    }
 }

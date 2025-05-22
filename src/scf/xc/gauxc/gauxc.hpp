@@ -8,7 +8,7 @@ DECLARE_MODULE(GauXCDriver);
 DECLARE_MODULE(XCPotential);
 DECLARE_MODULE(XCEnergy);
 
-// DECLARE_MODULE(snLinK);
+DECLARE_MODULE(snLinK);
 
 // Module to convert Chemist Basis -> GauXC Basis
 DECLARE_MODULE(BasisConversion);

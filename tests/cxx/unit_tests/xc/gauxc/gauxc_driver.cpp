@@ -22,6 +22,7 @@
 using namespace scf;
 
 using pt = scf::xc::gauxc::XCDriver;
+using tensorwrapper::operations::approximately_equal;
 
 TEST_CASE("GauXCDriver") {
     pluginplay::ModuleManager mm;
@@ -34,6 +35,12 @@ TEST_CASE("GauXCDriver") {
         auto rho        = test_scf::h2_density<double>();
         const auto& aos = rho.basis_set().ao_basis_set();
         auto [exc, vxc] = mod.run_as<pt>(func, aos, rho.value());
+        simde::type::tensor exc_corr(-0.587164);
+        REQUIRE(approximately_equal(exc_corr, exc, 1E-5));
+
+        simde::type::tensor vxc_corr{{-0.357302, -0.23347},
+                                     {-0.23347, -0.357302}};
+        REQUIRE(approximately_equal(vxc, vxc_corr, 1E-5));
     }
 
     SECTION("he") {
@@ -41,5 +48,15 @@ TEST_CASE("GauXCDriver") {
         const auto& aos = rho.basis_set().ao_basis_set();
 
         auto [exc, vxc] = mod.run_as<pt>(func, aos, rho.value());
+        simde::type::tensor exc_corr(-0.819986);
+        REQUIRE(approximately_equal(exc_corr, exc, 1E-5));
+
+        tensorwrapper::allocator::Eigen<double> alloc(mm.get_runtime());
+        tensorwrapper::shape::Smooth shape_corr{1, 1};
+        auto pcorr =
+          alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
+        pcorr->set_elem({0, 0}, -0.526535);
+        simde::type::tensor vxc_corr(shape_corr, std::move(pcorr));
+        REQUIRE(approximately_equal(vxc, vxc_corr, 1E-5));
     }
 }
