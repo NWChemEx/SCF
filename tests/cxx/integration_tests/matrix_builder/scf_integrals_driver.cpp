@@ -102,7 +102,7 @@ TEMPLATE_LIST_TEST_CASE("SCFIntegralsDriver", "", test_scf::float_types) {
         auto rho        = test_scf::h2_density<double>();
         const auto& aos = rho.basis_set();
         simde::type::xc_e_type xc_op(func, e, rho);
-        simde::type::braket xc_ij(aos, xc_op, aos);
+        chemist::braket::BraKet xc_ij(aos, xc_op, aos);
         erased_type copy_braket(xc_ij);
         auto vxc = mod.template run_as<pt>(copy_braket);
         simde::type::tensor corr{{-0.357302, -0.23347}, {-0.23347, -0.357302}};
