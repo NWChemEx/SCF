@@ -40,6 +40,9 @@ MODULE_RUN(XCPotential) {
     const auto& xc_op   = braket.op();
     const auto& ket_aos = braket.ket();
 
+    if(bra_aos != ket_aos)
+        throw std::runtime_error("Expected the same basis set!");
+
     const auto func = xc_op.functional_name();
     const auto& P   = xc_op.rhs_particle();
     const auto& aos = bra_aos.ao_basis_set();

@@ -38,6 +38,9 @@ MODULE_RUN(XCEnergy) {
     const auto& xc_op  = braket.op();
     const auto& ket_wf = braket.ket();
 
+    if(bra_wf != ket_wf)
+        throw std::runtime_error("Expected the same basis set");
+
     const auto func = xc_op.functional_name();
     const auto& P   = xc_op.rhs_particle();
     const auto& aos = P.basis_set().ao_basis_set();

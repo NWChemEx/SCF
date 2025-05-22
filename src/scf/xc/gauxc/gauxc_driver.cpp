@@ -53,7 +53,6 @@ MODULE_CTOR(GauXCDriver) {
 
 MODULE_RUN(GauXCDriver) {
     const auto& [nwx_func, aos, P] = XCDriver::unwrap_inputs(inputs);
-    const size_t nbf               = aos.size();
 
     auto P_eigen = tw_to_eigen<double>(P);
 
