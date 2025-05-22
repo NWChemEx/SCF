@@ -32,7 +32,8 @@ public:
                      const DensityType& rho) :
       base_type(F), m_func_(func), m_prho_(&rho) {}
 
-    void run(const V_ee_term& V_ee) {
+    using base_type::run;
+    void run(const V_ee_term& V_ee) override {
         if(*m_prho_ == DensityType{}) return;
         using j_type  = Coulomb<ElectronType, DensityType>;
         using xc_type = ExchangeCorrelation<ElectronType, DensityType>;

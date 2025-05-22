@@ -15,6 +15,7 @@
  */
 
 #pragma once
+#include <Eigen/Dense>
 #include <tensorwrapper/tensorwrapper.hpp>
 
 namespace scf::xc::gauxc {

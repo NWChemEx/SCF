@@ -37,8 +37,9 @@ MODULE_RUN(BasisConversion) {
     const auto& [nwx_basis] = gauxc_basis_conversion_t::unwrap_inputs(inputs);
 
     GauXC::BasisSet<double> gauxc_basis;
-    gauxc_basis.reserve(nwx_basis.n_shells());
-    for(auto i_sh = 0; i_sh < nwx_basis.n_shells(); ++i_sh) {
+    auto nshells = nwx_basis.n_shells();
+    gauxc_basis.reserve(nshells);
+    for(decltype(nshells) i_sh = 0; i_sh < nshells; ++i_sh) {
         const auto shell      = nwx_basis.shell(i_sh);
         const auto nprims     = shell.n_primitives();
         const auto first_prim = shell.primitive(0);
