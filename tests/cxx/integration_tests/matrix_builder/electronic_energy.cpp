@@ -44,14 +44,28 @@ TEMPLATE_LIST_TEST_CASE("ElectronicEnergy", "", test_scf::float_types) {
 
     auto rho = test_scf::h2_density<float_type>();
     simde::type::J_e_type J_e(es, rho);
-    simde::type::K_e_type K_e(es, rho);
-    simde::type::electronic_hamiltonian H_e(T_e * 2.0 + V_en * 2.0 + J_e * 2.0 -
-                                            K_e);
-    chemist::braket::BraKet braket(psi, H_e, psi);
+    SECTION("RHF") {
+        simde::type::K_e_type K_e(es, rho);
+        simde::type::electronic_hamiltonian H_e(T_e * 2.0 + V_en * 2.0 +
+                                                J_e * 2.0 - K_e);
+        chemist::braket::BraKet braket(psi, H_e, psi);
 
-    const auto& E_elec = mod.template run_as<pt<wf_type>>(braket);
+        const auto& E_elec = mod.template run_as<pt<wf_type>>(braket);
 
-    pcorr->set_elem({}, -1.90066758625308307);
-    tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
-    REQUIRE(approximately_equal(corr, E_elec, 1E-6));
+        pcorr->set_elem({}, -1.90066758625308307);
+        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+        REQUIRE(approximately_equal(corr, E_elec, 1E-6));
+    }
+    SECTION("RKS") {
+        if constexpr(std::is_same_v<float_type, double>) {
+            auto func = chemist::qm_operator::xc_functional::PBE;
+            simde::type::XC_e_type XC_e(func, es, rho);
+            simde::type::electronic_hamiltonian H_e(T_e * 2.0 + V_en * 2.0 +
+                                                    J_e * 2.0 + XC_e);
+            chemist::braket::BraKet braket(psi, H_e, psi);
+            const auto& E_elec = mod.template run_as<pt<wf_type>>(braket);
+            tensorwrapper::Tensor corr(-1.90692);
+            REQUIRE(approximately_equal(corr, E_elec, 1E-5));
+        }
+    }
 }

@@ -35,14 +35,18 @@ inline void load_modules(pluginplay::ModuleManager& mm) {
 
 inline void set_defaults(pluginplay::ModuleManager& mm) {
     const auto ao_driver = "SCF integral driver";
-    mm.change_submod(ao_driver, "Fock matrix", "Fock Matrix Builder");
+    // mm.change_submod(ao_driver, "Fock matrix", "Fock Matrix Builder");
     mm.change_submod(ao_driver, "Density matrix", "Density matrix builder");
+    mm.change_submod(ao_driver, "XC Potential", "GauXC XC Potential");
+
+    mm.change_submod("Fock Matrix Builder", "Two center evaluator", ao_driver);
 
     const auto det_driver = "Determinant driver";
     mm.change_submod(det_driver, "Two center evaluator", ao_driver);
     mm.change_submod(det_driver, "Fock matrix", "Fock matrix builder");
 
     mm.change_submod("Electronic energy", "determinant driver", det_driver);
+    mm.change_submod("Electronic energy", "XC Energy", "GauXC XC Energy");
 }
 
 } // namespace scf::matrix_builder

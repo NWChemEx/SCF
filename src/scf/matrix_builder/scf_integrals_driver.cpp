@@ -34,15 +34,16 @@ using simde::type::tensor;
 using pt       = simde::aos_op_base_aos;
 using f_e_pt   = simde::aos_f_e_aos;
 using rho_e_pt = simde::aos_rho_e_aos<simde::type::cmos>;
+using xc_e_pt  = simde::aos_xc_e_aos;
 
 class AODispatcher : public chemist::qm_operator::OperatorVisitor {
 private:
     using base_type = chemist::qm_operator::OperatorVisitor;
 
 public:
-    using f_e_type   = simde::type::fock;
-    using rho_e_type = simde::type::rho_e<simde::type::cmos>;
-
+    using f_e_type     = simde::type::fock;
+    using rho_e_type   = simde::type::rho_e<simde::type::cmos>;
+    using xc_e_type    = simde::type::xc_e_type;
     using submods_type = pluginplay::type::submodule_map;
 
     AODispatcher(const aos& bra, const aos& ket, submodule_map& submods,
@@ -50,6 +51,7 @@ public:
       base_type(false),
       m_pbra_(&bra),
       m_pket_(&ket),
+      m_evaluated_(false),
       m_psubmods_(&submods),
       m_ptensor_(&t) {}
 
@@ -67,6 +69,13 @@ public:
         m_evaluated_   = true;
     }
 
+    void run(const xc_e_type& xc_e) {
+        chemist::braket::BraKet input(*m_pbra_, xc_e, *m_pket_);
+        const auto key = "XC Potential";
+        *m_ptensor_    = m_psubmods_->at(key).run_as<xc_e_pt>(input);
+        m_evaluated_   = true;
+    }
+
     bool evaluated() const noexcept { return m_evaluated_; }
 
 private:
@@ -81,8 +90,8 @@ MODULE_CTOR(SCFIntegralsDriver) {
     description(desc);
     satisfies_property_type<pt>();
     add_submodule<pt>("Fundamental matrices");
-    add_submodule<f_e_pt>("Fock matrix");
     add_submodule<rho_e_pt>("Density matrix");
+    add_submodule<xc_e_pt>("XC Potential");
 }
 
 MODULE_RUN(SCFIntegralsDriver) {

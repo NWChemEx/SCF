@@ -21,6 +21,7 @@
 #include "matrix_builder/matrix_builder.hpp"
 #include "scf_modules.hpp"
 #include "update/update.hpp"
+#include "xc/xc.hpp"
 #include <scf/scf_mm.hpp>
 
 namespace scf {
@@ -32,6 +33,7 @@ void load_modules(pluginplay::ModuleManager& mm) {
     guess::load_modules(mm);
     matrix_builder::load_modules(mm);
     update::load_modules(mm);
+    xc::load_modules(mm);
 
     mm.add_module<CoulombsLaw>("Coulomb's Law");
 
@@ -44,6 +46,7 @@ void load_modules(pluginplay::ModuleManager& mm) {
     guess::set_defaults(mm);
     matrix_builder::set_defaults(mm);
     update::set_defaults(mm);
+    xc::set_defaults(mm);
 }
 
 } // namespace scf

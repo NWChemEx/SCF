@@ -39,9 +39,6 @@ pluginplay::ModuleManager load_modules() {
     mm.change_submod(ao_driver_key, "Fundamental matrices",
                      "AO integral driver");
 
-    mm.change_submod("Fock Matrix Builder", "Two center evaluator",
-                     "AO integral driver");
-
     mm.change_submod("Diagonalization Fock update", "Overlap matrix builder",
                      "Overlap");
 

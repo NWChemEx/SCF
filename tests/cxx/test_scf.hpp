@@ -122,7 +122,7 @@ inline auto he_basis(NucleiType& heliums) {
         center_type coords(hi.x(), hi.y(), hi.z());
         contracted_gaussian_type he_cg(he_coefs.begin(), he_coefs.end(),
                                        he_exps.begin(), he_exps.end(), coords);
-        atomic_basis_type he_basis("STO-3G", 1, coords);
+        atomic_basis_type he_basis("STO-3G", 2, coords);
         he_basis.add_shell(cartesian, l0, he_cg);
         rv.add_center(he_basis);
     }
@@ -230,6 +230,19 @@ inline auto h2_density() {
     auto pbuffer = alloc.construct(l, 0.31980835);
     tensor_type t(shape, std::move(pbuffer));
     return density_type(std::move(t), h2_mos<FloatType>());
+}
+
+template<typename FloatType>
+inline auto he_density() {
+    using density_type   = simde::type::decomposable_e_density;
+    using tensor_type    = typename density_type::value_type;
+    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
+    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    tensorwrapper::shape::Smooth shape{1, 1};
+    tensorwrapper::layout::Physical l(shape);
+    auto pbuffer = alloc.construct(l, 1.000);
+    tensor_type t(shape, std::move(pbuffer));
+    return density_type(std::move(t), he_mos<FloatType>());
 }
 
 /// The Fock matrix consistent with h2_hamiltonian and h2_density
