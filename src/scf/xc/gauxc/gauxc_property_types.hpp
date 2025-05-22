@@ -31,6 +31,28 @@ using gauxc_basis_conversion_t =
 using basis_to_gauxc_molecule_conversion_t =
   simde::Convert<GauXC::Molecule, simde::type::ao_basis_set>;
 
+DECLARE_PROPERTY_TYPE(XCDriver);
+
+PROPERTY_TYPE_INPUTS(XCDriver) {
+    using functional_type = chemist::qm_operator::xc_functional;
+    using basis_type      = simde::type::ao_basis_set;
+    using tensor_type     = simde::type::tensor;
+    auto rv               = pluginplay::declare_input()
+                .add_field<functional_type>("Functional Name")
+                .add_field<const basis_type&>("AO Basis")
+                .add_field<const tensor_type&>("density");
+    return rv;
+}
+
+PROPERTY_TYPE_RESULTS(XCDriver) {
+    using tensor_type = simde::type::tensor;
+    auto rv           = pluginplay::declare_result()
+                .add_field<tensor_type>("XC Energy")
+                .add_field<tensor_type>("XC Potential");
+
+    return rv;
+}
+
 DECLARE_PROPERTY_TYPE(XCQuadratureBatches);
 
 PROPERTY_TYPE_INPUTS(XCQuadratureBatches) {

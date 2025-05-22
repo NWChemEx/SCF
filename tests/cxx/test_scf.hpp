@@ -232,6 +232,19 @@ inline auto h2_density() {
     return density_type(std::move(t), h2_mos<FloatType>());
 }
 
+template<typename FloatType>
+inline auto he_density() {
+    using density_type   = simde::type::decomposable_e_density;
+    using tensor_type    = typename density_type::value_type;
+    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
+    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    tensorwrapper::shape::Smooth shape{1, 1};
+    tensorwrapper::layout::Physical l(shape);
+    auto pbuffer = alloc.construct(l, 1.000);
+    tensor_type t(shape, std::move(pbuffer));
+    return density_type(std::move(t), he_mos<FloatType>());
+}
+
 /// The Fock matrix consistent with h2_hamiltonian and h2_density
 template<typename ElectronType, typename FloatType = double>
 inline auto h2_fock() {

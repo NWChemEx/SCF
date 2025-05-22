@@ -14,72 +14,71 @@
 //  * limitations under the License.
 //  */
 
-// #include "gauxc.hpp"
+#include "gauxc.hpp"
 
-// #include <gauxc/molecular_weights.hpp>
-// #include <gauxc/molgrid/defaults.hpp>
-// #include <gauxc/runtime_environment.hpp>
+#include <gauxc/molecular_weights.hpp>
+#include <gauxc/molgrid/defaults.hpp>
+#include <gauxc/runtime_environment.hpp>
 
-// namespace scf::xc::gauxc {
+namespace scf::xc::gauxc {
 
-// MODULE_CTOR(QuadratureBatches) {
-//     satisfies_property_type<XCQuadratureBatches>();
+MODULE_CTOR(QuadratureBatches) {
+    satisfies_property_type<XCQuadratureBatches>();
 
-//     add_submodule<gauxc_basis_conversion_t>("GauXC Basis Converter")
-//       .set_description("Converts NWX Basis -> GauXC Basis");
-//     add_submodule<basis_to_gauxc_molecule_conversion_t>(
-//       "GauXC Molecule Converter")
-//       .set_description("Converts NWX Basis -> GauXC Molecule");
+    add_submodule<gauxc_basis_conversion_t>("GauXC Basis Converter")
+      .set_description("Converts NWX Basis -> GauXC Basis");
+    add_submodule<basis_to_gauxc_molecule_conversion_t>(
+      "GauXC Molecule Converter")
+      .set_description("Converts NWX Basis -> GauXC Molecule");
 
-//     /// TODO: Replace with information from the runtime
-//     add_input<bool>("On GPU").set_default(false);
-// }
+    /// TODO: Replace with information from the runtime
+    add_input<bool>("On GPU").set_default(false);
+}
 
-// MODULE_RUN(QuadratureBatches) {
-//     const auto& [obs, pruning_scheme, radial_quad, grid_spec] =
-//       XCQuadratureBatches::unwrap_inputs(inputs);
+MODULE_RUN(QuadratureBatches) {
+    const auto& [obs, pruning_scheme, radial_quad, grid_spec] =
+      XCQuadratureBatches::unwrap_inputs(inputs);
 
-//     // Setup execution environment
-//     auto on_gpu   = inputs.at("On GPU").value<bool>();
-//     auto ex_space = (on_gpu) ?
-//                       GauXC::ExecutionSpace::Device :
-//                       GauXC::ExecutionSpace::Host; // TODO handle CUDA/HIP
-//     auto comm     = get_runtime().mpi_comm();
-//     std::shared_ptr<GauXC::RuntimeEnvironment> gauxc_rt =
-// #ifdef GAUXC_ENABLE_DEVICE
-//       (on_gpu) ? std::make_shared<GauXC::DeviceRuntimeEnvironment>(comm, 0.8)
-//       :
-// #endif
-//                  std::make_shared<GauXC::RuntimeEnvironment>(comm);
+    // Setup execution environment
+    auto on_gpu   = inputs.at("On GPU").value<bool>();
+    auto ex_space = (on_gpu) ?
+                      GauXC::ExecutionSpace::Device :
+                      GauXC::ExecutionSpace::Host; // TODO handle CUDA/HIP
+    auto comm     = get_runtime().mpi_comm();
+    std::shared_ptr<GauXC::RuntimeEnvironment> gauxc_rt =
+#ifdef GAUXC_ENABLE_DEVICE
+      (on_gpu) ? std::make_shared<GauXC::DeviceRuntimeEnvironment>(comm, 0.8) :
+#endif
+                 std::make_shared<GauXC::RuntimeEnvironment>(comm);
 
-//     // Convert NWX Molecule -> GauXC Molecule
-//     auto& mol_submod = submods.at("GauXC Molecule Converter");
-//     const auto& gauxc_mol =
-//       mol_submod.run_as<basis_to_gauxc_molecule_conversion_t>(obs);
+    // Convert NWX Molecule -> GauXC Molecule
+    auto& mol_submod = submods.at("GauXC Molecule Converter");
+    const auto& gauxc_mol =
+      mol_submod.run_as<basis_to_gauxc_molecule_conversion_t>(obs);
 
-//     // Convert NWX Basis -> GauXC Basis
-//     auto& basis_submod = submods.at("GauXC Basis Converter");
-//     const auto& gauxc_basis =
-//       basis_submod.run_as<gauxc_basis_conversion_t>(obs);
+    // Convert NWX Basis -> GauXC Basis
+    auto& basis_submod = submods.at("GauXC Basis Converter");
+    const auto& gauxc_basis =
+      basis_submod.run_as<gauxc_basis_conversion_t>(obs);
 
-//     // Set up integration grid
-//     const auto bsz = GauXC::BatchSize(512);
-//     const auto prn = GauXC::PruningScheme::Unpruned;
-//     auto mol_grid  = GauXC::MolGridFactory::create_default_molgrid(
-//       gauxc_mol, prn, bsz, GauXC::RadialQuad::MuraKnowles, grid_spec);
+    // Set up integration grid
+    const auto bsz = GauXC::BatchSize(512);
+    const auto prn = GauXC::PruningScheme::Unpruned;
+    auto mol_grid  = GauXC::MolGridFactory::create_default_molgrid(
+      gauxc_mol, prn, bsz, GauXC::RadialQuad::MuraKnowles, grid_spec);
 
-//     // Generate LoadBalancer
-//     GauXC::LoadBalancerFactory lb_factory(ex_space, "Default");
-//     auto lb =
-//       lb_factory.get_instance(*gauxc_rt, gauxc_mol, mol_grid, gauxc_basis);
+    // Generate LoadBalancer
+    GauXC::LoadBalancerFactory lb_factory(ex_space, "Default");
+    auto lb =
+      lb_factory.get_instance(*gauxc_rt, gauxc_mol, mol_grid, gauxc_basis);
 
-//     // Apply Molecular Partition Weights
-//     GauXC::MolecularWeightsFactory mw_factory(
-//       ex_space, "Default", GauXC::MolecularWeightsSettings{});
-//     mw_factory.get_instance().modify_weights(lb);
+    // Apply Molecular Partition Weights
+    GauXC::MolecularWeightsFactory mw_factory(
+      ex_space, "Default", GauXC::MolecularWeightsSettings{});
+    mw_factory.get_instance().modify_weights(lb);
 
-//     auto rv = results();
-//     return XCQuadratureBatches::wrap_results(rv, lb);
-// }
+    auto rv = results();
+    return XCQuadratureBatches::wrap_results(rv, lb);
+}
 
-// } // namespace scf::xc::gauxc
+} // namespace scf::xc::gauxc

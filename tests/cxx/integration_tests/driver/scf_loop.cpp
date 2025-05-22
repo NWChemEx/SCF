@@ -39,6 +39,7 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
 
     SECTION("H2") {
         wf_type psi0(index_set{0}, test_scf::h2_cmos<float_type>());
+
         auto H = test_scf::h2_hamiltonian();
 
         chemist::braket::BraKet H_00(psi0, H, psi0);
