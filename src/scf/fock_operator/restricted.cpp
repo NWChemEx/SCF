@@ -29,7 +29,8 @@ public:
     RestrictedVisitor(simde::type::fock& F, const DensityType& rho) :
       base_type(F), m_prho_(&rho) {}
 
-    void run(const V_ee_term& V_ee) {
+    using base_type::run;
+    void run(const V_ee_term& V_ee) override {
         if(*m_prho_ == DensityType{}) return;
         using j_type = Coulomb<ElectronType, DensityType>;
         using k_type = Exchange<ElectronType, DensityType>;
