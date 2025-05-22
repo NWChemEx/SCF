@@ -29,7 +29,7 @@ TEST_CASE("snLinK") {
         const auto& aos = rho.basis_set();
         simde::type::electron e;
         simde::type::k_e_type k(e, rho);
-        simde::type::braket k_ij(aos, k, aos);
+        chemist::braket::BraKet k_ij(aos, k, aos);
         const auto& K = mod.run_as<k_pt>(k_ij);
 
         simde::type::tensor corr_k(

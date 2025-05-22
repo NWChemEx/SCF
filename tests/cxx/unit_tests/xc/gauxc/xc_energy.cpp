@@ -43,7 +43,7 @@ TEST_CASE("XCEnergy") {
         auto rho = test_scf::h2_density<float_type>();
         simde::type::many_electrons es{2};
         XC_e_t xc_op(func, es, rho);
-        simde::type::braket xc_ij(psi, xc_op, psi);
+        chemist::braket::BraKet xc_ij(psi, xc_op, psi);
         auto exc = mod.run_as<pt<wf_type>>(xc_ij);
         simde::type::tensor corr(-0.587164);
         REQUIRE(approximately_equal(exc, corr, 1E-5));
@@ -54,7 +54,7 @@ TEST_CASE("XCEnergy") {
         auto rho = test_scf::he_density<double>();
         simde::type::many_electrons es{2};
         XC_e_t xc_op(func, es, rho);
-        simde::type::braket xc_ij(psi, xc_op, psi);
+        chemist::braket::BraKet xc_ij(psi, xc_op, psi);
         auto exc = mod.run_as<pt<wf_type>>(xc_ij);
         simde::type::tensor corr(-0.819986);
         REQUIRE(approximately_equal(exc, corr, 1E-5));

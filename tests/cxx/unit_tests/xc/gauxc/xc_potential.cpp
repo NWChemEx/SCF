@@ -35,7 +35,7 @@ TEST_CASE("XCPotential") {
         auto rho        = test_scf::h2_density<double>();
         const auto& aos = rho.basis_set();
         simde::type::xc_e_type xc_op(func, e, rho);
-        simde::type::braket xc_ij(aos, xc_op, aos);
+        chemist::braket::BraKet xc_ij(aos, xc_op, aos);
         auto vxc = mod.run_as<pt>(xc_ij);
 
         simde::type::tensor corr{{-0.357302, -0.23347}, {-0.23347, -0.357302}};
@@ -46,7 +46,7 @@ TEST_CASE("XCPotential") {
         auto rho        = test_scf::he_density<double>();
         const auto& aos = rho.basis_set();
         simde::type::xc_e_type xc_op(func, e, rho);
-        simde::type::braket xc_ij(aos, xc_op, aos);
+        chemist::braket::BraKet xc_ij(aos, xc_op, aos);
         auto vxc = mod.run_as<pt>(xc_ij);
 
         tensorwrapper::allocator::Eigen<double> alloc(mm.get_runtime());
