@@ -96,7 +96,7 @@ if("${BUILD_TESTING}")
     python_mpi_test(
         unit_test_scf
         "${PYTHON_TEST_DIR}/unit_tests/run_unit_tests.py"
-        SUBMODULES simde chemist pluginplay parallelzone
+        SUBMODULES simde chemist pluginplay parallelzone tensorwrapper
     )
 
     if("${INTEGRATION_TESTING}")
