@@ -12,13 +12,24 @@
 .. See the License for the specific language governing permissions and
 .. limitations under the License.
 
-#########
+###
 SCF
-#########
+###
+
+.. toctree::
+   :maxdepth: 2
+
+   module_api/index
+   background/index.rst
+   features
+   install
+   tutorials/index
+   developer/index
+   faqs
+   bibliography/index.rst
 
 .. toctree::
    :maxdepth: 2
    :caption: APIs:
 
-   module_api/index
    C++ API <https://nwchemex.github.io/SCF/scf_cxx_api/index.html>
