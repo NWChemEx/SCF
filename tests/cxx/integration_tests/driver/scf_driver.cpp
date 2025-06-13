@@ -38,18 +38,21 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
             REQUIRE(approximately_equal(corr, e, 1E-6));
         }
         SECTION("DFT") {
-            auto func         = chemist::qm_operator::xc_functional::PBE;
-            const auto RKS_op = "Restricted Kohn-Sham Op";
-            const auto rks_op = "Restricted One-Electron Kohn-Sham Op";
-            mm.change_input(RKS_op, "XC Potential", func);
-            mm.change_input(rks_op, "XC Potential", func);
-            mm.change_submod("Loop", "One-electron Fock operator", rks_op);
-            mm.change_submod("Loop", "Fock operator", RKS_op);
-            mm.change_submod("Core guess", "Build Fock Operator", rks_op);
-            const auto e = mm.template run_as<pt>("SCF Driver", aos, h2);
-            pcorr->set_elem({}, -1.15207);
-            simde::type::tensor corr(shape_corr, std::move(pcorr));
-            REQUIRE(approximately_equal(corr, e, 1E-5));
+            // GauXC not currently compatible with Uncertain values
+            if constexpr(!tensorwrapper::types::is_uncertain_v<float_type>) {
+                auto func         = chemist::qm_operator::xc_functional::PBE;
+                const auto RKS_op = "Restricted Kohn-Sham Op";
+                const auto rks_op = "Restricted One-Electron Kohn-Sham Op";
+                mm.change_input(RKS_op, "XC Potential", func);
+                mm.change_input(rks_op, "XC Potential", func);
+                mm.change_submod("Loop", "One-electron Fock operator", rks_op);
+                mm.change_submod("Loop", "Fock operator", RKS_op);
+                mm.change_submod("Core guess", "Build Fock Operator", rks_op);
+                const auto e = mm.template run_as<pt>("SCF Driver", aos, h2);
+                pcorr->set_elem({}, -1.15207);
+                simde::type::tensor corr(shape_corr, std::move(pcorr));
+                REQUIRE(approximately_equal(corr, e, 1E-5));
+            }
         }
     }
 
