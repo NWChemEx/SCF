@@ -6,21 +6,21 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AO Restricted One-Electron Fock Op &mdash; SCF v0.0.19 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+  <title>AO Restricted One-Electron Fock Op &mdash; SCF v0.0.20 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=84fddc8a"></script>
+      <script src="../_static/documentation_options.js?v=ae461b50"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Core guess" href="Core_guess.html" />
-    <link rel="prev" title="AO Restricted Fock Op" href="AO_Restricted_Fock_Op.html" /> 
+    <link rel="next" title="AO Restricted One-Electron Kohn-Sham Op" href="AO_Restricted_One-Electron_Kohn-Sham_Op.html" />
+    <link rel="prev" title="AO Restricted Kohn-Sham Op" href="AO_Restricted_Kohn-Sham_Op.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,6 +46,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Modules API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="AO_Restricted_Fock_Op.html">AO Restricted Fock Op</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AO_Restricted_Kohn-Sham_Op.html">AO Restricted Kohn-Sham Op</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">AO Restricted One-Electron Fock Op</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#restricted-fock-operator-builder">Restricted Fock Operator Builder</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#please-cite">Please Cite</a></li>
@@ -61,6 +62,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="AO_Restricted_One-Electron_Kohn-Sham_Op.html">AO Restricted One-Electron Kohn-Sham Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Core_guess.html">Core guess</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Coulomb%27s_Law.html">Coulomb’s Law</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Density_matrix_builder.html">Density matrix builder</a></li>
@@ -68,12 +70,21 @@
 <li class="toctree-l2"><a class="reference internal" href="Diagonalization_Fock_update.html">Diagonalization Fock update</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Electronic_energy.html">Electronic energy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Fock_matrix_builder.html">Fock matrix builder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GauXC_Basis_Converter.html">GauXC Basis Converter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GauXC_Driver.html">GauXC Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GauXC_Molecule_Converter.html">GauXC Molecule Converter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GauXC_Quadrature_Batches.html">GauXC Quadrature Batches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GauXC_XC_Energy.html">GauXC XC Energy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GauXC_XC_Potential.html">GauXC XC Potential</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Generalized_eigensolve_via_Eigen.html">Generalized eigensolve via Eigen</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Loop.html">Loop</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Restricted_Fock_Op.html">Restricted Fock Op</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Restricted_Kohn-Sham_Op.html">Restricted Kohn-Sham Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Restricted_One-Electron_Fock_Op.html">Restricted One-Electron Fock Op</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Restricted_One-Electron_Kohn-Sham_Op.html">Restricted One-Electron Kohn-Sham Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="SCF_Driver.html">SCF Driver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="SCF_integral_driver.html">SCF integral driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="snLinK.html">snLinK</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://nwchemex.github.io/SCF/scf_cxx_api/index.html">C++ API</a></li>
@@ -244,8 +255,8 @@ the Module class’s advanced API.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="AO_Restricted_Fock_Op.html" class="btn btn-neutral float-left" title="AO Restricted Fock Op" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Core_guess.html" class="btn btn-neutral float-right" title="Core guess" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="AO_Restricted_Kohn-Sham_Op.html" class="btn btn-neutral float-left" title="AO Restricted Kohn-Sham Op" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="AO_Restricted_One-Electron_Kohn-Sham_Op.html" class="btn btn-neutral float-right" title="AO Restricted One-Electron Kohn-Sham Op" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

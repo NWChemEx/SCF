@@ -94,31 +94,48 @@ $(function() {
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> DensityType, <span class="keyword">typename</span> ElectronType&gt;</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;DECLARE_MODULE(Restricted);</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> load_modules(pluginplay::ModuleManager&amp; mm) {</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="keyword">using</span> simde::type::decomposable_e_density;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keyword">using</span> simde::type::e_density;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keyword">using</span> simde::type::electron;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">using</span> simde::type::many_electrons;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">using</span> e_many = Restricted&lt;e_density, many_electrons&gt;;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">using</span> e_e    = Restricted&lt;e_density, electron&gt;;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">using</span> d_many = Restricted&lt;decomposable_e_density, many_electrons&gt;;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">using</span> d_e    = Restricted&lt;decomposable_e_density, electron&gt;;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    mm.add_module&lt;e_many&gt;(<span class="stringliteral">&quot;AO Restricted Fock Op&quot;</span>);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    mm.add_module&lt;d_many&gt;(<span class="stringliteral">&quot;Restricted Fock Op&quot;</span>);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    mm.add_module&lt;e_e&gt;(<span class="stringliteral">&quot;AO Restricted One-Electron Fock Op&quot;</span>);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    mm.add_module&lt;d_e&gt;(<span class="stringliteral">&quot;Restricted One-Electron Fock Op&quot;</span>);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;}</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#define EXTERN_RESTRICTED(density)                                          \</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">    extern template struct Restricted&lt;density, simde::type::many_electrons&gt;; \</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">    extern template struct Restricted&lt;density, simde::type::electron&gt;</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;EXTERN_RESTRICTED(simde::type::e_density);</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;EXTERN_RESTRICTED(simde::type::decomposable_e_density);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#undef EXTERN_RESTRICTED</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">} </span><span class="comment">// namespace scf::fock_operator</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> DensityType, <span class="keyword">typename</span> ElectronType&gt;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;DECLARE_MODULE(RKohnSham);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> load_modules(pluginplay::ModuleManager&amp; mm) {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">using</span> simde::type::decomposable_e_density;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">using</span> simde::type::e_density;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">using</span> simde::type::electron;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">using</span> simde::type::many_electrons;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">using</span> e_many    = Restricted&lt;e_density, many_electrons&gt;;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">using</span> e_e       = Restricted&lt;e_density, electron&gt;;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">using</span> d_many    = Restricted&lt;decomposable_e_density, many_electrons&gt;;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">using</span> d_e       = Restricted&lt;decomposable_e_density, electron&gt;;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">using</span> e_ks_many = RKohnSham&lt;e_density, many_electrons&gt;;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keyword">using</span> e_ks_e    = RKohnSham&lt;e_density, electron&gt;;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">using</span> d_ks_many = RKohnSham&lt;decomposable_e_density, many_electrons&gt;;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keyword">using</span> d_ks_e    = RKohnSham&lt;decomposable_e_density, electron&gt;;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    mm.add_module&lt;e_many&gt;(<span class="stringliteral">&quot;AO Restricted Fock Op&quot;</span>);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    mm.add_module&lt;d_many&gt;(<span class="stringliteral">&quot;Restricted Fock Op&quot;</span>);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    mm.add_module&lt;e_e&gt;(<span class="stringliteral">&quot;AO Restricted One-Electron Fock Op&quot;</span>);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    mm.add_module&lt;d_e&gt;(<span class="stringliteral">&quot;Restricted One-Electron Fock Op&quot;</span>);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    mm.add_module&lt;e_ks_many&gt;(<span class="stringliteral">&quot;AO Restricted Kohn-Sham Op&quot;</span>);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    mm.add_module&lt;d_ks_many&gt;(<span class="stringliteral">&quot;Restricted Kohn-Sham Op&quot;</span>);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    mm.add_module&lt;e_ks_e&gt;(<span class="stringliteral">&quot;AO Restricted One-Electron Kohn-Sham Op&quot;</span>);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    mm.add_module&lt;d_ks_e&gt;(<span class="stringliteral">&quot;Restricted One-Electron Kohn-Sham Op&quot;</span>);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;}</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#define EXTERN_RESTRICTED(density)                                           \</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">    extern template struct Restricted&lt;density, simde::type::many_electrons&gt;; \</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">    extern template struct Restricted&lt;density, simde::type::electron&gt;</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#define EXTERN_RKOHN_SHAM(density)                                          \</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">    extern template struct RKohnSham&lt;density, simde::type::many_electrons&gt;; \</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">    extern template struct RKohnSham&lt;density, simde::type::electron&gt;</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;EXTERN_RESTRICTED(simde::type::e_density);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;EXTERN_RESTRICTED(simde::type::decomposable_e_density);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;EXTERN_RKOHN_SHAM(simde::type::e_density);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;EXTERN_RKOHN_SHAM(simde::type::decomposable_e_density);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#undef EXTERN_RKOHN_SHAM</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#undef EXTERN_RESTRICTED</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">} </span><span class="comment">// namespace scf::fock_operator</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

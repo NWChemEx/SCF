@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['grabnuclear_5',['GrabNuclear',['../structscf_1_1driver_1_1GrabNuclear.html',1,'scf::driver']]]
+  ['energydispatcher_8',['EnergyDispatcher',['../classscf_1_1matrix__builder_1_1EnergyDispatcher.html',1,'scf::matrix_builder']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['restrictedvisitor_7',['RestrictedVisitor',['../classscf_1_1fock__operator_1_1RestrictedVisitor.html',1,'scf::fock_operator']]]
+  ['grabnuclear_10',['GrabNuclear',['../structscf_1_1driver_1_1GrabNuclear.html',1,'scf::driver']]]
 ];

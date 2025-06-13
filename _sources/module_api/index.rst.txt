@@ -6,7 +6,9 @@ Modules API
    :maxdepth: 1
 
    AO_Restricted_Fock_Op
+   AO_Restricted_Kohn-Sham_Op
    AO_Restricted_One-Electron_Fock_Op
+   AO_Restricted_One-Electron_Kohn-Sham_Op
    Core_guess
    Coulomb's_Law
    Density_matrix_builder
@@ -14,9 +16,18 @@ Modules API
    Diagonalization_Fock_update
    Electronic_energy
    Fock_matrix_builder
+   GauXC_Basis_Converter
+   GauXC_Driver
+   GauXC_Molecule_Converter
+   GauXC_Quadrature_Batches
+   GauXC_XC_Energy
+   GauXC_XC_Potential
    Generalized_eigensolve_via_Eigen
    Loop
    Restricted_Fock_Op
+   Restricted_Kohn-Sham_Op
    Restricted_One-Electron_Fock_Op
+   Restricted_One-Electron_Kohn-Sham_Op
    SCF_Driver
    SCF_integral_driver
+   snLinK
