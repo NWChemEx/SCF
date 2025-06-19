@@ -41,6 +41,13 @@ using simde::type::electronic_hamiltonian;
 using simde::type::hamiltonian;
 using simde::type::op_base_type;
 
+using density_t      = simde::type::decomposable_e_density;
+using fock_pt        = simde::FockOperator<density_t>;
+using density_pt     = simde::aos_rho_e_aos<simde::type::cmos>;
+using v_nn_pt        = simde::charge_charge_interaction;
+using fock_matrix_pt = simde::aos_f_e_aos;
+using s_pt           = simde::aos_s_e_aos;
+
 template<typename WfType>
 using egy_pt = simde::eval_braket<WfType, hamiltonian, WfType>;
 
@@ -52,17 +59,6 @@ using pt = simde::Optimize<egy_pt<WfType>, WfType>;
 
 template<typename WfType>
 using update_pt = simde::UpdateGuess<WfType>;
-
-using density_t = simde::type::decomposable_e_density;
-
-using fock_pt = simde::FockOperator<density_t>;
-
-using density_pt = simde::aos_rho_e_aos<simde::type::cmos>;
-
-using v_nn_pt = simde::charge_charge_interaction;
-
-using fock_matrix_pt = simde::aos_f_e_aos;
-using s_pt           = simde::aos_s_e_aos;
 
 struct GrabNuclear : chemist::qm_operator::OperatorVisitor {
     using V_nn_type = simde::type::V_nn_type;
@@ -100,10 +96,14 @@ MODULE_RUN(SCFLoop) {
     using density_op_type       = simde::type::rho_e<simde::type::cmos>;
     const auto&& [braket, psi0] = pt<wf_type>::unwrap_inputs(inputs);
     // TODO: Assert bra == ket == psi0
-    const auto& H      = braket.op();
-    const auto& H_elec = H.electronic_hamiltonian();
-    const auto& H_core = H_elec.core_hamiltonian();
-    const auto& aos    = psi0.orbitals().from_space();
+    const auto& H       = braket.op();
+    const auto& H_elec  = H.electronic_hamiltonian();
+    const auto& H_core  = H_elec.core_hamiltonian();
+    const auto& aos     = psi0.orbitals().from_space();
+    const auto max_iter = inputs.at("max iterations").value<unsigned int>();
+    const auto e_tol    = inputs.at("energy tolerance").value<double>();
+    const auto dp_tol   = inputs.at("density tolerance").value<double>();
+    const auto g_tol    = inputs.at("gradient tolerance").value<double>();
 
     auto& egy_mod     = submods.at("Electronic energy");
     auto& density_mod = submods.at("Density matrix");
@@ -111,7 +111,6 @@ MODULE_RUN(SCFLoop) {
     auto& fock_mod    = submods.at("One-electron Fock operator");
     auto& Fock_mod    = submods.at("Fock operator");
     auto& V_nn_mod    = submods.at("Charge-charge");
-
     // TODO: should be split off into orbital gradient module
     auto& F_mod = submods.at("Fock matrix builder");
     auto& S_mod = submods.at("Overlap matrix builder");
@@ -152,24 +151,18 @@ MODULE_RUN(SCFLoop) {
     const auto& P = density_mod.run_as<density_pt>(P_mn);
     density_t rho_old(P, psi_old.orbitals());
 
-    const auto max_iter = inputs.at("max iterations").value<unsigned int>();
-    const auto e_tol    = inputs.at("energy tolerance").value<double>();
-    const auto dp_tol   = inputs.at("density tolerance").value<double>();
-    const auto g_tol    = inputs.at("gradient tolerance").value<double>();
-    unsigned int iter   = 0;
-
     auto& logger = get_runtime().logger();
 
+    unsigned int iter = 0;
     while(iter < max_iter) {
-        // Step 2: Old density is used to create the new Fock operator
+        // Step 2: Old density is used to create the corresponding Fock operator
         // TODO: Make easier to go from many-electron to one-electron
         // TODO: template fock_pt on Hamiltonian type and only pass H_elec
-        const auto& f_new = fock_mod.run_as<fock_pt>(H, rho_old);
-        const auto& F_new = Fock_mod.run_as<fock_pt>(H, rho_old);
+        const auto& f_old = fock_mod.run_as<fock_pt>(H, rho_old);
 
-        // Step 3: New Fock operator used to compute new wavefunction/density
+        // Step 3: Fock operator used to compute new wavefunction/density
         const auto& psi_new =
-          update_mod.run_as<update_pt<wf_type>>(f_new, psi_old);
+          update_mod.run_as<update_pt<wf_type>>(f_old, psi_old);
 
         density_op_type rho_hat_new(psi_new.orbitals(), psi_new.occupations());
         chemist::braket::BraKet P_mn_new(aos, rho_hat_new, aos);
@@ -180,6 +173,7 @@ MODULE_RUN(SCFLoop) {
         // Step 4: New electronic energy
         // Step 4a: New Fock operator to new electronic Hamiltonian
         // TODO: Should just be H_core + F;
+        const auto& F_new = Fock_mod.run_as<fock_pt>(H, rho_new);
         electronic_hamiltonian H_new;
         for(std::size_t i = 0; i < H_core.size(); ++i)
             H_new.emplace_back(H_core.coefficient(i),
@@ -211,6 +205,7 @@ MODULE_RUN(SCFLoop) {
 
             // Orbital gradient: FPS-SPF
             // TODO: module satisfying BraKet(aos, Commutator(F,P), aos)
+            const auto& f_new = fock_mod.run_as<fock_pt>(H, rho_new);
             chemist::braket::BraKet F_mn(aos, f_new, aos);
             const auto& F_matrix = F_mod.run_as<fock_matrix_pt>(F_mn);
 
