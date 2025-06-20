@@ -1,4 +1,4 @@
-.. Copyright 2022 NWChemEx-Project
+.. Copyright 2025 NWChemEx-Project
 ..
 .. Licensed under the Apache License, Version 2.0 (the "License");
 .. you may not use this file except in compliance with the License.
@@ -12,24 +12,12 @@
 .. See the License for the specific language governing permissions and
 .. limitations under the License.
 
-###
-SCF
-###
+##########
+References
+##########
 
-.. toctree::
-   :maxdepth: 2
+You know the book
 
-   module_api/index
-   background/index.rst
-   features
-   install
-   tutorials/index
-   developer/index
-   faqs
-   bibliography/index.rst
+or Helgaker if you're really bought in
 
-.. toctree::
-   :maxdepth: 2
-   :caption: APIs:
-
-   C++ API <https://nwchemex.github.io/SCF/scf_cxx_api/index.html>
+.. .. bibliography::
