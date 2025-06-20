@@ -41,25 +41,52 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
         wf_type psi0(index_set{0}, test_scf::h2_cmos<float_type>());
 
         auto H = test_scf::h2_hamiltonian();
-
         chemist::braket::BraKet H_00(psi0, H, psi0);
-        const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
 
-        pcorr->set_elem({}, -1.1167592336);
-        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
-        REQUIRE(approximately_equal(corr, e, 1E-6));
+        SECTION("Default") {
+            const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
+            pcorr->set_elem({}, -1.1167592336);
+            tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+            REQUIRE(approximately_equal(corr, e, 1E-6));
+        }
+
+        if constexpr(std::is_same_v<float_type, double>) {
+            SECTION("With DIIS") {
+                mod.change_input("DIIS", true);
+
+                const auto& [e, psi] =
+                  mod.template run_as<pt<wf_type>>(H_00, psi0);
+                pcorr->set_elem({}, -1.1167592336);
+                tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+                REQUIRE(approximately_equal(corr, e, 1E-6));
+            }
+        }
     }
 
     SECTION("He") {
         wf_type psi0(index_set{0}, test_scf::he_cmos<float_type>());
 
         auto H = test_scf::he_hamiltonian();
-
         chemist::braket::BraKet H_00(psi0, H, psi0);
-        const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
 
-        pcorr->set_elem({}, -2.807783957539);
-        tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
-        REQUIRE(approximately_equal(corr, e, 1E-6));
+        SECTION("Default") {
+            const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
+
+            pcorr->set_elem({}, -2.807783957539);
+            tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+            REQUIRE(approximately_equal(corr, e, 1E-6));
+        }
+
+        if constexpr(std::is_same_v<float_type, double>) {
+            SECTION("With DIIS") {
+                mod.change_input("DIIS", true);
+                const auto& [e, psi] =
+                  mod.template run_as<pt<wf_type>>(H_00, psi0);
+
+                pcorr->set_elem({}, -2.807783957539);
+                tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+                REQUIRE(approximately_equal(corr, e, 1E-6));
+            }
+        }
     }
 }

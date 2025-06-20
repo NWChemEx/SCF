@@ -25,24 +25,21 @@ import unittest
 class TestSCFDriver(unittest.TestCase):
 
     def test_scf_driver(self):
-        # Property Types
-        mol_from_str = simde.MoleculeFromString()
-        mol_basis_set = simde.MolecularBasisSet()
-        ao_energy = simde.AOEnergy()
+        egy = self.mm.run_as(self.ao_energy, "SCF Driver", self.aos, self.sys)
+        self.assertAlmostEqual(np.array(egy), -74.94208027122616, places=6)
 
-        # Inputs
-        water = self.mm.at("NWX Molecules").run_as(mol_from_str, "water")
-        aos = self.mm.at('STO-3G').run_as(mol_basis_set, water)
-        sys = chemist.ChemicalSystem(water)
-
-        # Run module
-        egy = self.mm.run_as(ao_energy, "SCF Driver", aos, sys)
+    def test_scf_driver_diis(self):
+        self.mm.change_input("Loop", "DIIS", True)
+        egy = self.mm.run_as(self.ao_energy, "SCF Driver", self.aos, self.sys)
         self.assertAlmostEqual(np.array(egy), -74.94208027122616, places=6)
 
     def setUp(self):
+        # Setup Module Manager
         self.mm = pp.ModuleManager(pz.runtime.RuntimeView())
         nux.load_modules(self.mm)
         nwx.load_modules(self.mm)
+
+        # Set Submods
         self.mm.change_submod("SCF Driver", "Hamiltonian",
                               "Born-Oppenheimer Approximation")
         self.mm.change_submod("SCF integral driver", "Fundamental matrices",
@@ -50,3 +47,13 @@ class TestSCFDriver(unittest.TestCase):
         self.mm.change_submod("Diagonalization Fock update",
                               "Overlap matrix builder", "Overlap")
         self.mm.change_submod("Loop", "Overlap matrix builder", "Overlap")
+
+        # Property Types
+        self.mol = simde.MoleculeFromString()
+        self.basis_set = simde.MolecularBasisSet()
+        self.ao_energy = simde.AOEnergy()
+
+        # Inputs
+        self.water = self.mm.at("NWX Molecules").run_as(self.mol, "water")
+        self.aos = self.mm.at('STO-3G').run_as(self.basis_set, self.water)
+        self.sys = chemist.ChemicalSystem(self.water)

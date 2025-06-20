@@ -20,8 +20,12 @@
 namespace scf::driver {
 namespace {
 
+// Comparison between convergence metrics based on floating point type
 struct Kernel {
-    explicit Kernel(parallelzone::runtime::RuntimeView rv) : m_rv(rv) {}
+    using rv_t = parallelzone::runtime::RuntimeView;
+
+    explicit Kernel(rv_t rv) : m_rv(rv) {}
+
     template<typename FloatType>
     auto run(const tensorwrapper::buffer::BufferBase& a, double tol) {
         tensorwrapper::allocator::Eigen<FloatType> allocator(m_rv);
@@ -29,7 +33,18 @@ struct Kernel {
         return tensorwrapper::types::fabs(eigen_a.get_data(0)) < FloatType(tol);
     }
 
-    parallelzone::runtime::RuntimeView m_rv;
+    rv_t m_rv;
+};
+
+// Pull out nuclear-nuclear interaction term, if there is one.
+struct GrabNuclear : chemist::qm_operator::OperatorVisitor {
+    using V_nn_type = simde::type::V_nn_type;
+
+    GrabNuclear() : chemist::qm_operator::OperatorVisitor(false) {}
+
+    void run(const V_nn_type& V_nn) { m_pv = &V_nn; }
+
+    const V_nn_type* m_pv = nullptr;
 };
 
 const auto desc = R"(
@@ -37,22 +52,20 @@ const auto desc = R"(
 
 } // namespace
 
-using simde::type::electronic_hamiltonian;
-using simde::type::hamiltonian;
-using simde::type::op_base_type;
-
 using tensor_t        = simde::type::tensor;
+using cmos_t          = simde::type::cmos;
+using diis_t          = tensorwrapper::diis::DIIS;
 using density_t       = simde::type::decomposable_e_density;
 using fock_pt         = simde::FockOperator<density_t>;
-using density_pt      = simde::aos_rho_e_aos<simde::type::cmos>;
+using density_pt      = simde::aos_rho_e_aos<cmos_t>;
 using v_nn_pt         = simde::charge_charge_interaction;
 using fock_matrix_pt  = simde::aos_f_e_aos;
 using diagonalizer_pt = simde::GeneralizedEigenSolve;
 using s_pt            = simde::aos_s_e_aos;
-using diis_t          = tensorwrapper::diis::DIIS;
+using simde::type::electronic_hamiltonian;
 
 template<typename WfType>
-using egy_pt = simde::eval_braket<WfType, hamiltonian, WfType>;
+using egy_pt = simde::eval_braket<WfType, simde::type::hamiltonian, WfType>;
 
 template<typename WfType>
 using elec_egy_pt = simde::eval_braket<WfType, electronic_hamiltonian, WfType>;
@@ -63,15 +76,7 @@ using pt = simde::Optimize<egy_pt<WfType>, WfType>;
 template<typename WfType>
 using update_pt = simde::UpdateGuess<WfType>;
 
-struct GrabNuclear : chemist::qm_operator::OperatorVisitor {
-    using V_nn_type = simde::type::V_nn_type;
-
-    GrabNuclear() : chemist::qm_operator::OperatorVisitor(false) {}
-
-    void run(const V_nn_type& V_nn) { m_pv = &V_nn; }
-
-    const V_nn_type* m_pv = nullptr;
-};
+using tensorwrapper::utilities::floating_point_dispatch;
 
 MODULE_CTOR(SCFLoop) {
     using wf_type = simde::type::rscf_wf;
@@ -99,14 +104,10 @@ MODULE_CTOR(SCFLoop) {
 }
 
 MODULE_RUN(SCFLoop) {
-    using wf_type               = simde::type::rscf_wf;
-    using density_op_type       = simde::type::rho_e<simde::type::cmos>;
+    using wf_type         = simde::type::rscf_wf;
+    using density_op_type = simde::type::rho_e<cmos_t>;
+
     const auto&& [braket, psi0] = pt<wf_type>::unwrap_inputs(inputs);
-    // TODO: Assert bra == ket == psi0
-    const auto& H       = braket.op();
-    const auto& H_elec  = H.electronic_hamiltonian();
-    const auto& H_core  = H_elec.core_hamiltonian();
-    const auto& aos     = psi0.orbitals().from_space();
     const auto max_iter = inputs.at("max iterations").value<unsigned int>();
     const auto e_tol    = inputs.at("energy tolerance").value<double>();
     const auto dp_tol   = inputs.at("density tolerance").value<double>();
@@ -121,7 +122,14 @@ MODULE_RUN(SCFLoop) {
     auto& F_mod            = submods.at("Fock matrix builder");
     auto& S_mod            = submods.at("Overlap matrix builder");
 
-    // DIIS setup
+    // Unwrap Braket and trial wavefunction
+    // TODO: Assert bra == ket == psi0
+    const auto& H      = braket.op();
+    const auto& H_elec = H.electronic_hamiltonian();
+    const auto& H_core = H_elec.core_hamiltonian();
+    const auto& aos    = psi0.orbitals().from_space();
+
+    // DIIS settings
     const auto diis_on = inputs.at("DIIS").value<bool>();
     const auto diis_max_samples =
       inputs.at("DIIS max samples").value<std::size_t>();
@@ -173,7 +181,7 @@ MODULE_RUN(SCFLoop) {
               diagonalizer_mod.run_as<diagonalizer_pt>(F_old, S);
 
             // Construct new trial wavefunction
-            simde::type::cmos cmos(evalues, aos, evectors);
+            cmos_t cmos(evalues, aos, evectors);
             psi = wf_type(psi_old.orbital_indices(), cmos);
         } else {
             // Use trial wavefunction provided from initial guess
@@ -193,7 +201,7 @@ MODULE_RUN(SCFLoop) {
 
         // Step 4: New electronic energy
         // Step 4a: New Fock operator to new electronic Hamiltonian
-        // TODO: Should just be H_core + F;
+        // TODO: Should just be H_core + F_hat;
         const auto& F_hat = Fock_mod.run_as<fock_pt>(H, rho);
         electronic_hamiltonian H_new;
         for(std::size_t i = 0; i < H_core.size(); ++i)
@@ -211,8 +219,8 @@ MODULE_RUN(SCFLoop) {
         e_msg += "  Electronic Energy = " + e.to_string();
         logger.log(e_msg);
 
-        bool converged = false;
         // Step 5: Converged?
+        bool converged = false;
         if(iter > 0) {
             // Change in the energy
             tensor_t de;
@@ -235,7 +243,6 @@ MODULE_RUN(SCFLoop) {
             logger.log("  dG = " + grad_norm.to_string());
 
             // Check for convergence
-            using tensorwrapper::utilities::floating_point_dispatch;
             Kernel k(get_runtime());
             auto e_conv = floating_point_dispatch(k, de.buffer(), e_tol);
             auto g_conv = floating_point_dispatch(k, grad_norm.buffer(), g_tol);
@@ -245,10 +252,8 @@ MODULE_RUN(SCFLoop) {
             // If using DIIS and not converged, extrapolate new Fock matrix
             if(diis_on && !converged) { F = diis.extrapolate(F, grad); }
         } else if(diis_on) {
-            // Orbital gradient: FPS-SPF
+            // For DIIS, still need to the orbital gradient
             auto grad = commutator(F, P, S);
-            tensor_t grad_norm;
-            grad_norm("") = grad("m,n") * grad("n,m");
 
             // If using DIIS, extrapolate new Fock matrix
             F = diis.extrapolate(F, grad);
