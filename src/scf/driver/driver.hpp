@@ -30,7 +30,9 @@ inline void load_modules(pluginplay::ModuleManager& mm) {
 inline void set_defaults(pluginplay::ModuleManager& mm) {
     mm.change_submod("Loop", "Electronic energy", "Electronic energy");
     mm.change_submod("Loop", "Density matrix", "Density matrix builder");
-    mm.change_submod("Loop", "Guess update", "Diagonalization Fock update");
+    mm.change_submod("Loop", "Diagonalizer",
+                     "Generalized eigensolve via Eigen");
+    mm.change_submod("Loop", "Fock matrix builder", "Fock matrix builder");
     mm.change_submod("Loop", "One-electron Fock operator",
                      "Restricted One-Electron Fock op");
     mm.change_submod("Loop", "Fock operator", "Restricted Fock Op");
