@@ -50,16 +50,13 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
             REQUIRE(approximately_equal(corr, e, 1E-6));
         }
 
-        if constexpr(std::is_same_v<float_type, double>) {
-            SECTION("With DIIS") {
-                mod.change_input("DIIS", true);
+        SECTION("With DIIS") {
+            mod.change_input("DIIS", true);
 
-                const auto& [e, psi] =
-                  mod.template run_as<pt<wf_type>>(H_00, psi0);
-                pcorr->set_elem({}, -1.1167592336);
-                tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
-                REQUIRE(approximately_equal(corr, e, 1E-6));
-            }
+            const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
+            pcorr->set_elem({}, -1.1167592336);
+            tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+            REQUIRE(approximately_equal(corr, e, 1E-6));
         }
     }
 
@@ -77,16 +74,13 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
             REQUIRE(approximately_equal(corr, e, 1E-6));
         }
 
-        if constexpr(std::is_same_v<float_type, double>) {
-            SECTION("With DIIS") {
-                mod.change_input("DIIS", true);
-                const auto& [e, psi] =
-                  mod.template run_as<pt<wf_type>>(H_00, psi0);
+        SECTION("With DIIS") {
+            mod.change_input("DIIS", true);
+            const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
 
-                pcorr->set_elem({}, -2.807783957539);
-                tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
-                REQUIRE(approximately_equal(corr, e, 1E-6));
-            }
+            pcorr->set_elem({}, -2.807783957539);
+            tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
+            REQUIRE(approximately_equal(corr, e, 1E-6));
         }
     }
 }
