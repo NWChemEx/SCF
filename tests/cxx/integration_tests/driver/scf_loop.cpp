@@ -44,6 +44,8 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
         chemist::braket::BraKet H_00(psi0, H, psi0);
 
         SECTION("Default") {
+            mod.change_input("DIIS", true);
+
             const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
             pcorr->set_elem({}, -1.1167592336);
             tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
@@ -51,8 +53,6 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
         }
 
         SECTION("With DIIS") {
-            mod.change_input("DIIS", true);
-
             const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
             pcorr->set_elem({}, -1.1167592336);
             tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
@@ -67,6 +67,7 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
         chemist::braket::BraKet H_00(psi0, H, psi0);
 
         SECTION("Default") {
+            mod.change_input("DIIS", true);
             const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
 
             pcorr->set_elem({}, -2.807783957539);
@@ -75,7 +76,6 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
         }
 
         SECTION("With DIIS") {
-            mod.change_input("DIIS", true);
             const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
 
             pcorr->set_elem({}, -2.807783957539);

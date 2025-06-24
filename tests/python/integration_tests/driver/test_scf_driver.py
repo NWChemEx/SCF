@@ -25,11 +25,11 @@ import unittest
 class TestSCFDriver(unittest.TestCase):
 
     def test_scf_driver(self):
+        self.mm.change_input("Loop", "DIIS", False)
         egy = self.mm.run_as(self.ao_energy, "SCF Driver", self.aos, self.sys)
         self.assertAlmostEqual(np.array(egy), -74.94208027122616, places=6)
 
     def test_scf_driver_diis(self):
-        self.mm.change_input("Loop", "DIIS", True)
         egy = self.mm.run_as(self.ao_energy, "SCF Driver", self.aos, self.sys)
         self.assertAlmostEqual(np.array(egy), -74.94208027122616, places=6)
 
