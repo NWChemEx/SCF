@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Loop &mdash; SCF v0.0.22 documentation</title>
+  <title>Loop &mdash; SCF v0.0.23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=3dc61523"></script>
+      <script src="../_static/documentation_options.js?v=99be913a"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -156,6 +156,14 @@ module. The columns are:</p>
 <td><p>1e-06</p></td>
 <td><p>N/A</p></td>
 </tr>
+<tr class="row-even"><td><p>DIIS</p></td>
+<td><p>1</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>DIIS max samples</p></td>
+<td><p>5</p></td>
+<td><p>N/A</p></td>
+</tr>
 <tr class="row-even"><td><p>energy tolerance</p></td>
 <td><p>1e-06</p></td>
 <td><p>N/A</p></td>
@@ -211,6 +219,34 @@ subsection we list:</p>
 <li><p>Domain Restrictions :</p>
 <ul>
 <li><p>Type == double</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="diis">
+<h4>DIIS<a class="headerlink" href="#diis" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Description : N/A</p></li>
+<li><p>Default Value : 1</p></li>
+<li><p>Optional? : False</p></li>
+<li><p>Opaque? : True</p></li>
+<li><p>Domain Restrictions :</p>
+<ul>
+<li><p>Type == bool</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="diis-max-samples">
+<h4>DIIS max samples<a class="headerlink" href="#diis-max-samples" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Description : N/A</p></li>
+<li><p>Default Value : 5</p></li>
+<li><p>Optional? : False</p></li>
+<li><p>Opaque? : True</p></li>
+<li><p>Domain Restrictions :</p>
+<ul>
+<li><p>Type == unsigned long</p></li>
 </ul>
 </li>
 </ul>
@@ -332,20 +368,20 @@ submodule we have listed:</p>
 <td><p>simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::AOs, chemist::qm_operator::Density&lt;chemist::wavefunction::CMOs, chemist::Electron&gt;, chemist::wavefunction::AOs&gt;&gt;</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-even"><td><p>Electronic energy</p></td>
+<tr class="row-even"><td><p>Diagonalizer</p></td>
+<td><p>simde::GeneralizedEigenSolve</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>Electronic energy</p></td>
 <td><p>simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;, chemist::qm_operator::ElectronicHamiltonian, chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;&gt;</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-odd"><td><p>Fock matrix builder</p></td>
+<tr class="row-even"><td><p>Fock matrix builder</p></td>
 <td><p>simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::AOs, chemist::qm_operator::Fock, chemist::wavefunction::AOs&gt;&gt;</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-even"><td><p>Fock operator</p></td>
+<tr class="row-odd"><td><p>Fock operator</p></td>
 <td><p>simde::FockOperator&lt;chemist::DecomposableDensity&lt;chemist::Electron&gt;&gt;</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>Guess update</p></td>
-<td><p>simde::UpdateGuess&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;</p></td>
 <td><p>N/A</p></td>
 </tr>
 <tr class="row-even"><td><p>One-electron Fock operator</p></td>

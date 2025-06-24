@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['nelectroncounter_4',['NElectronCounter',['../structscf_1_1guess_1_1NElectronCounter.html',1,'scf::guess']]]
+  ['restrictedvisitor_4',['RestrictedVisitor',['../classscf_1_1fock__operator_1_1RestrictedVisitor.html',1,'scf::fock_operator']]],
+  ['rkohnshamvisitor_5',['RKohnShamVisitor',['../classscf_1_1fock__operator_1_1RKohnShamVisitor.html',1,'scf::fock_operator']]]
 ];
