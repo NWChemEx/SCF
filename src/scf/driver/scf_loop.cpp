@@ -90,7 +90,7 @@ MODULE_CTOR(SCFLoop) {
     add_input<double>("gradient tolerance").set_default(1.0E-6);
 
     const std::size_t diis_sample_default = 5;
-    add_input<bool>("DIIS").set_default(false);
+    add_input<bool>("DIIS").set_default(true);
     add_input<std::size_t>("DIIS max samples").set_default(diis_sample_default);
 
     add_submodule<elec_egy_pt<wf_type>>("Electronic energy");
