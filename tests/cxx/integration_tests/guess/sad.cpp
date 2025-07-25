@@ -31,7 +31,6 @@ using tensorwrapper::operations::approximately_equal;
 TEMPLATE_LIST_TEST_CASE("SAD", "", test_scf::float_types) {
     using float_type     = TestType;
     using allocator_type = tensorwrapper::allocator::Eigen<float_type>;
-    using rank2_il_type  = typename allocator_type::rank2_il;
 
     auto mm  = test_scf::load_modules<float_type>();
     auto aos = test_scf::h2_aos();
