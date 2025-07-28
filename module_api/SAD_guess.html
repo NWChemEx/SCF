@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Loop &mdash; SCF v0.0.24 documentation</title>
+  <title>SAD guess &mdash; SCF v0.0.24 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Restricted Fock Op" href="Restricted_Fock_Op.html" />
-    <link rel="prev" title="Generalized eigensolve via Eigen" href="Generalized_eigensolve_via_Eigen.html" /> 
+    <link rel="next" title="SCF Driver" href="SCF_Driver.html" />
+    <link rel="prev" title="Restricted One-Electron Kohn-Sham Op" href="Restricted_One-Electron_Kohn-Sham_Op.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -63,23 +63,26 @@
 <li class="toctree-l2"><a class="reference internal" href="GauXC_XC_Energy.html">GauXC XC Energy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="GauXC_XC_Potential.html">GauXC XC Potential</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Generalized_eigensolve_via_Eigen.html">Generalized eigensolve via Eigen</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Loop</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#please-cite">Please Cite</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#property-types">Property Types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-inputs">Module Inputs</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#quick-reference">Quick Reference</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#detailed-descriptions">Detailed Descriptions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-results">Module Results</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="Loop.html">Loop</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Restricted_Fock_Op.html">Restricted Fock Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Restricted_Kohn-Sham_Op.html">Restricted Kohn-Sham Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Restricted_One-Electron_Fock_Op.html">Restricted One-Electron Fock Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Restricted_One-Electron_Kohn-Sham_Op.html">Restricted One-Electron Kohn-Sham Op</a></li>
-<li class="toctree-l2"><a class="reference internal" href="SAD_guess.html">SAD guess</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SAD guess</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">SAD Guess</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#please-cite">Please Cite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#property-types">Property Types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-inputs">Module Inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#aos">AOs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hamiltonian">Hamiltonian</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-results">Module Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="SCF_Driver.html">SCF Driver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="SCF_integral_driver.html">SCF integral driver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snLinK.html">snLinK</a></li>
@@ -103,9 +106,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Modules API</a></li>
-      <li class="breadcrumb-item active">Loop</li>
+      <li class="breadcrumb-item active">SAD guess</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/module_api/Loop.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/module_api/SAD_guess.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -113,27 +116,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="loop">
-<h1>Loop<a class="headerlink" href="#loop" title="Link to this heading"></a></h1>
+  <section id="sad-guess">
+<h1>SAD guess<a class="headerlink" href="#sad-guess" title="Link to this heading"></a></h1>
+<section id="id1">
+<h2>SAD Guess<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>TODO: Write me!!!</p>
 <section id="please-cite">
-<h2>Please Cite<a class="headerlink" href="#please-cite" title="Link to this heading"></a></h2>
+<h3>Please Cite<a class="headerlink" href="#please-cite" title="Link to this heading"></a></h3>
 <p>No citations</p>
 </section>
 <section id="property-types">
-<h2>Property Types<a class="headerlink" href="#property-types" title="Link to this heading"></a></h2>
+<h3>Property Types<a class="headerlink" href="#property-types" title="Link to this heading"></a></h3>
 <p>The following is a list of property types that this module satisfies.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">simde::Optimize&lt;simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;,</span> <span class="pre">chemist::qm_operator::Hamiltonian,</span> <span class="pre">chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;&gt;,</span> <span class="pre">chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simde::InitialGuess&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;</span></code></p></li>
 </ul>
 </section>
 <section id="module-inputs">
-<h2>Module Inputs<a class="headerlink" href="#module-inputs" title="Link to this heading"></a></h2>
+<h3>Module Inputs<a class="headerlink" href="#module-inputs" title="Link to this heading"></a></h3>
 <p>This section details the full list of inputs that the module accepts. Inputs
 that are not listed as optional must have their value set before the module can
 be run. Inputs can be set manually by calling the module’s <code class="docutils literal notranslate"><span class="pre">change_input</span></code>
 function or by passing arguments to a property type.</p>
 <section id="quick-reference">
-<h3>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading"></a></h3>
+<h4>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading"></a></h4>
 <p>The following table provides a quick summary of the inputs available to this
 module. The columns are:</p>
 <ul class="simple">
@@ -149,35 +155,11 @@ module. The columns are:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>BraKet</p></td>
+<tr class="row-even"><td><p>AOs</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-odd"><td><p>density tolerance</p></td>
-<td><p>1e-06</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-even"><td><p>DIIS</p></td>
-<td><p>1</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>DIIS max samples</p></td>
-<td><p>5</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-even"><td><p>energy tolerance</p></td>
-<td><p>1e-06</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>gradient tolerance</p></td>
-<td><p>1e-06</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-even"><td><p>max iterations</p></td>
-<td><p>20</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>Object to optimize the objective function with respect to</p></td>
+<tr class="row-odd"><td><p>Hamiltonian</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
@@ -185,7 +167,7 @@ module. The columns are:</p>
 </table>
 </section>
 <section id="detailed-descriptions">
-<h3>Detailed Descriptions<a class="headerlink" href="#detailed-descriptions" title="Link to this heading"></a></h3>
+<h4>Detailed Descriptions<a class="headerlink" href="#detailed-descriptions" title="Link to this heading"></a></h4>
 <p>The following subsections provide detailed descriptions of each input recognized
 by this module. The subsection headings are the name of the input. Within each
 subsection we list:</p>
@@ -196,8 +178,11 @@ subsection we list:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">Opaque?</span></code> : Does the value of the input influence memoization?.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Domain</span> <span class="pre">Restrictions</span></code> : Criteria a value must obey to be deemed valid.</p></li>
 </ul>
-<section id="braket">
-<h4>BraKet<a class="headerlink" href="#braket" title="Link to this heading"></a></h4>
+</section>
+</section>
+</section>
+<section id="aos">
+<h2>AOs<a class="headerlink" href="#aos" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Description : N/A</p></li>
 <li><p>Default Value : N/A</p></li>
@@ -205,97 +190,13 @@ subsection we list:</p>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == chemist::braket::BraKet&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;, chemist::qm_operator::Hamiltonian, chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;</p></li>
+<li><p>Type == chemist::wavefunction::AOs</p></li>
 </ul>
 </li>
 </ul>
 </section>
-<section id="density-tolerance">
-<h4>density tolerance<a class="headerlink" href="#density-tolerance" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>Description : N/A</p></li>
-<li><p>Default Value : 1e-06</p></li>
-<li><p>Optional? : False</p></li>
-<li><p>Opaque? : True</p></li>
-<li><p>Domain Restrictions :</p>
-<ul>
-<li><p>Type == double</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="diis">
-<h4>DIIS<a class="headerlink" href="#diis" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>Description : N/A</p></li>
-<li><p>Default Value : 1</p></li>
-<li><p>Optional? : False</p></li>
-<li><p>Opaque? : True</p></li>
-<li><p>Domain Restrictions :</p>
-<ul>
-<li><p>Type == bool</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="diis-max-samples">
-<h4>DIIS max samples<a class="headerlink" href="#diis-max-samples" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>Description : N/A</p></li>
-<li><p>Default Value : 5</p></li>
-<li><p>Optional? : False</p></li>
-<li><p>Opaque? : True</p></li>
-<li><p>Domain Restrictions :</p>
-<ul>
-<li><p>Type == unsigned long</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="energy-tolerance">
-<h4>energy tolerance<a class="headerlink" href="#energy-tolerance" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>Description : N/A</p></li>
-<li><p>Default Value : 1e-06</p></li>
-<li><p>Optional? : False</p></li>
-<li><p>Opaque? : True</p></li>
-<li><p>Domain Restrictions :</p>
-<ul>
-<li><p>Type == double</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="gradient-tolerance">
-<h4>gradient tolerance<a class="headerlink" href="#gradient-tolerance" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>Description : N/A</p></li>
-<li><p>Default Value : 1e-06</p></li>
-<li><p>Optional? : False</p></li>
-<li><p>Opaque? : True</p></li>
-<li><p>Domain Restrictions :</p>
-<ul>
-<li><p>Type == double</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="max-iterations">
-<h4>max iterations<a class="headerlink" href="#max-iterations" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>Description : N/A</p></li>
-<li><p>Default Value : 20</p></li>
-<li><p>Optional? : False</p></li>
-<li><p>Opaque? : True</p></li>
-<li><p>Domain Restrictions :</p>
-<ul>
-<li><p>Type == unsigned int</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="object-to-optimize-the-objective-function-with-respect-to">
-<h4>Object to optimize the objective function with respect to<a class="headerlink" href="#object-to-optimize-the-objective-function-with-respect-to" title="Link to this heading"></a></h4>
+<section id="hamiltonian">
+<h2>Hamiltonian<a class="headerlink" href="#hamiltonian" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Description : N/A</p></li>
 <li><p>Default Value : N/A</p></li>
@@ -303,15 +204,12 @@ subsection we list:</p>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;</p></li>
+<li><p>Type == chemist::qm_operator::Hamiltonian</p></li>
 </ul>
 </li>
 </ul>
-</section>
-</section>
-</section>
 <section id="module-results">
-<h2>Module Results<a class="headerlink" href="#module-results" title="Link to this heading"></a></h2>
+<h3>Module Results<a class="headerlink" href="#module-results" title="Link to this heading"></a></h3>
 <p>This section tabulates the full list of results that the module returns. The
 columns respectively are:</p>
 <ul class="simple">
@@ -333,19 +231,15 @@ the Module class’s advanced API.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Object that optimizes the objective function</p></td>
+<tr class="row-even"><td><p>Initial Wavefunction</p></td>
 <td><p>chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>tensor representation</p></td>
-<td><p>tensorwrapper::Tensor</p></td>
 <td><p>N/A</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+<h3>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h3>
 <p>This section details the full list of submodules that the module uses. For each
 submodule we have listed:</p>
 <ul class="simple">
@@ -361,40 +255,21 @@ submodule we have listed:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Charge-charge</p></td>
-<td><p>simde::ElectrostaticEnergy&lt;chemist::Charges&lt;double&gt;, chemist::Charges&lt;double&gt;&gt;</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>Density matrix</p></td>
-<td><p>simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::AOs, chemist::qm_operator::Density&lt;chemist::wavefunction::CMOs, chemist::Electron&gt;, chemist::wavefunction::AOs&gt;&gt;</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-even"><td><p>Diagonalizer</p></td>
-<td><p>simde::GeneralizedEigenSolve</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>Electronic energy</p></td>
-<td><p>simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;, chemist::qm_operator::ElectronicHamiltonian, chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;&gt;</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-even"><td><p>Fock matrix builder</p></td>
-<td><p>simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::AOs, chemist::qm_operator::Fock, chemist::wavefunction::AOs&gt;&gt;</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>Fock operator</p></td>
+<tr class="row-even"><td><p>Build Fock operator</p></td>
 <td><p>simde::FockOperator&lt;chemist::DecomposableDensity&lt;chemist::Electron&gt;&gt;</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-even"><td><p>One-electron Fock operator</p></td>
-<td><p>simde::FockOperator&lt;chemist::DecomposableDensity&lt;chemist::Electron&gt;&gt;</p></td>
+<tr class="row-odd"><td><p>Guess updater</p></td>
+<td><p>simde::UpdateGuess&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-odd"><td><p>Overlap matrix builder</p></td>
-<td><p>simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::AOs, chemist::qm_operator::Identity, chemist::wavefunction::AOs&gt;&gt;</p></td>
+<tr class="row-even"><td><p>SAD Density</p></td>
+<td><p>simde::InitialDensity</p></td>
 <td><p>N/A</p></td>
 </tr>
 </tbody>
 </table>
+</section>
 </section>
 </section>
 
@@ -402,8 +277,8 @@ submodule we have listed:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Generalized_eigensolve_via_Eigen.html" class="btn btn-neutral float-left" title="Generalized eigensolve via Eigen" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Restricted_Fock_Op.html" class="btn btn-neutral float-right" title="Restricted Fock Op" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Restricted_One-Electron_Kohn-Sham_Op.html" class="btn btn-neutral float-left" title="Restricted One-Electron Kohn-Sham Op" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SCF_Driver.html" class="btn btn-neutral float-right" title="SCF Driver" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

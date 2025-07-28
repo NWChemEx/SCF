@@ -28,6 +28,7 @@ Modules API
    Restricted_Kohn-Sham_Op
    Restricted_One-Electron_Fock_Op
    Restricted_One-Electron_Kohn-Sham_Op
+   SAD_guess
    SCF_Driver
    SCF_integral_driver
    snLinK
