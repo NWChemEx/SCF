@@ -15,25 +15,25 @@
  */
 
 #pragma once
+#include <scf/driver/commutator.hpp>
 #include <scf/scf_mm.hpp>
 #include <simde/simde.hpp>
-#include <scf/driver/commutator.hpp>
 #ifdef BUILD_TAMM_SCF
 #include <tamm/tamm.hpp>
 #endif
 
 namespace scf {
 
-inline auto initialize(int argc, char *argv[]) {
+inline auto initialize(int argc, char* argv[]) {
 #ifdef BUILD_TAMM_SCF
-  tamm::initialize(argc, argv);
+    tamm::initialize(argc, argv);
 #endif
-  return parallelzone::runtime::RuntimeView(argc, argv);
+    return parallelzone::runtime::RuntimeView(argc, argv);
 }
 
 inline auto finalize() {
 #ifdef BUILD_TAMM_SCF
-  tamm::finalize();
+    tamm::finalize();
 #endif
 }
 
