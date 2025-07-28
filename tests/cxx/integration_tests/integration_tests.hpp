@@ -16,6 +16,7 @@
 
 #pragma once
 #include "../test_scf.hpp"
+#include <chemcache/chemcache.hpp>
 #include <integrals/integrals.hpp>
 #include <nux/nux.hpp>
 #include <scf/scf.hpp>
@@ -31,6 +32,7 @@ pluginplay::ModuleManager load_modules() {
     scf::load_modules(mm);
     integrals::load_modules(mm);
     nux::load_modules(mm);
+    chemcache::load_modules(mm);
 
     mm.change_submod("SCF Driver", "Hamiltonian",
                      "Born-Oppenheimer approximation");
@@ -44,6 +46,8 @@ pluginplay::ModuleManager load_modules() {
 
     mm.change_submod("Loop", "Overlap matrix builder", "Overlap");
 
+    mm.change_submod("SAD guess", "SAD Density", "sto-3g SAD density");
+
     if constexpr(!std::is_same_v<FloatType, double>) {
         mm.change_input("Evaluate 2-Index BraKet", "With UQ?", true);
         mm.change_input("Evaluate 4-Index BraKet", "With UQ?", true);
@@ -51,6 +55,7 @@ pluginplay::ModuleManager load_modules() {
         mm.change_input("ERI4", "With UQ?", true);
         mm.change_input("Kinetic", "With UQ?", true);
         mm.change_input("Nuclear", "With UQ?", true);
+        mm.change_input("sto-3g atomic density matrix", "With UQ?", true);
     }
 
     return mm;
