@@ -21,20 +21,19 @@
 namespace scf {
 
 EXPORT_PLUGIN(scf, m) {
-  pybind11::module::import("parallelzone");
-  m.def("initialize", [](pybind11::list py_args) {
-    std::vector<std::string> args;
-    for (const auto &arg : py_args)
-      args.push_back(arg.cast<std::string>());
+    pybind11::module::import("parallelzone");
+    m.def("initialize", [](pybind11::list py_args) {
+        std::vector<std::string> args;
+        for(const auto& arg : py_args) args.push_back(arg.cast<std::string>());
 
-    std::vector<char *> argv;
-    for (const auto &arg : args)
-      argv.push_back(const_cast<char *>(arg.c_str()));
+        std::vector<char*> argv;
+        for(const auto& arg : args)
+            argv.push_back(const_cast<char*>(arg.c_str()));
 
-    int argc = static_cast<int>(argv.size());
-    return scf::initialize(argc, argv.data());
-  });
-  m.def("finalize", []() { scf::finalize(); });
+        int argc = static_cast<int>(argv.size());
+        return scf::initialize(argc, argv.data());
+    });
+    m.def("finalize", []() { scf::finalize(); });
 }
 
 } // namespace scf

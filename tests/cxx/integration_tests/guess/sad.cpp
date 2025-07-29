@@ -37,7 +37,7 @@ TEMPLATE_LIST_TEST_CASE("SAD", "", test_scf::float_types) {
     auto H   = test_scf::h2_hamiltonian();
     auto rt  = mm.get_runtime();
 
-    auto mod = mm.at("SAD guess");
+    auto mod          = mm.at("SAD guess");
     auto psi          = mod.template run_as<pt>(H, aos);
     const auto& evals = psi.orbitals().diagonalized_matrix();
 

@@ -99,7 +99,9 @@ MODULE_RUN(ElectronicEnergy) {
         }
         if(i == 0)
             e = temp;
-        else { e("") = e("") + temp(""); }
+        else {
+            e("") = e("") + temp("");
+        }
     }
 
     auto rv = results();

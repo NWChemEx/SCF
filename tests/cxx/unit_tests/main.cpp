@@ -18,12 +18,12 @@
 #include <catch2/catch_session.hpp>
 #include <scf/scf.hpp>
 
-int main(int argc, char *argv[]) {
-  auto rt = scf::initialize(argc, argv);
+int main(int argc, char* argv[]) {
+    auto rt = scf::initialize(argc, argv);
 
-  int res = Catch::Session().run(argc, argv);
+    int res = Catch::Session().run(argc, argv);
 
-  scf::finalize();
+    scf::finalize();
 
-  return res;
+    return res;
 }
