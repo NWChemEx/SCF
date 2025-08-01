@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 
-name: .github Pull Request Workflow
+name: Pull Request Workflow
 
 on:
   pull_request:
@@ -21,29 +21,30 @@ on:
       - master
 
 jobs:
-  default_build:
-    uses: NWChemEx/.github/.github/workflows/common_pull_request.yaml@master
+  check_formatting:
+    uses: NWChemEx/.github/.github/workflows/check_formatting.yaml@master
     with:
-      config_file: '.github/.licenserc.yaml'
-      source_dir: 'include src tests'
+      license_config: ".github/.licenserc.yaml"
+
+  test_nwx_docs:
+    uses: NWChemEx/.github/.github/workflows/test_nwx_docs.yaml@master
+    with:
+      doc_target: "scf_cxx_api"
+
+  test_library:
+    uses: NWChemEx/.github/.github/workflows/test_nwx_library.yaml@master
+    with:
       compilers: '["gcc-11", "clang-14"]'
-      doc_target: 'scf_cxx_api'
-    secrets: inherit
+
   integration_tests:
-    uses: NWChemEx/.github/.github/workflows/common_pull_request.yaml@master
+    uses: NWChemEx/.github/.github/workflows/test_nwx_library.yaml@master
     with:
-      config_file: '.github/.licenserc.yaml'
-      source_dir: ''
       compilers: '["gcc-11", "clang-14"]'
-      doc_target: ''
       repo_toolchain: '.github/integration_testing.cmake'
-    secrets: inherit
+
   # tamm_tests:
-  #   uses: NWChemEx/.github/.github/workflows/common_pull_request.yaml@master
+  #   uses: NWChemEx/.github/.github/workflows/test_nwx_library.yaml@master
   #   with:
-  #     config_file: '.github/.licenserc.yaml'
-  #     source_dir: ''
   #     compilers: '["gcc-11"]'
-  #     doc_target: ''
   #     repo_toolchain: '.github/tamm_testing.cmake'
-  #   secrets: inherit
+  
