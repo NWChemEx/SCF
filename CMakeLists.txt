@@ -133,3 +133,5 @@ if("${BUILD_TESTING}")
         endif()
     endif()
 endif()
+
+cmaize_add_package(${PROJECT_NAME} NAMESPACE nwx::)
