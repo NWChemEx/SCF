@@ -56,6 +56,7 @@ cmaize_find_or_build_dependency(
     VERSION 2e76277bd049f7bec36b0f908c69734a42c5234f
     BUILD_TARGET eigen
     FIND_TARGET Eigen3::Eigen
+    CMAKE_ARGS EIGEN_BUILD_TESTING=OFF
 )
 
 cmaize_add_library(
