@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import nux
-import simde
-import parallelzone as pz
-import chemist
-import pluginplay as pp
-import nwchemex as nwx
-import numpy as np
 import unittest
+
+import chemist
+import numpy as np
+import nux
+import nwchemex as nwx
+import parallelzone as pz
+import pluginplay as pp
+import simde
 
 
 class TestSCFDriver(unittest.TestCase):
-
     def test_scf_driver(self):
         self.mm.change_input("Loop", "DIIS", False)
         egy = self.mm.run_as(self.ao_energy, "SCF Driver", self.aos, self.sys)
@@ -40,12 +40,15 @@ class TestSCFDriver(unittest.TestCase):
         nwx.load_modules(self.mm)
 
         # Set Submods
-        self.mm.change_submod("SCF Driver", "Hamiltonian",
-                              "Born-Oppenheimer Approximation")
-        self.mm.change_submod("SCF integral driver", "Fundamental matrices",
-                              "AO integral driver")
-        self.mm.change_submod("Diagonalization Fock update",
-                              "Overlap matrix builder", "Overlap")
+        self.mm.change_submod(
+            "SCF Driver", "Hamiltonian", "Born-Oppenheimer Approximation"
+        )
+        self.mm.change_submod(
+            "SCF integral driver", "Fundamental matrices", "AO integral driver"
+        )
+        self.mm.change_submod(
+            "Diagonalization Fock update", "Overlap matrix builder", "Overlap"
+        )
         self.mm.change_submod("Loop", "Overlap matrix builder", "Overlap")
 
         # Property Types
@@ -55,5 +58,5 @@ class TestSCFDriver(unittest.TestCase):
 
         # Inputs
         self.water = self.mm.at("NWX Molecules").run_as(self.mol, "water")
-        self.aos = self.mm.at('STO-3G').run_as(self.basis_set, self.water)
+        self.aos = self.mm.at("STO-3G").run_as(self.basis_set, self.water)
         self.sys = chemist.ChemicalSystem(self.water)

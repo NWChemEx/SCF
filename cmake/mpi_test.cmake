@@ -28,7 +28,7 @@ macro(python_mpi_test test_name test_script)
         add_test(
             NAME "py_${test_name}"
             COMMAND "${MPIEXEC_EXECUTABLE}" "${MPIEXEC_NUMPROC_FLAG}" "2"
-                    "${Python_EXECUTABLE}" 
+                    "${Python_EXECUTABLE}"
                     "${test_script}"
         )
         nwx_python_path(TEST_PYTHONPATH ${ARGN})
