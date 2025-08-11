@@ -13,14 +13,13 @@
 # limitations under the License.
 
 import numpy as np
-from pluginplay import ModuleManager
 from nwchemex import load_modules
+from pluginplay import ModuleManager
 from simde import GeneralizedEigenSolve
 from tensorwrapper import Tensor
 
 
 class GeneralizedEigenSolverTester:
-
     def __init__(self):
         self.mm = ModuleManager()
         load_modules(self.mm)
@@ -35,7 +34,8 @@ class GeneralizedEigenSolverTester:
         # Solve
         λ, V = map(
             np.array,
-            self.solver.run_as(GeneralizedEigenSolve(), A_tensor, B_tensor))
+            self.solver.run_as(GeneralizedEigenSolve(), A_tensor, B_tensor),
+        )
 
         if verify:
             max_residual = self._verify_results(A, B, λ, V)
@@ -51,16 +51,16 @@ class GeneralizedEigenSolverTester:
             max_residual = max(max_residual, np.linalg.norm(res))
         return max_residual
 
-    def analyze_uncertainty(self,
-                            num_trials=100,
-                            matrix_size=5,
-                            noise_level=1e-10):
+    def analyze_uncertainty(
+        self, num_trials=100, matrix_size=5, noise_level=1e-10
+    ):
         """
-        Analyze numerical uncertainty in generalized eigensolve by testing pertubed matricies
+        Analyze numerical uncertainty in generalized eigensolve by testing
+        pertubed matricies
 
         Args:
             num_trials = Number of random matricies to test
-            matrix_size = Size of the random matricies 
+            matrix_size = Size of the random matricies
             noise_level: Magnitude of pertubations to add
         """
 
@@ -68,7 +68,7 @@ class GeneralizedEigenSolverTester:
         eigenvector_errors = []
 
         for _ in range(num_trials):
-            #Generate random symmetric matrices
+            # Generate random symmetric matrices
             A = np.random.rand(matrix_size, matrix_size)
             A = (A + A.T) / 2
             B = np.eye(matrix_size)
@@ -80,11 +80,14 @@ class GeneralizedEigenSolverTester:
             λ_p, V_p = self.solve_gen_eigenproblem(A_perturbed, B, False)
 
             eigenvalue_errors.append(np.abs(λ - λ_p))
-            eigenvector_errors.append([
-                np.linalg.norm(V[:, i] - V_p[:, i]) for i in range(matrix_size)
-            ])
+            eigenvector_errors.append(
+                [
+                    np.linalg.norm(V[:, i] - V_p[:, i])
+                    for i in range(matrix_size)
+                ]
+            )
 
-        #results
+        # results
         print("\n=== Uncertainty Analysis ===")
         print(
             f"Tested {num_trials} random {matrix_size}*{matrix_size} matricies"
@@ -114,9 +117,9 @@ class GeneralizedEigenSolverTester:
 def main():
     tester = GeneralizedEigenSolverTester()
 
-    tester.analyze_uncertainty(num_trials=100,
-                               matrix_size=5,
-                               noise_level=1e-10)
+    tester.analyze_uncertainty(
+        num_trials=100, matrix_size=5, noise_level=1e-10
+    )
 
     print("\n=== Standard Example ===")
     tester.run_standard_example()

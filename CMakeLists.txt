@@ -82,7 +82,7 @@ nwx_add_pybind11_module(
     DEPENDS "${PROJECT_NAME}"
 )
 
-if("${BUILD_TESTING}") 
+if("${BUILD_TESTING}")
     include(CTest)
     set(PYTHON_TEST_DIR "${SCF_TESTS_DIR}/python")
     set(CXX_TEST_DIR "${SCF_TESTS_DIR}/cxx")
@@ -113,7 +113,7 @@ if("${BUILD_TESTING}")
         python_mpi_test(
             integration_test_scf
             "${PYTHON_TEST_DIR}/integration_tests/run_integration_tests.py"
-            SUBMODULES nwchemex chemcache integrals simde chemist pluginplay 
+            SUBMODULES nwchemex chemcache integrals simde chemist pluginplay
                        parallelzone friendzone tensorwrapper nux
         )
 

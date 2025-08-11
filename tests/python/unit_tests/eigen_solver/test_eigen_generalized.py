@@ -13,16 +13,17 @@
 # limitations under the License.
 
 import unittest
-import pluginplay as pp
+
+import numpy as np
 import parallelzone as pz
-import scf
+import pluginplay as pp
 import simde
 import tensorwrapper as tw
-import numpy as np
+
+import scf
 
 
 class TestEigenGeneralized(unittest.TestCase):
-
     def test_eigen_generalized(self):
         # Property Type
         pt = simde.GeneralizedEigenSolve()

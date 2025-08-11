@@ -16,12 +16,11 @@
 
 #include <iostream>
 
-#include <scf/scf.hpp>
 #include <chemcache/chemcache.hpp>
+#include <scf/scf.hpp>
 #include <tamm/tamm.hpp>
 
 int main(int argc, char** argv) {
-
     tamm::initialize(argc, argv);
 
     // Populate modules
@@ -31,24 +30,26 @@ int main(int argc, char** argv) {
 
     // Create ChemicalSystem
     std::string mol_name = "water";
-    auto mol = mm.at("NWX Molecules").run_as<simde::MoleculeFromString>(mol_name);
+    auto mol =
+      mm.at("NWX Molecules").run_as<simde::MoleculeFromString>(mol_name);
     simde::type::chemical_system cs(mol);
 
     // Create BasisSet
-    std::string basis_name = "sto-3g"; // This is the only supported basis in ChemCache
+    std::string basis_name =
+      "sto-3g"; // This is the only supported basis in ChemCache
     auto aos = mm.at(basis_name).run_as<simde::MolecularBasisSet>(mol);
 
     // Run module
     auto E = mm.at("SCF Energy").run_as<simde::AOEnergy>(aos, cs);
     std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
-    
+
     std::vector<std::string> xc_type = {"pbe0"};
     mm.change_input("SCF Energy", "xc_type", xc_type);
     mm.change_input("SCF Energy", "molecule_name", mol_name);
     E = mm.at("SCF Energy").run_as<simde::AOEnergy>(aos, cs);
     std::cout << "SCF Energy = " << E << " Hartree" << std::endl;
-        
+
     tamm::finalize();
-    
+
     return 0;
 }
