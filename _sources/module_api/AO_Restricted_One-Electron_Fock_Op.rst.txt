@@ -9,11 +9,11 @@ AO Restricted One-Electron Fock Op
 Restricted Fock Operator Builder
 --------------------------------
 
-This module builds the Fock operator given a restricted density. Under this 
-assumption, the Fock operator is created by mapping each term in the 
+This module builds the Fock operator given a restricted density. Under this
+assumption, the Fock operator is created by mapping each term in the
 electronic Hamiltonian to itself with the exception of the electron-electron
 repulsion. The electron-electron repulsion is mapped to 2J-K where J is the
-Coulomb operator for the electrons interacting with a density and K is the 
+Coulomb operator for the electrons interacting with a density and K is the
 exchange operator for the same density.
 
 N.b. Empty densities are treated as zero densities and this module will skip
