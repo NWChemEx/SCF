@@ -12,9 +12,15 @@
 .. See the License for the specific language governing permissions and
 .. limitations under the License.
 
-#########
+###
 SCF
-#########
+###
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents
+
+   background/index
 
 .. toctree::
    :maxdepth: 2
