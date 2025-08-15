@@ -25,6 +25,8 @@ DFT Notes
 .. |drho| replace:: :math:`\left|\bigtriangledown\rho\left(\vec{r}\right)\right|^2`
 .. |dr| replace:: :math:`d\vec{r}`
 
+These are notes.
+
 Algorithmically, DFT will differ from Hartee-Fock primarily in the fact that we
 need to compute two additional quantities:
 
