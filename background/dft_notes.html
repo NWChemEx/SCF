@@ -1,0 +1,289 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DFT Notes &mdash; SCF 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Modules API" href="../module_api/index.html" />
+    <link rel="prev" title="Background" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Background</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">DFT Notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction-of-aos">Introduction of AOs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#introduction-of-quadrature">Introduction of Quadrature</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#as-a-sparse-map-problem">As a Sparse Map Problem</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">APIs:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../module_api/index.html">Modules API</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nwchemex.github.io/SCF/scf_cxx_api/index.html">C++ API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SCF</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Background</a></li>
+      <li class="breadcrumb-item active">DFT Notes</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/background/dft_notes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dft-notes">
+<h1>DFT Notes<a class="headerlink" href="#dft-notes" title="Link to this heading"></a></h1>
+<p>These are notes.</p>
+<p>Algorithmically, DFT will differ from Hartee-Fock primarily in the fact that we
+need to compute two additional quantities:</p>
+<ol class="arabic simple">
+<li><p>the exchange-correlation (XC) energy, <span class="math notranslate nohighlight">\(E^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span>, and</p></li>
+<li><p>the XC potential, <span class="math notranslate nohighlight">\(V^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span>,</p></li>
+</ol>
+<p>both of which are functionals of the electron density of the system, <span class="math notranslate nohighlight">\(\rho\left(\vec{r}\right)\)</span>.
+By definition, <span class="math notranslate nohighlight">\(V^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\newcommand{\density}{\rho\left(\vec{r}\right)}
+\newcommand{\exc}[1]{E^{XC}\left[#1\right]}
+\newcommand{\vxc}[1]{V^{XC}\left[#1\right]}\\\vxc{\density} \equiv
+    \frac{\partial \exc{\density}}{\partial \density}\end{aligned}\end{align} \]</div>
+<p>or rearranging for <span class="math notranslate nohighlight">\(E^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\exc{\density} = \int \vxc{\density}\density d\vec{r}.\]</div>
+<p>Conceptually, <span class="math notranslate nohighlight">\(E^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> is the XC contribution to the electronic energy and
+<span class="math notranslate nohighlight">\(V^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> is the potential needed to make the non-interacting system have the same
+density as the real system. Unfortunately, we do not know the analytic form of
+<span class="math notranslate nohighlight">\(E^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> (or equivalently <span class="math notranslate nohighlight">\(V^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span>) and likely never will.</p>
+<p>To make progress, we need to introduce an ansantze for either <span class="math notranslate nohighlight">\(E^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> or <span class="math notranslate nohighlight">\(V^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span>.
+To do this we define a quantity <span class="math notranslate nohighlight">\(f\left[\rho\left(\vec{r}\right), \cdots\right]\)</span> called the XC energy density
+which is the XC energy per infinitesimal volume <span class="math notranslate nohighlight">\(d\vec{r}\)</span>. In terms of
+<span class="math notranslate nohighlight">\(f\left[\rho\left(\vec{r}\right), \cdots\right]\)</span>, <span class="math notranslate nohighlight">\(E^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> is written as:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\newcommand{\edensity}[1]{f\left[#1\right]}
+\newcommand{\eparticle}[1]{\epsilon\left[#1\right]}\\\exc{\density} = \int \edensity{\density,\cdots} d\vec{r}.\end{aligned}\end{align} \]</div>
+<p>Related to <span class="math notranslate nohighlight">\(f\left[\rho\left(\vec{r}\right), \cdots\right]\)</span> is a quantity <span class="math notranslate nohighlight">\(\epsilon\left[\rho\left(\vec{r}\right), \cdots\right]\)</span> which is the XC energy per
+unit particle. The exact relationship between the two is:</p>
+<div class="math notranslate nohighlight">
+\[\edensity{\density,\cdots} = \eparticle{\density,\cdots}\density.\]</div>
+<p>It should be noted that, unlike <span class="math notranslate nohighlight">\(V^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> and <span class="math notranslate nohighlight">\(E^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span>, <span class="math notranslate nohighlight">\(f\left[\rho\left(\vec{r}\right), \cdots\right]\)</span> and <span class="math notranslate nohighlight">\(\epsilon\left[\rho\left(\vec{r}\right), \cdots\right]\)</span>
+will in general depend on additional functionals beyond the density.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Colloquially speaking, “a DFT functional” (e.g., when someone says they
+used “the BLYP DFT functional”) can refer to the analytic form of <span class="math notranslate nohighlight">\(f\left[\rho\left(\vec{r}\right), \cdots\right]\)</span>
+or <span class="math notranslate nohighlight">\(\epsilon\left[\rho\left(\vec{r}\right), \cdots\right]\)</span>. Making matters worse, <span class="math notranslate nohighlight">\(\epsilon\)</span> is commonly used to
+denote both quantities. When comparing equations it is critical to
+distinguish between these two quantities.</p>
+</div>
+<p>XC functionals are typically classified by the parameters that <span class="math notranslate nohighlight">\(f\left[\rho\left(\vec{r}\right), \cdots\right]\)</span> or
+<span class="math notranslate nohighlight">\(\epsilon\left[\rho\left(\vec{r}\right), \cdots\right]\)</span> depend on. More specifically dependence on:</p>
+<ul class="simple">
+<li><p>only <span class="math notranslate nohighlight">\(\rho\left(\vec{r}\right)\)</span> defines the local density approximation (LDA),</p></li>
+<li><p><span class="math notranslate nohighlight">\(\rho\left(\vec{r}\right)\)</span> and <span class="math notranslate nohighlight">\(\left|\bigtriangledown\rho\left(\vec{r}\right)\right|^2\)</span> (the square of the gradient of <span class="math notranslate nohighlight">\(\rho\left(\vec{r}\right)\)</span>) defines the
+generalized gradient approximation (GGA), and</p></li>
+<li><p><span class="math notranslate nohighlight">\(\rho\left(\vec{r}\right)\)</span>, <span class="math notranslate nohighlight">\(\left|\bigtriangledown\rho\left(\vec{r}\right)\right|^2\)</span>, the Laplacian of <span class="math notranslate nohighlight">\(\rho\left(\vec{r}\right)\)</span>, and the kinetic energy density defines
+a  meta GGA.</p></li>
+</ul>
+<p>For an LDA we have:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\vxc{\density} =&amp; \frac{\partial \exc{\density}}{\partial \density}\\
+               =&amp; \frac{\partial \edensity{\density}}{\partial \density}\end{split}\]</div>
+<section id="introduction-of-aos">
+<h2>Introduction of AOs<a class="headerlink" href="#introduction-of-aos" title="Link to this heading"></a></h2>
+<p>In Kohn-Sham DFT we solve the Kohn-Sham equations in an orbital basis that is
+obtained as a linear combination of atomic orbitals (AOs). Assume that there
+are <span class="math notranslate nohighlight">\(N_b\)</span> AOs and let <span class="math notranslate nohighlight">\(\phi_\mu\left(\vec{r}\right)\)</span> be the
+<span class="math notranslate nohighlight">\(\mu\)</span>-th AO. The equation for <span class="math notranslate nohighlight">\(E^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> remains unchanged other than <span class="math notranslate nohighlight">\(\rho\left(\vec{r}\right)\)</span>
+is now:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\newcommand{\bf}[1]{\phi_{#1}\left(\vec{r}\right)}\\\density = \sum_{\mu}^{N_b}\sum_{\nu}^{N_b} \bf{\mu}P_{\mu\nu}\bf{\nu}\end{aligned}\end{align} \]</div>
+<p>where <span class="math notranslate nohighlight">\(P_{\mu\nu}\)</span> is the <span class="math notranslate nohighlight">\(\mu\nu\)</span>-th element of the atomic
+density matrix. In the AO basis set the <span class="math notranslate nohighlight">\(\mu\nu\)</span>-th element of <span class="math notranslate nohighlight">\(V^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[V^{XC}_{\mu\nu} = \int \bf{\mu} \vxc{\density} \bf{\nu} d\vec{r}.\]</div>
+<p>In the LDA this becomes:</p>
+<div class="math notranslate nohighlight">
+\[V^{XC}_{\mu\nu} = \int \bf{\mu}
+  \frac{\partial \edensity{\density}}{\partial \density} \bf{\nu} d\vec{r}.\]</div>
+<p>For most DFT functionals, analytic solutions for the above integrals are not
+known and <span class="math notranslate nohighlight">\(E^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> and <span class="math notranslate nohighlight">\(V^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> must be evaluated by quadrature.</p>
+</section>
+<section id="introduction-of-quadrature">
+<h2>Introduction of Quadrature<a class="headerlink" href="#introduction-of-quadrature" title="Link to this heading"></a></h2>
+<p>In solving an integral by quadrature, we make the following approximation:</p>
+<div class="math notranslate nohighlight">
+\[\int g(\vec{r}) d\vec{r} \approx \sum_{i=1}^{N_g} w_i g(\vec{r_i}).\]</div>
+<p>That is we define a quadrature rule <span class="math notranslate nohighlight">\(\mathcal{Q}\)</span> which is a set of
+<span class="math notranslate nohighlight">\(N_g\)</span> pairs of the form <span class="math notranslate nohighlight">\(\lbrace w_i, \vec{r}_i\rbrace\)</span>. Here,
+<span class="math notranslate nohighlight">\(w_i\)</span> and <span class="math notranslate nohighlight">\(\vec{r_i}\)</span> are respectively the quadrature weight and
+real-space location of the <span class="math notranslate nohighlight">\(i\)</span>-th grid point.</p>
+<p>At this point it is helpful to define:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\newcommand{\densityg}[1]{\rho_{#1}}
+\newcommand{\bfg}[1]{\phi_{#1}}\\\begin{split}
+\densityg{i}\equiv&amp;\rho\left(\vec{r_i}\right)\\
+\bfg{\mu i}\equiv&amp;\phi_{\mu}\left(\vec{r_i}\right)\end{split}\end{aligned}\end{align} \]</div>
+<p>which respectively are the values of the density and the <span class="math notranslate nohighlight">\(\mu\)</span>-th AO
+evaluated at the <span class="math notranslate nohighlight">\(i\)</span>-th grid point. Similarly, we define:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\newcommand{\edensityg}[1]{f_{#1}}
+\newcommand{\dedensitygdrho}[1]{f_{#1}^{\left(\rho\right)}}\\\begin{split}\edensityg{i}\equiv&amp;\edensity{\densityg{i}}\\
+\dedensitygdrho{i}\equiv&amp;
+  \left.
+    \frac{\partial \edensity{\density{}}}
+      {\partial \density{}}
+  \right|_{\density{}=\densityg{i}}\end{split}\end{aligned}\end{align} \]</div>
+<p>which are the energy density, and the “derivative of the energy density with
+respect to the density” evaluated at <span class="math notranslate nohighlight">\(\rho_i\)</span>.</p>
+<p>Using these quantities, <span class="math notranslate nohighlight">\(\rho_i\)</span> is then given by:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\densityg{i} =&amp; \sum_{\mu}^{N_b}
+   \sum_{\nu}^{N_b} \bfg{\mu i}P_{\mu \nu}\bfg{\nu i}\\
+             =&amp; \sum_{\mu}^{N_b} \bfg{\mu i}X_{\mu i}\end{split}\]</div>
+<p>where in the second line we defined the common intermediate (the collocation
+matrix):</p>
+<div class="math notranslate nohighlight">
+\[X_{\mu i} = \sum_{\nu}^{N_b} P_{\mu\nu}\bfg{\nu i}\]</div>
+<p>Using <span class="math notranslate nohighlight">\(\mathcal{Q}\)</span>, <span class="math notranslate nohighlight">\(E^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> becomes:</p>
+<div class="math notranslate nohighlight">
+\[\exc{\density{}} = \sum_i^{N_g} w_i\edensityg{i}\]</div>
+<p>and <span class="math notranslate nohighlight">\(V^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> becomes:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}V_{\mu\nu}^{XC} =&amp;
+  \sum_i^{N_g} w_i \bfg{\mu i} \dedensitygdrho{i} \bfg{\nu i}\\
+                =&amp; \sum_i^{N_g} w_i \bfg{\mu i} Z_{\nu i}\end{split}\]</div>
+<p>where we defined the intermediate:</p>
+<div class="math notranslate nohighlight">
+\[Z_{\mu i} =\dedensitygdrho{i} \bfg{\mu i}.\]</div>
+</section>
+<section id="as-a-sparse-map-problem">
+<h2>As a Sparse Map Problem<a class="headerlink" href="#as-a-sparse-map-problem" title="Link to this heading"></a></h2>
+<p>While the last sections have described DFT as a tensor problem it’s usually not
+solved as one.  DFT is not usually treated as a tensor problem because:</p>
+<ul class="simple">
+<li><p>Large tensors. Grids minimally use about 1000 grid points per atom (higher-
+quality grids tend to be order 10,000) and most AO basis sets have order 10
+basis functions per atom. Tensors like <span class="math notranslate nohighlight">\(\phi_{\mu i}\)</span> then have
+minimally “10,000 times number of atoms squared” elements, meaning the tensor
+for 100 atoms already requires gigabytes of memory.</p></li>
+<li><p>Sparsity. Most DFT quantities are local. So if basis functions for a tensor
+element are spatially far a part, the element is usually close to zero.</p></li>
+</ul>
+<p>To describe the sparsity we introduce sparse maps. Given two basis sets,
+<span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>, the sparse map <span class="math notranslate nohighlight">\(L\)</span> maps each basis
+function in <span class="math notranslate nohighlight">\(A\)</span> to a subset of the basis functions in <span class="math notranslate nohighlight">\(B\)</span>. Assume
+we have some tensor with elements <span class="math notranslate nohighlight">\(T_{ab}\)</span> where <span class="math notranslate nohighlight">\(a\)</span> indexes basis
+functions in <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span> indexes basis functions in <span class="math notranslate nohighlight">\(B\)</span>.
+For a given value of <span class="math notranslate nohighlight">\(a\)</span>, the non-zero elements of <span class="math notranslate nohighlight">\(T_{ab}\)</span> are
+those such that <span class="math notranslate nohighlight">\(b\)</span> is in  <span class="math notranslate nohighlight">\(L(a)\)</span>.</p>
+<p>In DFT, we use atom-centered grids and AOs. It is therefore common to define
+sparse maps <span class="math notranslate nohighlight">\(L(A\rightarrow i)\)</span> and <span class="math notranslate nohighlight">\(L(A\rightarrow \mu)\)</span> which
+respectively map atom indices to grid points and atom indices to AOs. Using
+these maps the equation for the density becomes:</p>
+<div class="math notranslate nohighlight">
+\[\densityg{i_A} = \sum_{\mu_A} \bfg{\mu_A i_A}X_{\mu_A i_A}\]</div>
+<p>where an index like <span class="math notranslate nohighlight">\(i_A\)</span> is shorthand for restricting the value of
+<span class="math notranslate nohighlight">\(i\)</span> to those afforded by the sparse map <span class="math notranslate nohighlight">\(L(A\rightarrow i)\)</span>.
+Applying the same logic to the other DFT quantities:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}X_{\mu_A i_A} =&amp; \sum_{\nu_A} P_{\mu_A\nu_A}\bfg{\nu_A i_A}\\
+Z_{\mu_A i_A} =&amp; \dedensitygdrho{i_A} \bfg{\mu_A i_A}\\
+V_{\mu_A\nu_A}^{XC} =&amp; \sum_{i_A} w_{i_A}\bfg{\mu_A i_A} Z_{\nu_A i_A}.\end{split}\]</div>
+<p>Finally, the equation for <span class="math notranslate nohighlight">\(E^{XC}\left[\rho\left(\vec{r}\right)\right]\)</span> becomes:</p>
+<div class="math notranslate nohighlight">
+\[\exc{\density{}} = \sum_{A}\sum_{i_A} w_{i_A}\edensityg{i_A}\]</div>
+<p>Of note, for a given grid we expect the number of grid points associated with
+an atom to be roughly constant. Similarly, for a given AO basis set we expect
+the number of AOs associated with an atom to also be roughly constant. This
+means that cost to form all quantities will scale linearly with the number of
+atoms.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Background" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../module_api/index.html" class="btn btn-neutral float-right" title="Modules API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, NWChemEx Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
