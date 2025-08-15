@@ -14,6 +14,6 @@
   ~ limitations under the License.
 -->
 
-General instructions for building documentation found throughout the NWChemEx 
+General instructions for building documentation found throughout the NWChemEx
 project are available at:
 https://github.com/NWChemEx/NWChemEx/blob/master/docs/README.md
