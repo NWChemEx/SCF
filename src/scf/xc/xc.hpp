@@ -19,6 +19,8 @@
 
 namespace scf::xc {
 
+DECLARE_MODULE(GridFromFile);
+
 void set_defaults(pluginplay::ModuleManager& mm);
 void load_modules(pluginplay::ModuleManager& mm);
 
