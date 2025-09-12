@@ -23,6 +23,7 @@ Modules API
    GauXC_XC_Energy
    GauXC_XC_Potential
    Generalized_eigensolve_via_Eigen
+   Grid_From_File
    Loop
    Restricted_Fock_Op
    Restricted_Kohn-Sham_Op
