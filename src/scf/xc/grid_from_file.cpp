@@ -52,7 +52,7 @@ MODULE_CTOR(GridFromFile) {
 }
 
 MODULE_RUN(GridFromFile) {
-    const auto& [molecule] = pt::unwrap_inputs(inputs);
+    // const auto& [molecule] = pt::unwrap_inputs(inputs);
 
     const auto& path =
       inputs.at("Path to Grid File").value<std::filesystem::path>();
@@ -66,9 +66,14 @@ MODULE_RUN(GridFromFile) {
     std::string line;
     std::vector<chemist::GridPoint> grid_points;
     while(std::getline(file, line)) {
+        auto first_character = line.find_first_not_of(" \t\r\n");
+        if(first_character == std::string::npos) continue;
         double x, y, z, weight;
         std::stringstream ss(line);
-        ss >> x >> y >> z >> weight;
+        if(!(ss >> x >> y >> z >> weight) || !(ss >> std::ws).eof()) {
+            throw std::runtime_error("Malformed grid file line: '" + line +
+                                     "'");
+        }
         grid_points.emplace_back(weight, x, y, z);
     }
     chemist::Grid grid(grid_points.begin(), grid_points.end());
