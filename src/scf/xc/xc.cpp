@@ -18,7 +18,10 @@
 #include "xc.hpp"
 
 namespace scf::xc {
-void load_modules(pluginplay::ModuleManager& mm) { gauxc::load_modules(mm); }
+void load_modules(pluginplay::ModuleManager& mm) {
+    gauxc::load_modules(mm);
+    mm.add_module<GridFromFile>("Grid From File");
+}
 
 void set_defaults(pluginplay::ModuleManager& mm) { gauxc::set_defaults(mm); }
 } // namespace scf::xc
