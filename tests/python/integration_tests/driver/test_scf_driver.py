@@ -33,6 +33,18 @@ class TestSCFDriver(unittest.TestCase):
         egy = self.mm.run_as(self.ao_energy, "SCF Driver", self.aos, self.sys)
         self.assertAlmostEqual(np.array(egy), -74.94208027122616, places=6)
 
+    def test_dft_driver(self):
+        func = chemist.qm_operator.xc_functional.PBE
+        RKS_op = "Restricted Kohn-Sham Op"
+        rks_op = "Restricted One-Electron Kohn-Sham Op"
+        self.mm.change_input(RKS_op, "XC Potential", func)
+        self.mm.change_input(rks_op, "XC Potential", func)
+        self.mm.change_submod("Loop", "One-electron Fock operator", rks_op)
+        self.mm.change_submod("Loop", "Fock operator", RKS_op)
+        self.mm.change_submod("Core guess", "Build Fock Operator", rks_op)
+        egy = self.mm.run_as(self.ao_energy, "SCF Driver", self.aos, self.sys)
+        self.assertAlmostEqual(np.array(egy), -75.22989870343218, places=6)
+
     def setUp(self):
         # Setup Module Manager
         self.mm = pp.ModuleManager(pz.runtime.RuntimeView())
