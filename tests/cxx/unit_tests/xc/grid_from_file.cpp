@@ -27,6 +27,10 @@ TEST_CASE("GridFromFile") {
     scf::load_modules(mm);
     auto& mod = mm.at("Grid From File");
 
+    int process_rank;
+    MPI_Comm_rank(mm.get_runtime().mpi_comm(), &process_rank);
+    auto rank_str = std::to_string(process_rank);
+
     auto h2 = test_scf::make_h2<chemist::Molecule>();
 
     SECTION("file doesn't exist") {
@@ -36,7 +40,7 @@ TEST_CASE("GridFromFile") {
     }
 
     SECTION("only three points") {
-        std::filesystem::path p = "unit_test_pretend_h2_grid.txt";
+        std::filesystem::path p = "only_three_points" + rank_str + ".txt";
         std::ofstream file(p);
         file << "1.0 2.0 3.0\n";
         file << "5.0 6.0 7.0 8.0\n";
@@ -47,7 +51,7 @@ TEST_CASE("GridFromFile") {
     }
 
     SECTION("five numbers points") {
-        std::filesystem::path p = "unit_test_pretend_h2_grid.txt";
+        std::filesystem::path p = "five_numbers_points" + rank_str + ".txt";
         std::ofstream file(p);
         file << "1.0 2.0 3.0 4.0 5.0\n";
         file << "5.0 6.0 7.0 8.0\n";
@@ -58,7 +62,7 @@ TEST_CASE("GridFromFile") {
     }
 
     SECTION("non-mumeric data") {
-        std::filesystem::path p = "unit_test_pretend_h2_grid.txt";
+        std::filesystem::path p = "non-numeric_data" + rank_str + ".txt";
         std::ofstream file(p);
         file << "1.0 2.0 3.0 hello\n";
         file << "5.0 6.0 7.0 8.0\n";
@@ -69,7 +73,7 @@ TEST_CASE("GridFromFile") {
     }
 
     SECTION("good file") {
-        std::filesystem::path p = "unit_test_pretend_h2_grid.txt";
+        std::filesystem::path p = "good_file" + rank_str + ".txt";
         std::ofstream file(p);
         file << "1.0 2.0 3.0 4.0\n";
         file << "5.0 6.0 7.0 8.0\n";
@@ -89,7 +93,7 @@ TEST_CASE("GridFromFile") {
     }
 
     SECTION("skip blank line") {
-        std::filesystem::path p = "unit_test_pretend_h2_grid.txt";
+        std::filesystem::path p = "skip_blank_line" + rank_str + ".txt";
         std::ofstream file(p);
         file << "1.0 2.0 3.0 4.0\n";
         file << "\n";
