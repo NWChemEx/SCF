@@ -59,11 +59,21 @@ cmaize_find_or_build_dependency(
     CMAKE_ARGS EIGEN_BUILD_TESTING=OFF
 )
 
+cmaize_find_or_build_dependency(
+    gau2grid
+    NAME Gau2grid
+    URL https://github.com/psi4/gau2grid
+    VERSION master
+    BUILD_TARGET gg
+    FIND_TARGET gg
+
+)
+
 cmaize_add_library(
     scf
     SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/src/scf"
     INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/include/scf"
-    DEPENDS "${DEPENDENCIES}" eigen
+    DEPENDS "${DEPENDENCIES}" eigen gau2grid
 )
 
 if("${BUILD_TAMM_SCF}")
