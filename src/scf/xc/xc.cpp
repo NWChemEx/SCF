@@ -20,6 +20,7 @@
 namespace scf::xc {
 void load_modules(pluginplay::ModuleManager& mm) {
     gauxc::load_modules(mm);
+    mm.add_module<Gau2Grid>("Gau2Grid");
     mm.add_module<GridFromFile>("Grid From File");
 }
 

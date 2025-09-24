@@ -19,6 +19,7 @@
 
 namespace scf::xc {
 
+DECLARE_MODULE(Gau2Grid);
 DECLARE_MODULE(GridFromFile);
 
 void set_defaults(pluginplay::ModuleManager& mm);
