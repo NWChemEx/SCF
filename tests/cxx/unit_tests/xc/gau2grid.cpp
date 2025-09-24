@@ -20,7 +20,7 @@
 
 using namespace scf;
 
-using pt = simde::CollocationMatrix;
+using pt = simde::AOCollocationMatrix;
 
 using tensorwrapper::operations::approximately_equal;
 

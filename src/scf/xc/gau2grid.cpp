@@ -40,7 +40,7 @@ std::vector<T> flatten_grid(const chemist::Grid& grid) {
 
 } // namespace
 
-using pt = simde::CollocationMatrix;
+using pt = simde::AOCollocationMatrix;
 
 MODULE_CTOR(Gau2Grid) {
     satisfies_property_type<pt>();
