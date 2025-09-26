@@ -78,8 +78,6 @@ MODULE_RUN(Density2Grid) {
     auto& ao2grid_mod = submods.at("AOs on a grid");
     auto aos_on_grid  = ao2grid_mod.run_as<ao2grid_pt>(grid, aos);
 
-    auto n_grid      = grid.size();
-    using shape_type = tensorwrapper::shape::Smooth;
     simde::type::tensor X;
     X("m,i") = rho("m,n") * aos_on_grid("n,i");
 
