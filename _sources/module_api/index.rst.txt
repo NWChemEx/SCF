@@ -12,10 +12,12 @@ Modules API
    Core_guess
    Coulomb's_Law
    Density_matrix_builder
+   Density2Grid
    Determinant_driver
    Diagonalization_Fock_update
    Electronic_energy
    Fock_matrix_builder
+   Gau2Grid
    GauXC_Basis_Converter
    GauXC_Driver
    GauXC_Molecule_Converter

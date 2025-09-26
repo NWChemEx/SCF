@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Restricted Fock Op &mdash; SCF 1.0.0 documentation</title>
+  <title>Gau2Grid &mdash; SCF 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Restricted Kohn-Sham Op" href="Restricted_Kohn-Sham_Op.html" />
-    <link rel="prev" title="Loop" href="Loop.html" /> 
+    <link rel="next" title="GauXC Basis Converter" href="GauXC_Basis_Converter.html" />
+    <link rel="prev" title="Fock matrix builder" href="Fock_matrix_builder.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -61,7 +61,21 @@
 <li class="toctree-l2"><a class="reference internal" href="Diagonalization_Fock_update.html">Diagonalization Fock update</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Electronic_energy.html">Electronic energy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Fock_matrix_builder.html">Fock matrix builder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Gau2Grid.html">Gau2Grid</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Gau2Grid</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#collocationmatrix">CollocationMatrix</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#please-cite">Please Cite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#property-types">Property Types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-inputs">Module Inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#grid">Grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#quantity-to-collocate">Quantity to Collocate</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-results">Module Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="GauXC_Basis_Converter.html">GauXC Basis Converter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="GauXC_Driver.html">GauXC Driver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="GauXC_Molecule_Converter.html">GauXC Molecule Converter</a></li>
@@ -71,21 +85,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Generalized_eigensolve_via_Eigen.html">Generalized eigensolve via Eigen</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Grid_From_File.html">Grid From File</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Loop.html">Loop</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Restricted Fock Op</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#restricted-fock-operator-builder">Restricted Fock Operator Builder</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#please-cite">Please Cite</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#property-types">Property Types</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-inputs">Module Inputs</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#density">Density</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#hamiltonian">Hamiltonian</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#module-results">Module Results</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="Restricted_Fock_Op.html">Restricted Fock Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Restricted_Kohn-Sham_Op.html">Restricted Kohn-Sham Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Restricted_One-Electron_Fock_Op.html">Restricted One-Electron Fock Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Restricted_One-Electron_Kohn-Sham_Op.html">Restricted One-Electron Kohn-Sham Op</a></li>
@@ -113,9 +113,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Modules API</a></li>
-      <li class="breadcrumb-item active">Restricted Fock Op</li>
+      <li class="breadcrumb-item active">Gau2Grid</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/module_api/Restricted_Fock_Op.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/module_api/Gau2Grid.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -123,18 +123,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="restricted-fock-op">
-<h1>Restricted Fock Op<a class="headerlink" href="#restricted-fock-op" title="Link to this heading"></a></h1>
-<section id="restricted-fock-operator-builder">
-<h2>Restricted Fock Operator Builder<a class="headerlink" href="#restricted-fock-operator-builder" title="Link to this heading"></a></h2>
-<p>This module builds the Fock operator given a restricted density. Under this
-assumption, the Fock operator is created by mapping each term in the
-electronic Hamiltonian to itself with the exception of the electron-electron
-repulsion. The electron-electron repulsion is mapped to 2J-K where J is the
-Coulomb operator for the electrons interacting with a density and K is the
-exchange operator for the same density.</p>
-<p>N.b. Empty densities are treated as zero densities and this module will skip
-adding 2J-K if provided an empty density.</p>
+  <section id="gau2grid">
+<h1>Gau2Grid<a class="headerlink" href="#gau2grid" title="Link to this heading"></a></h1>
+<section id="collocationmatrix">
+<h2>CollocationMatrix<a class="headerlink" href="#collocationmatrix" title="Link to this heading"></a></h2>
 <section id="please-cite">
 <h3>Please Cite<a class="headerlink" href="#please-cite" title="Link to this heading"></a></h3>
 <p>No citations</p>
@@ -143,7 +135,7 @@ adding 2J-K if provided an empty density.</p>
 <h3>Property Types<a class="headerlink" href="#property-types" title="Link to this heading"></a></h3>
 <p>The following is a list of property types that this module satisfies.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">simde::FockOperator&lt;chemist::DecomposableDensity&lt;chemist::Electron&gt;&gt;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simde::CollocationMatrix&lt;chemist::basis_set::AOBasisSet&lt;chemist::basis_set::AtomicBasisSet&lt;chemist::basis_set::Shell&lt;chemist::basis_set::ContractedGaussian&lt;chemist::basis_set::Primitive&lt;double&gt;&gt;&gt;&gt;&gt;&gt;</span></code></p></li>
 </ul>
 </section>
 <section id="module-inputs">
@@ -169,11 +161,11 @@ module. The columns are:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Density</p></td>
+<tr class="row-even"><td><p>Grid</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-odd"><td><p>Hamiltonian</p></td>
+<tr class="row-odd"><td><p>Quantity to Collocate</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
@@ -195,8 +187,8 @@ subsection we list:</p>
 </section>
 </section>
 </section>
-<section id="density">
-<h2>Density<a class="headerlink" href="#density" title="Link to this heading"></a></h2>
+<section id="grid">
+<h2>Grid<a class="headerlink" href="#grid" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Description : N/A</p></li>
 <li><p>Default Value : N/A</p></li>
@@ -204,13 +196,13 @@ subsection we list:</p>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == chemist::DecomposableDensity&lt;chemist::Electron&gt;</p></li>
+<li><p>Type == chemist::Grid</p></li>
 </ul>
 </li>
 </ul>
 </section>
-<section id="hamiltonian">
-<h2>Hamiltonian<a class="headerlink" href="#hamiltonian" title="Link to this heading"></a></h2>
+<section id="quantity-to-collocate">
+<h2>Quantity to Collocate<a class="headerlink" href="#quantity-to-collocate" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Description : N/A</p></li>
 <li><p>Default Value : N/A</p></li>
@@ -218,7 +210,7 @@ subsection we list:</p>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == chemist::qm_operator::Hamiltonian</p></li>
+<li><p>Type == chemist::basis_set::AOBasisSet&lt;chemist::basis_set::AtomicBasisSet&lt;chemist::basis_set::Shell&lt;chemist::basis_set::ContractedGaussian&lt;chemist::basis_set::Primitive&lt;double&gt;&gt;&gt;&gt;&gt;</p></li>
 </ul>
 </li>
 </ul>
@@ -245,8 +237,8 @@ the Module class’s advanced API.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Fock operator</p></td>
-<td><p>chemist::qm_operator::Fock</p></td>
+<tr class="row-even"><td><p>Collocation Matrix</p></td>
+<td><p>tensorwrapper::Tensor</p></td>
 <td><p>N/A</p></td>
 </tr>
 </tbody>
@@ -263,8 +255,8 @@ the Module class’s advanced API.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Loop.html" class="btn btn-neutral float-left" title="Loop" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Restricted_Kohn-Sham_Op.html" class="btn btn-neutral float-right" title="Restricted Kohn-Sham Op" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Fock_matrix_builder.html" class="btn btn-neutral float-left" title="Fock matrix builder" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="GauXC_Basis_Converter.html" class="btn btn-neutral float-right" title="GauXC Basis Converter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
