@@ -36,7 +36,7 @@ TEST_CASE("Gau2Grid") {
     using atomic_bs_type = chemist::basis_set::AtomicBasisSet<shell_type>;
     using ao_basis_type  = chemist::basis_set::AOBasisSet<atomic_bs_type>;
 
-    auto cart = chemist::ShellType::cartesian;
+    // TODO: better testing auto cart = chemist::ShellType::cartesian;
     auto pure = chemist::ShellType::pure;
 
     SECTION("Manual examples") {
