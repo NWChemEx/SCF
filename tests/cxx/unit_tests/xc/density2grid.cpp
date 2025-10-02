@@ -17,7 +17,7 @@
 #include "../../test_scf.hpp"
 #include <iostream>
 #include <pluginplay/pluginplay.hpp>
-
+#include <scf/xc/libxc/libxc.hpp>
 using namespace scf;
 
 using pt    = simde::EDensityCollocationMatrix;
@@ -31,7 +31,7 @@ TEST_CASE("Density2Grid") {
 
     chemist::Grid grid; // Value doesn't matter for this test b/c of submodule
 
-    SECTION("H2") {
+    SECTION("Fake AOs on a grid") {
         auto rho = test_scf::h2_density<double>();
         simde::type::tensor ao2grid{{1.0, 2.0, 3.0, 4.0}, {5.0, 6.0, 7.0, 8.0}};
         auto ao_mod =
@@ -42,7 +42,43 @@ TEST_CASE("Density2Grid") {
           });
         mod.change_submod("AOs on a grid", ao_mod);
         auto rv = mod.run_as<pt>(grid, rho);
-        simde::type::tensor corr{11.513088, 20.467712, 31.9808, 46.052352};
+        simde::type::tensor corr{23.0262, 40.9355, 63.9617, 92.1048};
         REQUIRE(approximately_equal(rv, corr, 1e-4));
+    }
+
+    SECTION("He STO-3G") {
+        // Get the grid
+        auto path = std::filesystem::current_path().parent_path();
+        path += "/tests/he_grid.txt";
+        mm.change_input("Grid From File", "Path to Grid File", path);
+        using grid_pt = simde::MolecularGrid;
+        auto he       = test_scf::make_he<chemist::Molecule>();
+        auto grid     = mm.at("Grid From File").run_as<grid_pt>(he);
+        auto rho      = test_scf::he_density<double>();
+        auto rv       = mod.run_as<pt>(grid, rho);
+        auto runtime  = mm.get_runtime();
+        auto weights  = scf::xc::libxc::tensorify_weights(grid, runtime);
+        simde::type::tensor n_electrons;
+        n_electrons("") = weights("i") * rv("i");
+        simde::type::tensor corr(2.0);
+        REQUIRE(approximately_equal(n_electrons, corr, 1e-6));
+    }
+
+    SECTION("H2 STO-3G") {
+        // Get the grid
+        auto path = std::filesystem::current_path().parent_path();
+        path += "/tests/h2_grid.txt";
+        mm.change_input("Grid From File", "Path to Grid File", path);
+        using grid_pt = simde::MolecularGrid;
+        auto he       = test_scf::make_h2<chemist::Molecule>();
+        auto grid     = mm.at("Grid From File").run_as<grid_pt>(he);
+        auto rho      = test_scf::h2_density<double>();
+        auto rv       = mod.run_as<pt>(grid, rho);
+        auto runtime  = mm.get_runtime();
+        auto weights  = scf::xc::libxc::tensorify_weights(grid, runtime);
+        simde::type::tensor n_electrons;
+        n_electrons("") = weights("i") * rv("i");
+        simde::type::tensor corr(2.12336);
+        REQUIRE(approximately_equal(n_electrons, corr, 1e-4));
     }
 }

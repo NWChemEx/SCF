@@ -69,11 +69,20 @@ cmaize_find_or_build_dependency(
 
 )
 
+cmaize_find_or_build_dependency(
+    libxc
+    NAME libxc
+    URL https://gitlab.com/libxc/libxc
+    VERSION devel
+    BUILD_TARGET xc
+    FIND_TARGET xc
+)
+
 cmaize_add_library(
     scf
     SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/src/scf"
     INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/include/scf"
-    DEPENDS "${DEPENDENCIES}" eigen gau2grid
+    DEPENDS "${DEPENDENCIES}" eigen gau2grid libxc
 )
 
 if("${BUILD_TAMM_SCF}")

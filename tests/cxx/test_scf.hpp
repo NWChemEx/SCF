@@ -82,9 +82,10 @@ inline auto h_basis(NucleiType& hydrogens) {
     using contracted_gaussian_type = typename shell_type::cg_type;
     using center_type = typename atomic_basis_type::shell_traits::center_type;
 
+    // std::vector<double> h_coefs{0.276934, 0.267839, 0.0834737};
     std::vector<double> h_coefs{0.1543289673, 0.5353281423, 0.4446345422};
     std::vector<double> h_exps{3.425250914, 0.6239137298, 0.1688554040};
-    auto cartesian = shell_type::pure_type::cartesian;
+    auto cartesian = shell_type::pure_type::pure;
     shell_type::angular_momentum_type l0{0};
 
     ao_basis_type rv;
@@ -113,7 +114,7 @@ inline auto he_basis(NucleiType& heliums) {
                                  4.4463454220e-01};
     std::vector<double> he_exps{6.3624213940e+00, 1.1589229990e+00,
                                 3.1364979150e-01};
-    auto cartesian = shell_type::pure_type::cartesian;
+    auto cartesian = shell_type::pure_type::pure;
     shell_type::angular_momentum_type l0{0};
 
     ao_basis_type rv;
@@ -218,6 +219,21 @@ inline auto he_cmos() {
     tensor_type e(shape, std::move(e_buffer));
     return cmos_type(std::move(e), he_aos(), he_mos<FloatType>().transform());
 }
+template<typename FloatType>
+inline auto h2_wave_function() {
+    using wf_type        = simde::type::rscf_wf;
+    using index_set_type = typename wf_type::orbital_index_set_type;
+    index_set_type occs{0};
+    return wf_type(occs, h2_cmos<FloatType>());
+}
+
+template<typename FloatType>
+inline auto he_wave_function() {
+    using wf_type        = simde::type::rscf_wf;
+    using index_set_type = typename wf_type::orbital_index_set_type;
+    index_set_type occs{0};
+    return wf_type(occs, he_cmos<FloatType>());
+}
 
 template<typename FloatType>
 inline auto h2_density() {
@@ -269,4 +285,19 @@ inline auto h2_fock() {
     return F;
 }
 
+template<typename FloatType>
+inline auto h2_xc(chemist::qm_operator::xc_functional func) {
+    using many_electrons_type = simde::type::many_electrons;
+    many_electrons_type es(2);
+    auto rho = h2_density<FloatType>();
+    return simde::type::XC_e_type(func, es, rho);
+}
+
+template<typename FloatType>
+inline auto he_xc(chemist::qm_operator::xc_functional func) {
+    using many_electrons_type = simde::type::many_electrons;
+    many_electrons_type es(2);
+    auto rho = he_density<FloatType>();
+    return simde::type::XC_e_type(func, es, rho);
+}
 } // namespace test_scf
