@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "../../test_scf.hpp"
+#include "../../../test_scf.hpp"
 
 using grid_pt = simde::MolecularGrid;
 using rho_pt  = simde::EDensityCollocationMatrix;

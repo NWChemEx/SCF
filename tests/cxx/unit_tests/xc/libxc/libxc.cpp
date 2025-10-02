@@ -50,6 +50,24 @@ TEST_CASE("libxc_lda_energy_density") {
     REQUIRE(approximately_equal(exc, corr, 1e-6));
 }
 
+TEST_CASE("libxc_lda_energy_density_derivative") {
+    using namespace chemist::qm_operator;
+    using namespace scf::xc::libxc;
+    using tensorwrapper::operations::approximately_equal;
+
+    // I compared these values from a modified Psi4numpy example with 6 angular
+    // and 2 radial points per atom using Psi4's "SVWN" functional. These are
+    // the points for the first batch. The agreement between these values and
+    // the ones output by Psi4 is roughly 1e-3.
+
+    simde::type::tensor rho_on_grid{0.01313525, 0.32141338, 0.01313525,
+                                    0.3214133};
+    auto exc =
+      libxc_lda_energy_density_derivative(xc_functional::SVWN3, rho_on_grid);
+    simde::type::tensor corr{-0.278091, -0.744822, -0.278091, -0.744822};
+    REQUIRE(approximately_equal(exc, corr, 1e-6));
+}
+
 TEST_CASE("tensorify_weights") {
     using namespace scf::xc::libxc;
     using tensorwrapper::operations::approximately_equal;

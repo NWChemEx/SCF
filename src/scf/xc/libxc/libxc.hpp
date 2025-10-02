@@ -43,6 +43,10 @@ simde::type::tensor libxc_lda_energy_density(
   chemist::qm_operator::xc_functional func,
   const simde::type::tensor& rho_on_grid);
 
+simde::type::tensor libxc_lda_energy_density_derivative(
+  chemist::qm_operator::xc_functional func,
+  const simde::type::tensor& rho_on_grid);
+
 /** @brief Extracts the weights from a Grid object and puts them in a tensor.
  *
  *  This function is a stop gap. When we have type-erased floats and the

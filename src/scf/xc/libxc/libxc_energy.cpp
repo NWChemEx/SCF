@@ -74,9 +74,6 @@ MODULE_RUN(LibXCEnergy) {
     simde::type::tensor exc_xc;
     exc_xc("") = weight("i") * x_xc("i");
 
-    simde::type::tensor n_electrons;
-    n_electrons("") = weight("i") * rho("i");
-
     auto rv = results();
     return pt<wf_type>::wrap_results(rv, exc_xc);
 }

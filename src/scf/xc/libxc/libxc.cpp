@@ -26,6 +26,8 @@ void load_modules(pluginplay::ModuleManager& mm) {
 
 void set_defaults(pluginplay::ModuleManager& mm) {
     mm.change_submod("LibXC Energy", "Density on a grid", "Density2Grid");
+    mm.change_submod("LibXC Potential", "Density on a grid", "Density2Grid");
+    mm.change_submod("LibXC Potential", "AOs on a grid", "AOs on a Grid");
 }
 
 std::pair<int, int> to_libxc_codes(chemist::qm_operator::xc_functional func) {
@@ -90,6 +92,49 @@ simde::type::tensor libxc_lda_energy_density(
     xc_func_end(&func_c);
 
     return exc_xc;
+}
+
+simde::type::tensor libxc_lda_energy_density_derivative(
+  chemist::qm_operator::xc_functional func,
+  const simde::type::tensor& rho_on_grid) {
+    const auto [id_x, id_c] = to_libxc_codes(func);
+    xc_func_type func_x, func_c;
+
+    if(xc_func_init(&func_x, id_x, XC_UNPOLARIZED) != 0)
+        throw std::runtime_error("Failed to initialize libxc functional ");
+    if(xc_func_init(&func_c, id_c, XC_UNPOLARIZED) != 0)
+        throw std::runtime_error("Failed to initialize libxc functional ");
+
+    const auto& rho_buffer = rho_on_grid.buffer();
+    auto& rv               = rho_buffer.allocator().runtime();
+    tensorwrapper::allocator::Eigen<double> allocator(rv);
+    const auto* prho = allocator.rebind(rho_buffer).get_immutable_data();
+
+    auto n_grid = rho_on_grid.logical_layout().shape().as_smooth().extent(0);
+
+    // Buffers for derivative of exchange and correlation energy densities
+    tensorwrapper::shape::Smooth shape{n_grid};
+    tensorwrapper::layout::Physical layout(shape);
+
+    auto pbuffer_x = allocator.allocate(layout);
+    auto pbuffer_c = allocator.allocate(layout);
+
+    auto* pdepsilon_x = pbuffer_x->get_mutable_data();
+    auto* pdepsilon_c = pbuffer_c->get_mutable_data();
+    xc_lda_vxc(&func_c, n_grid, prho, pdepsilon_x);
+    xc_lda_vxc(&func_x, n_grid, prho, pdepsilon_c);
+
+    simde::type::tensor depsilon_x(shape, std::move(pbuffer_x));
+    simde::type::tensor depsilon_c(shape, std::move(pbuffer_c));
+    simde::type::tensor depsilon_xc, dexc_xc;
+
+    depsilon_xc("i") = depsilon_x("i") + depsilon_c("i");
+    dexc_xc("i")     = depsilon_xc("i");
+
+    xc_func_end(&func_x);
+    xc_func_end(&func_c);
+
+    return dexc_xc;
 }
 
 simde::type::tensor tensorify_weights(const chemist::Grid& grid,
