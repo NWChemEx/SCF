@@ -24,7 +24,6 @@ using tensorwrapper::operations::approximately_equal;
 
 TEST_CASE("LibXCEnergy") {
     using float_type = double;
-    using index_set  = typename wf_type::orbital_index_set_type;
 
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);

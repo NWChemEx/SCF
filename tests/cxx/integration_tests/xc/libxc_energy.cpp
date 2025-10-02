@@ -23,7 +23,6 @@ using pt      = simde::eval_braket<wf_type, simde::type::XC_e_type, wf_type>;
 
 TEST_CASE("LibXCEnergy") {
     using float_type = double;
-    using index_set  = typename wf_type::orbital_index_set_type;
     using tensorwrapper::operations::approximately_equal;
 
     pluginplay::ModuleManager mm;
