@@ -76,6 +76,7 @@ cmaize_find_or_build_dependency(
     VERSION devel
     BUILD_TARGET xc
     FIND_TARGET xc
+    CMAKE_ARGS BUILD_TESTING=OFF
 )
 
 cmaize_add_library(
