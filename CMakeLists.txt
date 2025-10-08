@@ -32,9 +32,7 @@ set(SCF_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 nwx_cxx_api_docs("${SCF_SOURCE_DIR}" "${SCF_INCLUDE_DIR}")
 
 ### Options ###
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(BUILD_LIBXC OFF)
-endif()
+
 cmaize_option_list(
     BUILD_TESTING OFF "Should we build the tests?"
     BUILD_PYBIND11_PYBINDINGS ON "Build Python bindings with pybind11?"
@@ -42,6 +40,10 @@ cmaize_option_list(
     BUILD_LIBXC ON "Should we build libxc?"
     INTEGRATION_TESTING OFF "Should we build the integration tests?"
 )
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(BUILD_LIBXC OFF)
+endif()
 
 if("${BUILD_TAMM_SCF}")
     set(DEPENDENCIES simde gauxc tamm exachem chemcache)
