@@ -39,7 +39,7 @@ cmaize_option_list(
     BUILD_TESTING OFF "Should we build the tests?"
     BUILD_PYBIND11_PYBINDINGS ON "Build Python bindings with pybind11?"
     BUILD_TAMM_SCF OFF "Should we build modules that rely on TAMM/Exachem?"
-    BUILD_LIBXC OFF "Should we build libxc?"
+    BUILD_LIBXC ON "Should we build libxc?"
     INTEGRATION_TESTING OFF "Should we build the integration tests?"
 )
 
