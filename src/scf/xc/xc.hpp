@@ -19,6 +19,7 @@
 
 namespace scf::xc {
 
+DECLARE_MODULE(AOsOnGrid);
 DECLARE_MODULE(Density2Grid);
 DECLARE_MODULE(Gau2Grid);
 DECLARE_MODULE(GridFromFile);

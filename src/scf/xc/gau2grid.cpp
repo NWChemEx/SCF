@@ -24,6 +24,9 @@ const auto desc = R"(
 
 CollocationMatrix
 -----------------
+
+Warning! Gau2Grid assumes that the primitive normalization has been folded into
+the contraction coefficients!!!
 )";
 
 template<typename T>
@@ -73,6 +76,7 @@ MODULE_RUN(Gau2Grid) {
             std::vector<double> exponents(n_primitives);
             std::vector<double> coefficients(n_primitives);
             std::vector<double> center(3);
+
             for(std::size_t i = 0; i < n_primitives; ++i) {
                 exponents[i]    = cg.at(i).exponent();
                 coefficients[i] = cg.at(i).coefficient();
@@ -84,12 +88,14 @@ MODULE_RUN(Gau2Grid) {
             auto is_pure = shell_i.pure() == chemist::ShellType::pure;
             auto order   = is_pure ? GG_SPHERICAL_CCA : GG_CARTESIAN_CCA;
 
-            auto offset = ao_i * n_points;
-
+            auto offset       = ao_i * n_points;
             auto shell_i_data = matrix_data + offset;
-            gg_collocation(L, n_points, flattened_grid.data(), 3, n_primitives,
-                           coefficients.data(), exponents.data(), center.data(),
-                           order, shell_i_data);
+            gg_collocation(static_cast<int>(L), static_cast<int>(n_points),
+                           flattened_grid.data(), 3,
+                           static_cast<int>(n_primitives), coefficients.data(),
+                           exponents.data(), center.data(), order,
+                           shell_i_data);
+
             ao_i += n_aos;
         }
     }

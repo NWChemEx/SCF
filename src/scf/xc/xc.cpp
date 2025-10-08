@@ -15,15 +15,23 @@
  */
 
 #include "gauxc/gauxc.hpp"
+#include "libxc/libxc.hpp"
 #include "xc.hpp"
 
 namespace scf::xc {
 void load_modules(pluginplay::ModuleManager& mm) {
     gauxc::load_modules(mm);
+    libxc::load_modules(mm);
+    mm.add_module<AOsOnGrid>("AOs on a grid");
     mm.add_module<Gau2Grid>("Gau2Grid");
     mm.add_module<GridFromFile>("Grid From File");
     mm.add_module<Density2Grid>("Density2Grid");
 }
 
-void set_defaults(pluginplay::ModuleManager& mm) { gauxc::set_defaults(mm); }
+void set_defaults(pluginplay::ModuleManager& mm) {
+    gauxc::set_defaults(mm);
+    libxc::set_defaults(mm);
+    mm.change_submod("Density2Grid", "AOs on a grid", "AOs on a grid");
+}
+
 } // namespace scf::xc

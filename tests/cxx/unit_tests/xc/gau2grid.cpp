@@ -17,6 +17,7 @@
 #include "../../test_scf.hpp"
 #include <iostream>
 #include <pluginplay/pluginplay.hpp>
+#include <scf/xc/libxc/libxc.hpp>
 
 using namespace scf;
 
@@ -82,5 +83,33 @@ TEST_CASE("Gau2Grid") {
               {0, 0, 0, 0, 0}};
             REQUIRE(approximately_equal(rv, corr, 1e-6));
         };
+    }
+
+    SECTION("A single s Gaussian on a realistic grid") {
+        // Assumes build directory is under root and we are running from the
+        // build directory
+        auto path = std::filesystem::current_path().parent_path();
+        path += "/tests/he_grid.txt";
+        mm.change_input("Grid From File", "Path to Grid File", path);
+        using grid_pt = simde::MolecularGrid;
+        auto he       = test_scf::make_he<chemist::Molecule>();
+        auto grid     = mm.at("Grid From File").run_as<grid_pt>(he);
+        ao_basis_type ao_basis;
+        atomic_bs_type abs("n/a", 1, {0.0, 0.0, 0.0});
+
+        std::vector<float_type> coefs{1.0};
+        std::vector<float_type> exps{1.0};
+        cg_type cg(coefs.begin(), coefs.end(), exps.begin(), exps.end(), 0.0,
+                   0.0, 0.0);
+        abs.add_shell(pure, 0, cg);
+        ao_basis.add_center(std::move(abs));
+        auto rv      = mod.run_as<pt>(grid, ao_basis);
+        auto runtime = mm.get_runtime();
+        auto weights = scf::xc::libxc::tensorify_weights(grid, runtime);
+        simde::type::tensor sum;
+        sum("m") = weights("i") * rv("m,i");
+        // \int d^3r exp(-r^2) = 4pi \int_0^inf dr r^2 exp(-r^2) = pi^(3/2)
+        simde::type::tensor corr{M_PI * std::sqrt(M_PI)};
+        REQUIRE(approximately_equal(sum, corr, 1e-6));
     }
 }

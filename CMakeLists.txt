@@ -32,12 +32,19 @@ set(SCF_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 nwx_cxx_api_docs("${SCF_SOURCE_DIR}" "${SCF_INCLUDE_DIR}")
 
 ### Options ###
+
 cmaize_option_list(
     BUILD_TESTING OFF "Should we build the tests?"
     BUILD_PYBIND11_PYBINDINGS ON "Build Python bindings with pybind11?"
     BUILD_TAMM_SCF OFF "Should we build modules that rely on TAMM/Exachem?"
+    BUILD_LIBXC ON "Should we build libxc?"
     INTEGRATION_TESTING OFF "Should we build the integration tests?"
 )
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(BUILD_LIBXC OFF)
+endif()
+
 if("${BUILD_TAMM_SCF}")
     set(DEPENDENCIES simde gauxc tamm exachem chemcache)
     include(get_libint2)
@@ -69,11 +76,25 @@ cmaize_find_or_build_dependency(
 
 )
 
+set(BUILD_TESTING_BACKUP ${BUILD_TESTING})
+set(BUILD_TESTING OFF)
+cmaize_find_or_build_optional_dependency(
+    libxc
+    BUILD_LIBXC
+    NAME libxc
+    URL https://gitlab.com/libxc/libxc
+    VERSION devel
+    BUILD_TARGET xc
+    FIND_TARGET xc
+    CMAKE_ARGS BUILD_TESTING=OFF
+)
+set(BUILD_TESTING ${BUILD_TESTING_BACKUP})
+
 cmaize_add_library(
     scf
     SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/src/scf"
     INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/include/scf"
-    DEPENDS "${DEPENDENCIES}" eigen gau2grid
+    DEPENDS "${DEPENDENCIES}" eigen gau2grid libxc
 )
 
 if("${BUILD_TAMM_SCF}")
