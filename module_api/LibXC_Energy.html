@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GauXC Driver &mdash; SCF 1.0.0 documentation</title>
+  <title>LibXC Energy &mdash; SCF 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="GauXC Molecule Converter" href="GauXC_Molecule_Converter.html" />
-    <link rel="prev" title="GauXC Basis Converter" href="GauXC_Basis_Converter.html" /> 
+    <link rel="next" title="LibXC Potential" href="LibXC_Potential.html" />
+    <link rel="prev" title="Grid From File" href="Grid_From_File.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -64,7 +64,14 @@
 <li class="toctree-l2"><a class="reference internal" href="Fock_matrix_builder.html">Fock matrix builder</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Gau2Grid.html">Gau2Grid</a></li>
 <li class="toctree-l2"><a class="reference internal" href="GauXC_Basis_Converter.html">GauXC Basis Converter</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">GauXC Driver</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="GauXC_Driver.html">GauXC Driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GauXC_Molecule_Converter.html">GauXC Molecule Converter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GauXC_Quadrature_Batches.html">GauXC Quadrature Batches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GauXC_XC_Energy.html">GauXC XC Energy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GauXC_XC_Potential.html">GauXC XC Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Generalized_eigensolve_via_Eigen.html">Generalized eigensolve via Eigen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Grid_From_File.html">Grid From File</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">LibXC Energy</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#please-cite">Please Cite</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#property-types">Property Types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-inputs">Module Inputs</a><ul>
@@ -76,13 +83,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="GauXC_Molecule_Converter.html">GauXC Molecule Converter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="GauXC_Quadrature_Batches.html">GauXC Quadrature Batches</a></li>
-<li class="toctree-l2"><a class="reference internal" href="GauXC_XC_Energy.html">GauXC XC Energy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="GauXC_XC_Potential.html">GauXC XC Potential</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Generalized_eigensolve_via_Eigen.html">Generalized eigensolve via Eigen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Grid_From_File.html">Grid From File</a></li>
-<li class="toctree-l2"><a class="reference internal" href="LibXC_Energy.html">LibXC Energy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LibXC_Potential.html">LibXC Potential</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Loop.html">Loop</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Restricted_Fock_Op.html">Restricted Fock Op</a></li>
@@ -113,9 +113,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Modules API</a></li>
-      <li class="breadcrumb-item active">GauXC Driver</li>
+      <li class="breadcrumb-item active">LibXC Energy</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/module_api/GauXC_Driver.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/module_api/LibXC_Energy.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -123,9 +123,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="gauxc-driver">
-<h1>GauXC Driver<a class="headerlink" href="#gauxc-driver" title="Link to this heading"></a></h1>
-<p>No description provided</p>
+  <section id="libxc-energy">
+<h1>LibXC Energy<a class="headerlink" href="#libxc-energy" title="Link to this heading"></a></h1>
 <section id="please-cite">
 <h2>Please Cite<a class="headerlink" href="#please-cite" title="Link to this heading"></a></h2>
 <p>No citations</p>
@@ -134,7 +133,7 @@
 <h2>Property Types<a class="headerlink" href="#property-types" title="Link to this heading"></a></h2>
 <p>The following is a list of property types that this module satisfies.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">scf::xc::gauxc::XCDriver</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;,</span> <span class="pre">chemist::qm_operator::ExchangeCorrelation&lt;chemist::ManyElectrons,</span> <span class="pre">chemist::DecomposableDensity&lt;chemist::Electron&gt;&gt;,</span> <span class="pre">chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;&gt;</span></code></p></li>
 </ul>
 </section>
 <section id="module-inputs">
@@ -160,20 +159,8 @@ module. The columns are:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>AO Basis</p></td>
+<tr class="row-even"><td><p>BraKet</p></td>
 <td><p>N/A</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>density</p></td>
-<td><p>N/A</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-even"><td><p>Functional Name</p></td>
-<td><p>N/A</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>On GPU</p></td>
-<td><p>0</p></td>
 <td><p>N/A</p></td>
 </tr>
 </tbody>
@@ -191,8 +178,8 @@ subsection we list:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">Opaque?</span></code> : Does the value of the input influence memoization?.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Domain</span> <span class="pre">Restrictions</span></code> : Criteria a value must obey to be deemed valid.</p></li>
 </ul>
-<section id="ao-basis">
-<h4>AO Basis<a class="headerlink" href="#ao-basis" title="Link to this heading"></a></h4>
+<section id="braket">
+<h4>BraKet<a class="headerlink" href="#braket" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p>Description : N/A</p></li>
 <li><p>Default Value : N/A</p></li>
@@ -200,49 +187,7 @@ subsection we list:</p>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == chemist::basis_set::AOBasisSet&lt;chemist::basis_set::AtomicBasisSet&lt;chemist::basis_set::Shell&lt;chemist::basis_set::ContractedGaussian&lt;chemist::basis_set::Primitive&lt;double&gt;&gt;&gt;&gt;&gt;</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="density">
-<h4>density<a class="headerlink" href="#density" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>Description : N/A</p></li>
-<li><p>Default Value : N/A</p></li>
-<li><p>Optional? : False</p></li>
-<li><p>Opaque? : True</p></li>
-<li><p>Domain Restrictions :</p>
-<ul>
-<li><p>Type == tensorwrapper::Tensor</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="functional-name">
-<h4>Functional Name<a class="headerlink" href="#functional-name" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>Description : N/A</p></li>
-<li><p>Default Value : N/A</p></li>
-<li><p>Optional? : False</p></li>
-<li><p>Opaque? : True</p></li>
-<li><p>Domain Restrictions :</p>
-<ul>
-<li><p>Type == chemist::qm_operator::xc_functional</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="on-gpu">
-<h4>On GPU<a class="headerlink" href="#on-gpu" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>Description : N/A</p></li>
-<li><p>Default Value : 0</p></li>
-<li><p>Optional? : False</p></li>
-<li><p>Opaque? : True</p></li>
-<li><p>Domain Restrictions :</p>
-<ul>
-<li><p>Type == bool</p></li>
+<li><p>Type == chemist::braket::BraKet&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;, chemist::qm_operator::ExchangeCorrelation&lt;chemist::ManyElectrons, chemist::DecomposableDensity&lt;chemist::Electron&gt;&gt;, chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;</p></li>
 </ul>
 </li>
 </ul>
@@ -272,11 +217,7 @@ the Module class’s advanced API.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>XC Energy</p></td>
-<td><p>tensorwrapper::Tensor</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>XC Potential</p></td>
+<tr class="row-even"><td><p>tensor representation</p></td>
 <td><p>tensorwrapper::Tensor</p></td>
 <td><p>N/A</p></td>
 </tr>
@@ -300,9 +241,13 @@ submodule we have listed:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Quadrature Batches</p></td>
-<td><p>scf::xc::gauxc::XCQuadratureBatches</p></td>
-<td><p>Generate XC Quadrature Batches</p></td>
+<tr class="row-even"><td><p>Density on a grid</p></td>
+<td><p>simde::CollocationMatrix&lt;chemist::Density&lt;chemist::Electron&gt;&gt;</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>Integration grid</p></td>
+<td><p>simde::MolecularGrid</p></td>
+<td><p>N/A</p></td>
 </tr>
 </tbody>
 </table>
@@ -313,8 +258,8 @@ submodule we have listed:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="GauXC_Basis_Converter.html" class="btn btn-neutral float-left" title="GauXC Basis Converter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="GauXC_Molecule_Converter.html" class="btn btn-neutral float-right" title="GauXC Molecule Converter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Grid_From_File.html" class="btn btn-neutral float-left" title="Grid From File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="LibXC_Potential.html" class="btn btn-neutral float-right" title="LibXC Potential" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

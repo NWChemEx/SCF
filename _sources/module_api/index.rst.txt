@@ -9,6 +9,7 @@ Modules API
    AO_Restricted_Kohn-Sham_Op
    AO_Restricted_One-Electron_Fock_Op
    AO_Restricted_One-Electron_Kohn-Sham_Op
+   AOs_on_a_grid
    Core_guess
    Coulomb's_Law
    Density_matrix_builder
@@ -26,6 +27,8 @@ Modules API
    GauXC_XC_Potential
    Generalized_eigensolve_via_Eigen
    Grid_From_File
+   LibXC_Energy
+   LibXC_Potential
    Loop
    Restricted_Fock_Op
    Restricted_Kohn-Sham_Op

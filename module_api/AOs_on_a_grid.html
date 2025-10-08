@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GauXC Driver &mdash; SCF 1.0.0 documentation</title>
+  <title>AOs on a grid &mdash; SCF 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="GauXC Molecule Converter" href="GauXC_Molecule_Converter.html" />
-    <link rel="prev" title="GauXC Basis Converter" href="GauXC_Basis_Converter.html" /> 
+    <link rel="next" title="Core guess" href="Core_guess.html" />
+    <link rel="prev" title="AO Restricted One-Electron Kohn-Sham Op" href="AO_Restricted_One-Electron_Kohn-Sham_Op.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -53,7 +53,21 @@
 <li class="toctree-l2"><a class="reference internal" href="AO_Restricted_Kohn-Sham_Op.html">AO Restricted Kohn-Sham Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AO_Restricted_One-Electron_Fock_Op.html">AO Restricted One-Electron Fock Op</a></li>
 <li class="toctree-l2"><a class="reference internal" href="AO_Restricted_One-Electron_Kohn-Sham_Op.html">AO Restricted One-Electron Kohn-Sham Op</a></li>
-<li class="toctree-l2"><a class="reference internal" href="AOs_on_a_grid.html">AOs on a grid</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">AOs on a grid</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ao-collocationmatrix">AO CollocationMatrix</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#please-cite">Please Cite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#property-types">Property Types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-inputs">Module Inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#grid">Grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#quantity-to-collocate">Quantity to Collocate</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-results">Module Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="Core_guess.html">Core guess</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Coulomb%27s_Law.html">Coulomb’s Law</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Density_matrix_builder.html">Density matrix builder</a></li>
@@ -64,18 +78,7 @@
 <li class="toctree-l2"><a class="reference internal" href="Fock_matrix_builder.html">Fock matrix builder</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Gau2Grid.html">Gau2Grid</a></li>
 <li class="toctree-l2"><a class="reference internal" href="GauXC_Basis_Converter.html">GauXC Basis Converter</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">GauXC Driver</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#please-cite">Please Cite</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#property-types">Property Types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-inputs">Module Inputs</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#quick-reference">Quick Reference</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#detailed-descriptions">Detailed Descriptions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-results">Module Results</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="GauXC_Driver.html">GauXC Driver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="GauXC_Molecule_Converter.html">GauXC Molecule Converter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="GauXC_Quadrature_Batches.html">GauXC Quadrature Batches</a></li>
 <li class="toctree-l2"><a class="reference internal" href="GauXC_XC_Energy.html">GauXC XC Energy</a></li>
@@ -113,9 +116,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Modules API</a></li>
-      <li class="breadcrumb-item active">GauXC Driver</li>
+      <li class="breadcrumb-item active">AOs on a grid</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/module_api/GauXC_Driver.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/module_api/AOs_on_a_grid.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -123,28 +126,29 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="gauxc-driver">
-<h1>GauXC Driver<a class="headerlink" href="#gauxc-driver" title="Link to this heading"></a></h1>
-<p>No description provided</p>
+  <section id="aos-on-a-grid">
+<h1>AOs on a grid<a class="headerlink" href="#aos-on-a-grid" title="Link to this heading"></a></h1>
+<section id="ao-collocationmatrix">
+<h2>AO CollocationMatrix<a class="headerlink" href="#ao-collocationmatrix" title="Link to this heading"></a></h2>
 <section id="please-cite">
-<h2>Please Cite<a class="headerlink" href="#please-cite" title="Link to this heading"></a></h2>
+<h3>Please Cite<a class="headerlink" href="#please-cite" title="Link to this heading"></a></h3>
 <p>No citations</p>
 </section>
 <section id="property-types">
-<h2>Property Types<a class="headerlink" href="#property-types" title="Link to this heading"></a></h2>
+<h3>Property Types<a class="headerlink" href="#property-types" title="Link to this heading"></a></h3>
 <p>The following is a list of property types that this module satisfies.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">scf::xc::gauxc::XCDriver</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simde::CollocationMatrix&lt;chemist::basis_set::AOBasisSet&lt;chemist::basis_set::AtomicBasisSet&lt;chemist::basis_set::Shell&lt;chemist::basis_set::ContractedGaussian&lt;chemist::basis_set::Primitive&lt;double&gt;&gt;&gt;&gt;&gt;&gt;</span></code></p></li>
 </ul>
 </section>
 <section id="module-inputs">
-<h2>Module Inputs<a class="headerlink" href="#module-inputs" title="Link to this heading"></a></h2>
+<h3>Module Inputs<a class="headerlink" href="#module-inputs" title="Link to this heading"></a></h3>
 <p>This section details the full list of inputs that the module accepts. Inputs
 that are not listed as optional must have their value set before the module can
 be run. Inputs can be set manually by calling the module’s <code class="docutils literal notranslate"><span class="pre">change_input</span></code>
 function or by passing arguments to a property type.</p>
 <section id="quick-reference">
-<h3>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading"></a></h3>
+<h4>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading"></a></h4>
 <p>The following table provides a quick summary of the inputs available to this
 module. The columns are:</p>
 <ul class="simple">
@@ -160,27 +164,19 @@ module. The columns are:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>AO Basis</p></td>
+<tr class="row-even"><td><p>Grid</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-odd"><td><p>density</p></td>
+<tr class="row-odd"><td><p>Quantity to Collocate</p></td>
 <td><p>N/A</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-even"><td><p>Functional Name</p></td>
-<td><p>N/A</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>On GPU</p></td>
-<td><p>0</p></td>
 <td><p>N/A</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="detailed-descriptions">
-<h3>Detailed Descriptions<a class="headerlink" href="#detailed-descriptions" title="Link to this heading"></a></h3>
+<h4>Detailed Descriptions<a class="headerlink" href="#detailed-descriptions" title="Link to this heading"></a></h4>
 <p>The following subsections provide detailed descriptions of each input recognized
 by this module. The subsection headings are the name of the input. Within each
 subsection we list:</p>
@@ -191,8 +187,25 @@ subsection we list:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">Opaque?</span></code> : Does the value of the input influence memoization?.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Domain</span> <span class="pre">Restrictions</span></code> : Criteria a value must obey to be deemed valid.</p></li>
 </ul>
-<section id="ao-basis">
-<h4>AO Basis<a class="headerlink" href="#ao-basis" title="Link to this heading"></a></h4>
+</section>
+</section>
+</section>
+<section id="grid">
+<h2>Grid<a class="headerlink" href="#grid" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Description : N/A</p></li>
+<li><p>Default Value : N/A</p></li>
+<li><p>Optional? : False</p></li>
+<li><p>Opaque? : True</p></li>
+<li><p>Domain Restrictions :</p>
+<ul>
+<li><p>Type == chemist::Grid</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="quantity-to-collocate">
+<h2>Quantity to Collocate<a class="headerlink" href="#quantity-to-collocate" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Description : N/A</p></li>
 <li><p>Default Value : N/A</p></li>
@@ -204,53 +217,8 @@ subsection we list:</p>
 </ul>
 </li>
 </ul>
-</section>
-<section id="density">
-<h4>density<a class="headerlink" href="#density" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>Description : N/A</p></li>
-<li><p>Default Value : N/A</p></li>
-<li><p>Optional? : False</p></li>
-<li><p>Opaque? : True</p></li>
-<li><p>Domain Restrictions :</p>
-<ul>
-<li><p>Type == tensorwrapper::Tensor</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="functional-name">
-<h4>Functional Name<a class="headerlink" href="#functional-name" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>Description : N/A</p></li>
-<li><p>Default Value : N/A</p></li>
-<li><p>Optional? : False</p></li>
-<li><p>Opaque? : True</p></li>
-<li><p>Domain Restrictions :</p>
-<ul>
-<li><p>Type == chemist::qm_operator::xc_functional</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="on-gpu">
-<h4>On GPU<a class="headerlink" href="#on-gpu" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>Description : N/A</p></li>
-<li><p>Default Value : 0</p></li>
-<li><p>Optional? : False</p></li>
-<li><p>Opaque? : True</p></li>
-<li><p>Domain Restrictions :</p>
-<ul>
-<li><p>Type == bool</p></li>
-</ul>
-</li>
-</ul>
-</section>
-</section>
-</section>
 <section id="module-results">
-<h2>Module Results<a class="headerlink" href="#module-results" title="Link to this heading"></a></h2>
+<h3>Module Results<a class="headerlink" href="#module-results" title="Link to this heading"></a></h3>
 <p>This section tabulates the full list of results that the module returns. The
 columns respectively are:</p>
 <ul class="simple">
@@ -272,11 +240,7 @@ the Module class’s advanced API.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>XC Energy</p></td>
-<td><p>tensorwrapper::Tensor</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>XC Potential</p></td>
+<tr class="row-even"><td><p>Collocation Matrix</p></td>
 <td><p>tensorwrapper::Tensor</p></td>
 <td><p>N/A</p></td>
 </tr>
@@ -284,28 +248,9 @@ the Module class’s advanced API.</p>
 </table>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
-<p>This section details the full list of submodules that the module uses. For each
-submodule we have listed:</p>
-<ul class="simple">
-<li><p>Key : The key used to refer to this particular callback.</p></li>
-<li><p>Property Type : The property type that the submodule must satisfy.</p></li>
-<li><p>Description : How the module will use the submodule.</p></li>
-</ul>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Key</p></th>
-<th class="head"><p>Property Type</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Quadrature Batches</p></td>
-<td><p>scf::xc::gauxc::XCQuadratureBatches</p></td>
-<td><p>Generate XC Quadrature Batches</p></td>
-</tr>
-</tbody>
-</table>
+<h3>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h3>
+<p>The module defines no submodules.</p>
+</section>
 </section>
 </section>
 
@@ -313,8 +258,8 @@ submodule we have listed:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="GauXC_Basis_Converter.html" class="btn btn-neutral float-left" title="GauXC Basis Converter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="GauXC_Molecule_Converter.html" class="btn btn-neutral float-right" title="GauXC Molecule Converter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="AO_Restricted_One-Electron_Kohn-Sham_Op.html" class="btn btn-neutral float-left" title="AO Restricted One-Electron Kohn-Sham Op" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Core_guess.html" class="btn btn-neutral float-right" title="Core guess" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
