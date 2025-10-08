@@ -69,8 +69,11 @@ TEST_CASE("LibXCEnergy") {
     mod.change_submod("Integration grid", grid_mod);
     mod.change_submod("Density on a grid", rho_mod);
 
+#ifdef BUILD_LIBXC
     auto exc = mod.run_as<pt>(braket);
     simde::type::tensor corr(-0.1031596741234082);
-
     REQUIRE(approximately_equal(exc, corr, 1e-6));
+#else
+    REQUIRE_THROWS_AS(mod.run_as<pt>(braket), std::runtime_error);
+#endif
 }

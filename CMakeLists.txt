@@ -32,12 +32,17 @@ set(SCF_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 nwx_cxx_api_docs("${SCF_SOURCE_DIR}" "${SCF_INCLUDE_DIR}")
 
 ### Options ###
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(BUILD_LIBXC OFF)
+endif()
 cmaize_option_list(
     BUILD_TESTING OFF "Should we build the tests?"
     BUILD_PYBIND11_PYBINDINGS ON "Build Python bindings with pybind11?"
     BUILD_TAMM_SCF OFF "Should we build modules that rely on TAMM/Exachem?"
+    BUILD_LIBXC OFF "Should we build libxc?"
     INTEGRATION_TESTING OFF "Should we build the integration tests?"
 )
+
 if("${BUILD_TAMM_SCF}")
     set(DEPENDENCIES simde gauxc tamm exachem chemcache)
     include(get_libint2)
@@ -69,8 +74,11 @@ cmaize_find_or_build_dependency(
 
 )
 
-cmaize_find_or_build_dependency(
+set(BUILD_TESTING_BACKUP ${BUILD_TESTING})
+set(BUILD_TESTING OFF)
+cmaize_find_or_build_optional_dependency(
     libxc
+    BUILD_LIBXC
     NAME libxc
     URL https://gitlab.com/libxc/libxc
     VERSION devel
@@ -78,6 +86,7 @@ cmaize_find_or_build_dependency(
     FIND_TARGET xc
     CMAKE_ARGS BUILD_TESTING=OFF
 )
+set(BUILD_TESTING ${BUILD_TESTING_BACKUP})
 
 cmaize_add_library(
     scf

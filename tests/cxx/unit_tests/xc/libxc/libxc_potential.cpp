@@ -62,7 +62,11 @@ TEST_CASE("LibXCPotential") {
     simde::type::xc_e_type xc_op(func, simde::type::electron{}, rho);
     chemist::braket::BraKet braket(aos, xc_op, aos);
 
+#ifdef BUILD_LIBXC
     auto vxc = mod.run_as<pt>(braket);
     simde::type::tensor corr{{-1.83222, -0.402489}, {-0.402489, -0.0886007}};
     REQUIRE(approximately_equal(vxc, corr, 1e-5));
+#else
+    REQUIRE_THROWS_AS(mod.run_as<pt>(braket), std::runtime_error);
+#endif
 }

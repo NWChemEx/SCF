@@ -43,9 +43,13 @@ TEST_CASE("LibXCEnergy") {
         auto xc_hat = test_scf::he_xc<float_type>(func);
         chemist::braket::BraKet braket(psi, xc_hat, psi);
 
+#ifdef BUILD_LIBXC
         auto exc = mod.run_as<pt>(braket);
         simde::type::tensor corr(-1.01982);
         REQUIRE(approximately_equal(exc, corr, 1e-5));
+#else
+        REQUIRE_THROWS_AS(mod.run_as<pt>(braket), std::runtime_error);
+#endif
     }
 
     SECTION("H2") {
@@ -59,8 +63,12 @@ TEST_CASE("LibXCEnergy") {
         auto xc_hat = test_scf::h2_xc<float_type>(func);
         chemist::braket::BraKet braket(psi, xc_hat, psi);
 
+#ifdef BUILD_LIBXC
         auto exc = mod.run_as<pt>(braket);
         simde::type::tensor corr(-0.734458);
         REQUIRE(approximately_equal(exc, corr, 1e-5));
+#else
+        REQUIRE_THROWS_AS(mod.run_as<pt>(braket), std::runtime_error);
+#endif
     }
 }

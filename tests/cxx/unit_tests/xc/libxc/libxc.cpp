@@ -21,7 +21,7 @@
 TEST_CASE("to_libxc_codes") {
     using namespace chemist::qm_operator;
     using namespace scf::xc::libxc;
-
+#ifdef BUILD_LIBXC
     auto [x, c] = to_libxc_codes(xc_functional::SVWN3);
     REQUIRE(x == XC_LDA_X);
     REQUIRE(c == XC_LDA_C_VWN_3);
@@ -31,6 +31,9 @@ TEST_CASE("to_libxc_codes") {
     REQUIRE(c2 == XC_LDA_C_VWN);
 
     REQUIRE_THROWS_AS(to_libxc_codes(xc_functional::B3LYP), std::runtime_error);
+#else
+    REQUIRE_THROWS_AS(to_libxc_codes(xc_functional::SVWN3), std::runtime_error);
+#endif
 }
 
 TEST_CASE("libxc_lda_energy_density") {
@@ -45,9 +48,15 @@ TEST_CASE("libxc_lda_energy_density") {
 
     simde::type::tensor rho_on_grid{0.01313525, 0.32141338, 0.01313525,
                                     0.3214133};
+#ifdef BUILD_LIBXC
     auto exc = libxc_lda_energy_density(xc_functional::SVWN3, rho_on_grid);
     simde::type::tensor corr{-0.00280601, -0.182648, -0.00280601, -0.182648};
     REQUIRE(approximately_equal(exc, corr, 1e-6));
+#else
+    REQUIRE_THROWS_AS(
+      libxc_lda_energy_density(xc_functional::SVWN3, rho_on_grid),
+      std::runtime_error);
+#endif
 }
 
 TEST_CASE("libxc_lda_energy_density_derivative") {
@@ -62,10 +71,16 @@ TEST_CASE("libxc_lda_energy_density_derivative") {
 
     simde::type::tensor rho_on_grid{0.01313525, 0.32141338, 0.01313525,
                                     0.3214133};
+#ifdef BUILD_LIBXC
     auto exc =
       libxc_lda_energy_density_derivative(xc_functional::SVWN3, rho_on_grid);
     simde::type::tensor corr{-0.278091, -0.744822, -0.278091, -0.744822};
     REQUIRE(approximately_equal(exc, corr, 1e-6));
+#else
+    REQUIRE_THROWS_AS(
+      libxc_lda_energy_density_derivative(xc_functional::SVWN3, rho_on_grid),
+      std::runtime_error);
+#endif
 }
 
 TEST_CASE("tensorify_weights") {

@@ -15,7 +15,9 @@
  */
 
 #include "libxc.hpp"
+#ifdef BUILD_LIBXC
 #include "xc.h"
+#endif
 
 namespace scf::xc::libxc {
 
@@ -32,11 +34,15 @@ void set_defaults(pluginplay::ModuleManager& mm) {
 
 std::pair<int, int> to_libxc_codes(chemist::qm_operator::xc_functional func) {
     using namespace chemist::qm_operator;
+#ifdef BUILD_LIBXC
     switch(func) {
         case xc_functional::SVWN3: return std::pair(XC_LDA_X, XC_LDA_C_VWN_3);
         case xc_functional::SVWN5: return std::pair(XC_LDA_X, XC_LDA_C_VWN);
         default: throw std::runtime_error("Functional not supported");
     }
+#else
+    throw std::runtime_error("LibXC support not compiled in");
+#endif
 }
 
 simde::type::molecule aos2molecule(const simde::type::ao_basis_set& aos) {
@@ -54,6 +60,7 @@ simde::type::molecule aos2molecule(const simde::type::ao_basis_set& aos) {
 simde::type::tensor libxc_lda_energy_density(
   chemist::qm_operator::xc_functional func,
   const simde::type::tensor& rho_on_grid) {
+#ifdef BUILD_LIBXC
     const auto [id_x, id_c] = to_libxc_codes(func);
     xc_func_type func_x, func_c;
 
@@ -92,11 +99,15 @@ simde::type::tensor libxc_lda_energy_density(
     xc_func_end(&func_c);
 
     return exc_xc;
+#else
+    throw std::runtime_error("LibXC support not compiled in");
+#endif
 }
 
 simde::type::tensor libxc_lda_energy_density_derivative(
   chemist::qm_operator::xc_functional func,
   const simde::type::tensor& rho_on_grid) {
+#ifdef BUILD_LIBXC
     const auto [id_x, id_c] = to_libxc_codes(func);
     xc_func_type func_x, func_c;
 
@@ -135,6 +146,9 @@ simde::type::tensor libxc_lda_energy_density_derivative(
     xc_func_end(&func_c);
 
     return dexc_xc;
+#else
+    throw std::runtime_error("LibXC support not compiled in");
+#endif
 }
 
 simde::type::tensor tensorify_weights(const chemist::Grid& grid,
