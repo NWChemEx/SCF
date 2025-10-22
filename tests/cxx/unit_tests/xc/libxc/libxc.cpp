@@ -16,6 +16,7 @@
 
 #include "../../../test_scf.hpp"
 #include "xc.h"
+#include "xc_funcs.h"
 #include <scf/xc/libxc/libxc.hpp>
 
 TEST_CASE("to_libxc_codes") {
