@@ -81,11 +81,11 @@ set(BUILD_TESTING OFF)
 cmaize_find_or_build_optional_dependency(
     libxc
     BUILD_LIBXC
-    NAME libxc
+    NAME Libxc
     URL https://gitlab.com/libxc/libxc
     VERSION devel
     BUILD_TARGET xc
-    FIND_TARGET xc
+    FIND_TARGET Libxc::xc
     CMAKE_ARGS BUILD_TESTING=OFF
 )
 set(BUILD_TESTING ${BUILD_TESTING_BACKUP})
