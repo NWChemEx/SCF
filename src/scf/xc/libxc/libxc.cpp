@@ -17,6 +17,7 @@
 #include "libxc.hpp"
 #ifdef BUILD_LIBXC
 #include "xc.h"
+#include "xc_funcs.h"
 #endif
 
 namespace scf::xc::libxc {

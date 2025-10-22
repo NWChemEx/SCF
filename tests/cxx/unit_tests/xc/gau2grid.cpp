@@ -86,10 +86,8 @@ TEST_CASE("Gau2Grid") {
     }
 
     SECTION("A single s Gaussian on a realistic grid") {
-        // Assumes build directory is under root and we are running from the
-        // build directory
-        auto path = std::filesystem::current_path().parent_path();
-        path += "/tests/he_grid.txt";
+        auto path = test_scf::get_test_directory_path();
+        path += "/he_grid.txt";
         mm.change_input("Grid From File", "Path to Grid File", path);
         using grid_pt = simde::MolecularGrid;
         auto he       = test_scf::make_he<chemist::Molecule>();
