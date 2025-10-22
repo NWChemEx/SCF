@@ -29,6 +29,8 @@ TEST_CASE("Density2Grid") {
     scf::load_modules(mm);
     auto& mod = mm.at("Density2Grid");
 
+    auto path = test_scf::get_test_directory_path();
+
     chemist::Grid grid; // Value doesn't matter for this test b/c of submodule
 
     SECTION("Fake AOs on a grid") {
@@ -48,8 +50,7 @@ TEST_CASE("Density2Grid") {
 
     SECTION("He STO-3G") {
         // Get the grid
-        auto path = std::filesystem::current_path().parent_path();
-        path += "/tests/he_grid.txt";
+        path += "/he_grid.txt";
         mm.change_input("Grid From File", "Path to Grid File", path);
         using grid_pt = simde::MolecularGrid;
         auto he       = test_scf::make_he<chemist::Molecule>();
@@ -66,8 +67,7 @@ TEST_CASE("Density2Grid") {
 
     SECTION("H2 STO-3G") {
         // Get the grid
-        auto path = std::filesystem::current_path().parent_path();
-        path += "/tests/h2_grid.txt";
+        path += "/h2_grid.txt";
         mm.change_input("Grid From File", "Path to Grid File", path);
         using grid_pt = simde::MolecularGrid;
         auto he       = test_scf::make_h2<chemist::Molecule>();

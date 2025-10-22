@@ -30,11 +30,10 @@ TEST_CASE("AOsOnGrid") {
     scf::load_modules(mm);
     auto& mod = mm.at("AOs on a grid");
 
+    auto path = test_scf::get_test_directory_path();
+
     SECTION("He STO-3G on a realistic grid") {
-        // Assumes build directory is under root and we are running from the
-        // build directory
-        auto path = std::filesystem::current_path().parent_path();
-        path += "/tests/he_grid.txt";
+        path += "/he_grid.txt";
         mm.change_input("Grid From File", "Path to Grid File", path);
         using grid_pt = simde::MolecularGrid;
         auto he       = test_scf::make_he<chemist::Molecule>();
@@ -51,10 +50,7 @@ TEST_CASE("AOsOnGrid") {
     }
 
     SECTION("H2 STO-3G on a realistic grid") {
-        // Assumes build directory is under root and we are running from the
-        // build directory
-        auto path = std::filesystem::current_path().parent_path();
-        path += "/tests/h2_grid.txt";
+        path += "/h2_grid.txt";
         mm.change_input("Grid From File", "Path to Grid File", path);
         using grid_pt = simde::MolecularGrid;
         auto h2       = test_scf::make_h2<chemist::Molecule>();

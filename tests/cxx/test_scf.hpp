@@ -18,6 +18,7 @@
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <filesystem>
 #include <scf/scf.hpp>
 #include <simde/simde.hpp>
 
@@ -300,4 +301,15 @@ inline auto he_xc(chemist::qm_operator::xc_functional func) {
     auto rho = he_density<FloatType>();
     return simde::type::XC_e_type(func, es, rho);
 }
+
+inline std::filesystem::path get_test_directory_path() {
+    auto path = std::filesystem::current_path().parent_path();
+    // Spack testing hack
+    if(path.string().find("spack") != std::string::npos) {
+        path += "/spack-src";
+    }
+    path += "/tests";
+    return path;
+}
+
 } // namespace test_scf

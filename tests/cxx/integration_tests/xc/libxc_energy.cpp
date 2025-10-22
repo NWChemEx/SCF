@@ -30,11 +30,10 @@ TEST_CASE("LibXCEnergy") {
     mm.change_submod("LibXC Energy", "Integration grid", "Grid From File");
     auto& mod = mm.at("LibXC Energy");
 
+    auto path = test_scf::get_test_directory_path();
+
     SECTION("He") {
-        // Assumes build directory is under root and we are running from the
-        // build directory
-        auto path = std::filesystem::current_path().parent_path();
-        path += "/tests/he_grid.txt";
+        path += "/he_grid.txt";
         mm.change_input("Grid From File", "Path to Grid File", path);
         auto rho    = test_scf::he_density<float_type>();
         auto aos    = test_scf::he_aos();
@@ -53,8 +52,7 @@ TEST_CASE("LibXCEnergy") {
     }
 
     SECTION("H2") {
-        auto path = std::filesystem::current_path().parent_path();
-        path += "/tests/h2_grid.txt";
+        path += "/h2_grid.txt";
         mm.change_input("Grid From File", "Path to Grid File", path);
         auto rho    = test_scf::h2_density<float_type>();
         auto aos    = test_scf::h2_aos();
