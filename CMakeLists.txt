@@ -41,10 +41,6 @@ cmaize_option_list(
     INTEGRATION_TESTING OFF "Should we build the integration tests?"
 )
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    set(BUILD_LIBXC OFF)
-endif()
-
 if("${BUILD_TAMM_SCF}")
     set(DEPENDENCIES simde gauxc tamm exachem chemcache)
     include(get_libint2)
