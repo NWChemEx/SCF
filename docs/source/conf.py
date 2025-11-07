@@ -121,7 +121,14 @@ html_theme = "sphinx_rtd_theme"
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-html_theme_options = {"logo_only": True}
+html_theme_options = {"vcs_pageview_mode": "edit"}
+
+html_context = {
+    "display_github": True,
+    "github_user": "NWChemEx",
+    "github_repo": "SCF",
+    "github_version": "master/docs/source/",
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -154,7 +161,7 @@ latex_elements = {
     # 'pointsize': '10pt',
     # Additional stuff for the LaTeX preamble.
     #
-    # 'preamble': '',
+    "preamble": r"\usepackage{braket}\usepackage{amsmath}",
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
