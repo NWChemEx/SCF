@@ -379,6 +379,8 @@ state). From the definition of |yvector| we have:
 Working Equations
 *****************
 
+It is helpful to define a series of intermediate quantities:
+
 .. math::
 
    \newcommand{\iFock}[1]{F^I_{#1}}
@@ -388,26 +390,69 @@ Working Equations
    \iFock{pq} =& h_{pq} + \sum_{i}\left[2\eri{pq}{ii} - \eri{pi}{qi}\right]\\
    \aFock{pq} =& \sum_{uv} \gamma_{uv}
                   \left[\eri{pq}{uv} - \frac{1}{2}\eri{pu}{qv}\right]\\
+   Q_{up}     =& \sum_{vwx} \Gamma_{uvwx}\eri{pv}{wx}\\
+   E^I        =& \sum_{i}\left(h_{ii} + \iFock{ii}\right)
 
-The gradient is given in terms of the generalized Fock matrix:
+Which respectively define the inactive Fock matrix, the active Fock matrix,
+an auxilliary "Q matrix", and the inactive energy.
+
+The orbital gradient is given in terms of the generalized Fock matrix:
 
 .. math::
 
-   \ederiv{1}_{pq} = 2\left(F_{pq} - F_{qp}\right)\\
-   F_{ip} = 2\iFock{pi} + 2\aFock{pi}\\
-   F_{up} = \sum_{v}\iFock{pv}\gamma_{uv} + Q_{up}\\
-   F_{ap} = \mathbf{0} \\
-   Q_{up} = \sum_{vwx} \Gamma_{uvwx}\eri{pv}{wx}
+   \ederiv{1}_{pq} =& 2\left(F_{pq} - F_{qp}\right)\\
+   F_{ip}          =& 2\iFock{pi} + 2\aFock{pi}\\
+   F_{up}          =& \sum_{v}\iFock{pv}\gamma_{uv} + Q_{up}\\
+   F_{ap}          =& 0
+
+and the CI gradient is given by:
+
+.. math::
+
+   \ederiv{1}_{I} = 2\sum_{uv}\braket{I\mid E_{uv} \mid 0}\iFock{uv} +
+                    \sum_{uvwx}\braket{I\mid e_{uvwx} \mid 0}\eri{uv}{wx} -
+                    2\refC{I}\left(E-E^I\right).
+
+In practice we do not form the augmented Hessian explicitly. Instead, we form
+the sigma vectors, which are the product of the augmented Hessian with a
+guess for |yvector|:
+
+.. math::
+
+   \newcommand{\Galpha}[1]{\left[G\left(\alpha\right)\right]_{#1}}
+
+   \sum_{J}\Galpha{IJ}c_{J} =& 2\braket{I\mid\hat{H} - E \mid \mathbf{c}} +
+                               \left(\alpha -1\right)\left[
+                                 \refC{I}\sum_{J}\ederiv{1}_{J}c_{J} +
+                                 \ederiv{1}_{I}\sum_{J}\refC{J}c_{J}\right]\\
+   \sum_{pq}\Galpha{I,pq}k_{pq} =& 2\braket{I\mid\hat{H}_\kappa\mid 0} +
+                                    \left(\alpha-2\right)
+                                    \refC{I}\sum_{pq}\ederiv{1}_{pq}k_{pq}\\
+   \sum_{I}\Galpha{pq,I}c_{I} =&
+      \braket{0\mid\left[\Epq{pq}, \hat{H}\right]\mid \mathbf{c}} +
+      \braket{\mathbf{c}\mid\left[\Epq{pq},\hat{H}\right]\mid 0} +
+      \left(\alpha - 2\right)\ederiv{1}_{pq}\sum_{I}\refC{I}c_{I}\\
+   \sum_{rs}\Galpha{pq,rs}k_{rs} =&
+      \braket{0\mid\left[\Epq{pq}, \hat{H}_\kappa\right]\mid 0} +
+      \left(\left[\ograd,\kvector\right]\right)_{pq}
 
 *********
 Algorithm
 *********
 
-- Input: set of MO coefficients and a CI vector.
-- Transform from AOs to current MOs
-- For the energy of the :math:`n`-the state solve for the :math:`n`-th
-  |yvector|.
+0. Input: set of MO coefficients and a CI vector.
+1. Transform from AOs to current MOs.
+2. Compute the gradient.
+3. Solve the eigenvalue equation for :math:`\yvector` and :math:`\mu`
+   using an eigensolver.
+
+  - This is usually done with a Davidson solver that only requires
+    matrix-vector products with the augmented Hessian.
+  - The iterative solving of this step are the "microiterations" of CASSCF.
+
 - Compute |newparams| via :math:`\oldparams + \alpha^{-1}\mathbf{P}\yvector`.
+- Compute the new CI coefficients.
+- Return to step 1.
 
 Before leaving this section, it is useful to note that the CASSCF Hessian
 contains terms that depend on the gradients. Such contributions will be zero at
