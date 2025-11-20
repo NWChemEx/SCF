@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['aodispatcher_6',['AODispatcher',['../classscf_1_1matrix__builder_1_1AODispatcher.html',1,'scf::matrix_builder']]]
+  ['aodispatcher_0',['AODispatcher',['../classscf_1_1matrix__builder_1_1AODispatcher.html',1,'scf::matrix_builder']]]
 ];

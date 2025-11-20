@@ -1,4 +1,5 @@
 <map id="scf::matrix_builder::EnergyDispatcher&lt; WFType &gt;" name="scf::matrix_builder::EnergyDispatcher&lt; WFType &gt;">
-<area shape="rect" id="node1" title=" " alt="" coords="10,95,166,151"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,5,171,47"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="10,93,166,148"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,171,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,59,91,93,85,93,85,59"/>
 </map>
