@@ -32,12 +32,12 @@ jobs:
   test_library:
     uses: NWChemEx/.github/.github/workflows/test_nwx_library.yaml@master
     with:
-      compilers: '["gcc-14", "clang-19"]'
+      compilers: '["gcc-14", "clang-18"]'
 
   integration_tests:
     uses: NWChemEx/.github/.github/workflows/test_nwx_library.yaml@master
     with:
-      compilers: '["gcc-14", "clang-19"]'
+      compilers: '["gcc-14", "clang-18"]'
       repo_toolchain: '.github/integration_testing.cmake'
 
   # tamm_tests:
