@@ -30,10 +30,9 @@ TEMPLATE_LIST_TEST_CASE("Density Matrix Builder", "", test_scf::float_types) {
 
     chemist::braket::BraKet p_mn(aos, rho_hat, aos);
     const auto& P = mod.run_as<pt>(p_mn);
-    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
     tensorwrapper::shape::Smooth corr_shape{2, 2};
-    tensorwrapper::layout::Physical l(corr_shape);
-    auto corr_buffer = alloc.construct(l, 0.31980835);
+    float_type init{0.31980835};
+    auto corr_buffer = tensorwrapper::buffer::make_contiguous(corr_shape, init);
     tensorwrapper::Tensor corr(corr_shape, std::move(corr_buffer));
 
     using tensorwrapper::operations::approximately_equal;

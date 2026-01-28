@@ -51,11 +51,10 @@ TEST_CASE("GauXCDriver") {
         simde::type::tensor exc_corr(-0.819986);
         REQUIRE(approximately_equal(exc_corr, exc, 1E-5));
 
-        tensorwrapper::allocator::Eigen<double> alloc(mm.get_runtime());
+        using tensorwrapper::buffer::make_contiguous;
         tensorwrapper::shape::Smooth shape_corr{1, 1};
-        auto pcorr =
-          alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
-        pcorr->set_elem({0, 0}, -0.526535);
+        auto pcorr = make_contiguous<double>(shape_corr);
+        pcorr.set_elem({0, 0}, -0.526535);
         simde::type::tensor vxc_corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(vxc, vxc_corr, 1E-5));
     }

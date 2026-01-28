@@ -27,28 +27,28 @@ TEMPLATE_LIST_TEST_CASE("EigenGeneralized", "", test_scf::float_types) {
 
     auto& mod = mm.at("Generalized eigensolve via Eigen");
 
-    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
     tensorwrapper::shape::Smooth shape{2, 2};
-    tensorwrapper::layout::Physical l(shape);
-    auto A_buffer = alloc.allocate(l);
-    A_buffer->set_elem({0, 0}, 1.0);
-    A_buffer->set_elem({0, 1}, 2.0);
-    A_buffer->set_elem({1, 0}, 2.0);
-    A_buffer->set_elem({1, 1}, 3.0);
+    using tensorwrapper::buffer::make_contiguous;
+    auto A_buffer = make_contiguous<float_type>(shape);
+    A_buffer.set_elem({0, 0}, 1.0);
+    A_buffer.set_elem({0, 1}, 2.0);
+    A_buffer.set_elem({1, 0}, 2.0);
+    A_buffer.set_elem({1, 1}, 3.0);
 
-    auto B_buffer = alloc.allocate(l);
-    B_buffer->set_elem({0, 0}, 1.0);
-    B_buffer->set_elem({0, 1}, 0.0);
-    B_buffer->set_elem({1, 0}, 0.0);
-    B_buffer->set_elem({1, 1}, 1.0);
+    auto B_buffer = make_contiguous<float_type>(shape);
+    B_buffer.set_elem({0, 0}, 1.0);
+    B_buffer.set_elem({0, 1}, 0.0);
+    B_buffer.set_elem({1, 0}, 0.0);
+    B_buffer.set_elem({1, 1}, 1.0);
 
     simde::type::tensor A(shape, std::move(A_buffer));
     simde::type::tensor B(shape, std::move(B_buffer));
 
     auto&& [values, vector] = mod.run_as<pt>(A, B);
 
-    auto corr_buffer = alloc.construct({-0.236068, 4.236068});
+    std::vector<float_type> expected_values{-0.236068, 4.236068};
     tensorwrapper::shape::Smooth corr_shape{2};
+    tensorwrapper::buffer::Contiguous corr_buffer(expected_values, corr_shape);
     simde::type::tensor corr(corr_shape, std::move(corr_buffer));
 
     REQUIRE(tensorwrapper::operations::approximately_equal(corr, values, 1E-6));

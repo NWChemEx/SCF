@@ -29,9 +29,9 @@ TEMPLATE_LIST_TEST_CASE("ElectronicEnergy", "", test_scf::float_types) {
     using wf_type   = simde::type::rscf_wf;
     using index_set = typename wf_type::orbital_index_set_type;
 
-    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+    using tensorwrapper::buffer::make_contiguous;
     tensorwrapper::shape::Smooth shape_corr{};
-    auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
+    auto pcorr = make_contiguous<float_type>(shape_corr);
     using tensorwrapper::operations::approximately_equal;
 
     wf_type psi(index_set{0}, test_scf::h2_cmos<float_type>());
@@ -52,7 +52,7 @@ TEMPLATE_LIST_TEST_CASE("ElectronicEnergy", "", test_scf::float_types) {
 
         const auto& E_elec = mod.template run_as<pt<wf_type>>(braket);
 
-        pcorr->set_elem({}, -1.90066758625308307);
+        pcorr.set_elem({}, -1.90066758625308307);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, E_elec, 1E-6));
     }

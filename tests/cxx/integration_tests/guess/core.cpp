@@ -34,10 +34,11 @@ TEMPLATE_LIST_TEST_CASE("Core", "", test_scf::float_types) {
     REQUIRE(psi.orbital_indices() == occs);
     REQUIRE(psi.orbitals().from_space() == aos);
     const auto& evals = psi.orbitals().diagonalized_matrix();
-    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
     tensorwrapper::shape::Smooth shape_corr{2};
-    auto pbuffer = alloc.construct({-1.25330893, -0.47506974});
-    tensorwrapper::Tensor corr(shape_corr, std::move(pbuffer));
+    std::vector<float_type> corr_buffer{-1.25330893, -0.47506974};
+    tensorwrapper::buffer::Contiguous buffer(std::move(corr_buffer),
+                                             shape_corr);
+    tensorwrapper::Tensor corr(shape_corr, std::move(buffer));
 
     using tensorwrapper::operations::approximately_equal;
     REQUIRE(approximately_equal(corr, evals, 1E-6));

@@ -29,8 +29,7 @@ using initial_rho_pt = simde::InitialDensity;
 using tensorwrapper::operations::approximately_equal;
 
 TEMPLATE_LIST_TEST_CASE("SAD", "", test_scf::float_types) {
-    using float_type     = TestType;
-    using allocator_type = tensorwrapper::allocator::Eigen<float_type>;
+    using float_type = TestType;
 
     auto mm  = test_scf::load_modules<float_type>();
     auto aos = test_scf::h2_aos();
@@ -42,9 +41,9 @@ TEMPLATE_LIST_TEST_CASE("SAD", "", test_scf::float_types) {
     const auto& evals = psi.orbitals().diagonalized_matrix();
 
     occ_index occs{0};
-    allocator_type alloc(rt);
     shape_type shape_corr{2};
-    auto pbuffer = alloc.construct({-0.498376, 0.594858});
+    std::vector<float_type> buffer{-0.498376, 0.594858};
+    tensorwrapper::buffer::Contiguous pbuffer(std::move(buffer), shape_corr);
     tensor corr(shape_corr, std::move(pbuffer));
 
     REQUIRE(psi.orbital_indices() == occs);
