@@ -48,9 +48,10 @@ TEMPLATE_LIST_TEST_CASE("Diagaonalization", "", test_scf::float_types) {
 
         // Check orbital energies
         const auto& evals = psi.orbitals().diagonalized_matrix();
-        tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
-        auto corr_buffer = alloc.construct({-1.25330893, -0.47506974});
+        std::vector<float_type> corr_data{-1.25330893, -0.47506974};
         tensorwrapper::shape::Smooth corr_shape{2};
+        using tensorwrapper::buffer::Contiguous;
+        Contiguous corr_buffer(std::move(corr_data), corr_shape);
         tensorwrapper::Tensor corr(corr_shape, std::move(corr_buffer));
 
         using tensorwrapper::operations::approximately_equal;
