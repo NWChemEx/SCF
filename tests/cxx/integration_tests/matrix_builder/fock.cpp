@@ -42,10 +42,10 @@ TEMPLATE_LIST_TEST_CASE("Fock Matrix Builder", "", test_scf::float_types) {
         chemist::braket::BraKet f_mn(aos, f_e, aos);
         const auto& F = mod.template run_as<pt>(f_mn);
 
-        pcorr.set_elem({0, 0}, -1.120958);
-        pcorr.set_elem({0, 1}, -0.959374);
-        pcorr.set_elem({1, 0}, -0.959374);
-        pcorr.set_elem({1, 1}, -1.120958);
+        pcorr.set_elem({0, 0}, float_type{-1.120958});
+        pcorr.set_elem({0, 1}, float_type{-0.959374});
+        pcorr.set_elem({1, 0}, float_type{-0.959374});
+        pcorr.set_elem({1, 1}, float_type{-1.120958});
 
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
 
@@ -57,10 +57,10 @@ TEMPLATE_LIST_TEST_CASE("Fock Matrix Builder", "", test_scf::float_types) {
         chemist::braket::BraKet f_mn(aos, f_e, aos);
         const auto& F = mod.template run_as<pt>(f_mn);
 
-        pcorr.set_elem({0, 0}, -0.319459);
-        pcorr.set_elem({0, 1}, -0.571781);
-        pcorr.set_elem({1, 0}, -0.571781);
-        pcorr.set_elem({1, 1}, -0.319459);
+        pcorr.set_elem({0, 0}, float_type{-0.319459});
+        pcorr.set_elem({0, 1}, float_type{-0.571781});
+        pcorr.set_elem({1, 0}, float_type{-0.571781});
+        pcorr.set_elem({1, 1}, float_type{-0.319459});
 
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
 

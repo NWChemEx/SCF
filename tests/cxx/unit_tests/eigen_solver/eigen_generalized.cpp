@@ -30,16 +30,16 @@ TEMPLATE_LIST_TEST_CASE("EigenGeneralized", "", test_scf::float_types) {
     tensorwrapper::shape::Smooth shape{2, 2};
     using tensorwrapper::buffer::make_contiguous;
     auto A_buffer = make_contiguous<float_type>(shape);
-    A_buffer.set_elem({0, 0}, 1.0);
-    A_buffer.set_elem({0, 1}, 2.0);
-    A_buffer.set_elem({1, 0}, 2.0);
-    A_buffer.set_elem({1, 1}, 3.0);
+    A_buffer.set_elem({0, 0}, float_type{1.0});
+    A_buffer.set_elem({0, 1}, float_type{2.0});
+    A_buffer.set_elem({1, 0}, float_type{2.0});
+    A_buffer.set_elem({1, 1}, float_type{3.0});
 
     auto B_buffer = make_contiguous<float_type>(shape);
-    B_buffer.set_elem({0, 0}, 1.0);
-    B_buffer.set_elem({0, 1}, 0.0);
-    B_buffer.set_elem({1, 0}, 0.0);
-    B_buffer.set_elem({1, 1}, 1.0);
+    B_buffer.set_elem({0, 0}, float_type{1.0});
+    B_buffer.set_elem({0, 1}, float_type{0.0});
+    B_buffer.set_elem({1, 0}, float_type{0.0});
+    B_buffer.set_elem({1, 1}, float_type{1.0});
 
     simde::type::tensor A(shape, std::move(A_buffer));
     simde::type::tensor B(shape, std::move(B_buffer));

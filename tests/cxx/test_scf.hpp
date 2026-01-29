@@ -167,10 +167,10 @@ inline auto h2_mos() {
     using tensor_type = typename mos_type::transform_type;
     tensorwrapper::shape::Smooth shape{2, 2};
     auto c_buffer = tensorwrapper::buffer::make_contiguous<FloatType>(shape);
-    c_buffer.set_elem({0, 0}, -0.565516);
-    c_buffer.set_elem({0, 1}, -1.07019);
-    c_buffer.set_elem({1, 0}, -0.565516);
-    c_buffer.set_elem({1, 1}, 1.07019);
+    c_buffer.set_elem({0, 0}, FloatType{-0.565516});
+    c_buffer.set_elem({0, 1}, FloatType{-1.07019});
+    c_buffer.set_elem({1, 0}, FloatType{-0.565516});
+    c_buffer.set_elem({1, 1}, FloatType{1.07019});
     tensor_type t(shape, std::move(c_buffer));
     return mos_type(h2_aos(), std::move(t));
 }
@@ -181,7 +181,7 @@ inline auto he_mos() {
     using tensor_type = typename mos_type::transform_type;
     tensorwrapper::shape::Smooth shape{1, 1};
     auto c_buffer = tensorwrapper::buffer::make_contiguous<FloatType>(shape);
-    c_buffer.set_elem({0, 0}, 1.0000);
+    c_buffer.set_elem({0, 0}, FloatType{1.0000});
     tensor_type t(shape, std::move(c_buffer));
     return mos_type(he_aos(), std::move(t));
 }
@@ -192,8 +192,8 @@ inline auto h2_cmos() {
     using tensor_type = typename cmos_type::transform_type;
     tensorwrapper::shape::Smooth shape{2};
     auto e_buffer = tensorwrapper::buffer::make_contiguous<FloatType>(shape);
-    e_buffer.set_elem({0}, -1.25330893);
-    e_buffer.set_elem({1}, -0.47506974);
+    e_buffer.set_elem({0}, FloatType{-1.25330893});
+    e_buffer.set_elem({1}, FloatType{-0.47506974});
     tensor_type e(shape, std::move(e_buffer));
     return cmos_type(std::move(e), h2_aos(), h2_mos<FloatType>().transform());
 }
@@ -204,7 +204,7 @@ inline auto he_cmos() {
     using tensor_type = typename cmos_type::transform_type;
     tensorwrapper::shape::Smooth shape{1};
     auto e_buffer = tensorwrapper::buffer::make_contiguous<FloatType>(shape);
-    e_buffer.set_elem({0}, -0.876036);
+    e_buffer.set_elem({0}, FloatType{-0.876036});
     tensor_type e(shape, std::move(e_buffer));
     return cmos_type(std::move(e), he_aos(), he_mos<FloatType>().transform());
 }

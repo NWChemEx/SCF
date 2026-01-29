@@ -50,6 +50,34 @@ struct GrabNuclear : chemist::qm_operator::OperatorVisitor {
     const V_nn_type* m_pv = nullptr;
 };
 
+struct ChangeTypeVisitor {
+    double m_val;
+    explicit ChangeTypeVisitor(double val) : m_val(val) {}
+
+    template<typename FloatType>
+    void operator()(std::span<FloatType> out) {
+        if constexpr(std::is_const_v<FloatType>) {
+            throw std::runtime_error(
+              "ChangeTypeVisitor: Cannot write to const buffer");
+        } else {
+            out[0] = std::decay_t<FloatType>(m_val);
+        }
+    }
+};
+
+// corr_type is only non-const so underlying type has correct cv-qualifiers
+auto convert_e_nuclear(simde::type::tensor& corr_type,
+                       const simde::type::tensor& e_nuc) {
+    using tensorwrapper::buffer::make_contiguous;
+    const auto& nuc_buffer = make_contiguous(e_nuc.buffer());
+    auto val = wtf::fp::float_cast<double>(nuc_buffer.get_elem({}));
+    tensorwrapper::shape::Smooth shape{};
+    ChangeTypeVisitor visitor(val);
+    auto temp_buffer = make_contiguous(corr_type.buffer(), shape);
+    tensorwrapper::buffer::visit_contiguous_buffer(visitor, temp_buffer);
+    return simde::type::tensor(shape, std::move(temp_buffer));
+}
+
 const auto desc = R"(
 )";
 
@@ -271,19 +299,8 @@ MODULE_RUN(SCFLoop) {
 
     tensor_t e_total;
 
-    // e_nuclear is a double. This hack converts it to udouble (if needed)
-    try {
-        using tensorwrapper::buffer::make_contiguous;
-        using tensorwrapper::types::udouble;
-        const auto& e_contig = make_contiguous(e_nuclear.buffer());
-        auto val = wtf::fp::float_cast<udouble>(e_contig.get_elem({}));
-        std::vector<udouble> val_vector{val};
-        tensorwrapper::shape::Smooth scalar{};
-        tensorwrapper::buffer::Contiguous nuc_buffer(val_vector, scalar);
-        e_nuclear = tensor_t(scalar, std::move(nuc_buffer));
-    } catch(...) {
-        // Nothing to do here
-    }
+    // This is a hack because WTF doesn't do auto-conversions yet
+    e_nuclear = convert_e_nuclear(e_old, e_nuclear);
 
     e_total("") = e_old("") + e_nuclear("");
 

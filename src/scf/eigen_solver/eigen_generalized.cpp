@@ -106,11 +106,11 @@ MODULE_CTOR(EigenGeneralized) {
 MODULE_RUN(EigenGeneralized) {
     auto&& [A, B] = pt::unwrap_inputs(inputs);
 
-    const auto& A_shape = A.logical_layout().shape().as_smooth();
-    Kernel k(A_shape.extent(0), A_shape.extent(1));
     using tensorwrapper::buffer::make_contiguous;
     const auto& A_buffer = make_contiguous(A.buffer());
     const auto& B_buffer = make_contiguous(B.buffer());
+    const auto& A_shape  = A_buffer.shape();
+    Kernel k(A_shape.extent(0), A_shape.extent(1));
     using tensorwrapper::buffer::visit_contiguous_buffer;
     auto [values, vectors] = visit_contiguous_buffer(k, A_buffer, B_buffer);
 

@@ -52,7 +52,7 @@ TEMPLATE_LIST_TEST_CASE("ElectronicEnergy", "", test_scf::float_types) {
 
         const auto& E_elec = mod.template run_as<pt<wf_type>>(braket);
 
-        pcorr.set_elem({}, -1.90066758625308307);
+        pcorr.set_elem({}, float_type{-1.90066758625308307});
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, E_elec, 1E-6));
     }

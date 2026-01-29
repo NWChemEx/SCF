@@ -273,7 +273,7 @@ struct BatchedDotKernel {
 
     BatchedDotKernel(std::size_t n_aos, std::size_t n_grid,
                      bool sum_row = true) :
-      m_sum_row(true), m_n_grid(n_grid), m_n_aos(n_aos) {}
+      m_sum_row(sum_row), m_n_grid(n_grid), m_n_aos(n_aos) {}
 
     template<typename FloatType0, typename FloatType1>
     tensor_type operator()(const std::span<FloatType0>& w,
@@ -322,12 +322,11 @@ simde::type::tensor weight_a_matrix(const simde::type::tensor& w,
                                     const simde::type::tensor& b) {
     using tensorwrapper::buffer::make_contiguous;
     using tensorwrapper::buffer::visit_contiguous_buffer;
-    auto shape  = b.logical_layout().shape().as_smooth();
-    auto n_aos  = shape.extent(0);
-    auto n_grid = shape.extent(1);
-    WeightMatrixKernel k(n_aos, n_grid);
     const auto& b_buffer = make_contiguous(b.buffer());
     const auto& w_buffer = make_contiguous(w.buffer());
+
+    auto b_shape = b_buffer.shape();
+    WeightMatrixKernel k(b_shape.extent(0), b_shape.extent(1));
     return visit_contiguous_buffer(k, w_buffer, b_buffer);
 }
 
@@ -335,12 +334,10 @@ simde::type::tensor normalize_row(const simde::type::tensor& w,
                                   const simde::type::tensor& b) {
     using tensorwrapper::buffer::make_contiguous;
     using tensorwrapper::buffer::visit_contiguous_buffer;
-    auto shape  = b.logical_layout().shape().as_smooth();
-    auto n_aos  = shape.extent(0);
-    auto n_grid = shape.extent(1);
-    NormalizeKernel k(n_aos, n_grid);
     const auto& b_buffer = make_contiguous(b.buffer());
     const auto& w_buffer = make_contiguous(w.buffer());
+    auto b_shape         = b_buffer.shape();
+    NormalizeKernel k(b_shape.extent(0), b_shape.extent(1));
     return visit_contiguous_buffer(k, w_buffer, b_buffer);
 }
 
@@ -348,12 +345,10 @@ simde::type::tensor batched_dot(const simde::type::tensor& aos_on_grid,
                                 const simde::type::tensor& X, bool sum_row) {
     using tensorwrapper::buffer::make_contiguous;
     using tensorwrapper::buffer::visit_contiguous_buffer;
-    auto shape  = X.logical_layout().shape().as_smooth();
-    auto n_aos  = shape.extent(0);
-    auto n_grid = shape.extent(1);
-    BatchedDotKernel k(n_aos, n_grid, sum_row);
     const auto& aos_on_grid_buffer = make_contiguous(aos_on_grid.buffer());
     const auto& X_buffer           = make_contiguous(X.buffer());
+    auto X_shape                   = X_buffer.shape();
+    BatchedDotKernel k(X_shape.extent(0), X_shape.extent(1), sum_row);
     return visit_contiguous_buffer(std::move(k), aos_on_grid_buffer, X_buffer);
 }
 } // namespace scf::xc::libxc

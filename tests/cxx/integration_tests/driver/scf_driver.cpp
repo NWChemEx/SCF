@@ -31,7 +31,7 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
         auto aos = test_scf::h2_aos().ao_basis_set();
 
         SECTION("SCF") {
-            pcorr.set_elem({}, -1.1167592336);
+            pcorr.set_elem({}, float_type{-1.1167592336});
             simde::type::tensor corr(shape_corr, std::move(pcorr));
             const auto e = mm.template run_as<pt>("SCF Driver", aos, h2);
             REQUIRE(approximately_equal(corr, e, 1E-6));
@@ -48,7 +48,7 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
                 mm.change_submod("Loop", "Fock operator", RKS_op);
                 mm.change_submod("Core guess", "Build Fock Operator", rks_op);
                 const auto e = mm.template run_as<pt>("SCF Driver", aos, h2);
-                pcorr.set_elem({}, -1.15207);
+                pcorr.set_elem({}, float_type{-1.15207});
                 simde::type::tensor corr(shape_corr, std::move(pcorr));
                 REQUIRE(approximately_equal(corr, e, 1E-5));
             }
@@ -66,7 +66,7 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
         simde::type::chemical_system h2_dimer_sys(h2_dimer_mol);
         const auto e =
           mm.template run_as<pt>("SCF Driver", ao_bs, h2_dimer_sys);
-        pcorr.set_elem({}, -2.2260535919670001);
+        pcorr.set_elem({}, float_type{-2.2260535919670001});
         simde::type::tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, e, 1E-6));
     }
