@@ -28,9 +28,8 @@ TEST_CASE("CoulombsLaw") {
     scf::load_modules(mm);
     auto& mod = mm.at("Coulomb's Law");
 
-    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
     tensorwrapper::shape::Smooth shape_corr{};
-    auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
+    auto pcorr = tensorwrapper::buffer::make_contiguous<float_type>(shape_corr);
     using tensorwrapper::operations::approximately_equal;
 
     using charge_type = typename simde::type::charges::value_type;
@@ -43,21 +42,21 @@ TEST_CASE("CoulombsLaw") {
 
     SECTION("empty points") {
         auto e = mod.run_as<pt>(empty, empty);
-        pcorr->set_elem({}, 0.0);
+        pcorr.set_elem({}, 0.0);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, e, 1E-6));
     }
 
     SECTION("charges w/ itself") {
         auto e = mod.run_as<pt>(qs, qs);
-        pcorr->set_elem({}, -1.0103629710818451);
+        pcorr.set_elem({}, -1.0103629710818451);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, e, 1E-6));
     }
 
     SECTION("charges w/ empty") {
         auto e = mod.run_as<pt>(qs, empty);
-        pcorr->set_elem({}, 0.0);
+        pcorr.set_elem({}, 0.0);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, e, 1E-6));
     }
@@ -66,7 +65,7 @@ TEST_CASE("CoulombsLaw") {
         simde::type::charges qs0{q0};
         simde::type::charges qs12{q1, q2};
         auto e = mod.run_as<pt>(qs0, qs12);
-        pcorr->set_elem({}, -0.1443375672974065);
+        pcorr.set_elem({}, -0.1443375672974065);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, e, 1E-6));
     }

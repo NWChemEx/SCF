@@ -29,10 +29,8 @@ TEMPLATE_LIST_TEST_CASE("Fock Matrix Builder", "", test_scf::float_types) {
     auto aos  = test_scf::h2_aos();
 
     using tensorwrapper::operations::approximately_equal;
-    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
     tensorwrapper::shape::Smooth shape_corr{2, 2};
-    tensorwrapper::layout::Physical l(shape_corr);
-    auto pcorr = alloc.allocate(l);
+    auto pcorr = tensorwrapper::buffer::make_contiguous<float_type>(shape_corr);
 
     SECTION("No J or K") {
         auto h2 = test_scf::make_h2<simde::type::nuclei>();
@@ -44,10 +42,10 @@ TEMPLATE_LIST_TEST_CASE("Fock Matrix Builder", "", test_scf::float_types) {
         chemist::braket::BraKet f_mn(aos, f_e, aos);
         const auto& F = mod.template run_as<pt>(f_mn);
 
-        pcorr->set_elem({0, 0}, -1.120958);
-        pcorr->set_elem({0, 1}, -0.959374);
-        pcorr->set_elem({1, 0}, -0.959374);
-        pcorr->set_elem({1, 1}, -1.120958);
+        pcorr.set_elem({0, 0}, -1.120958);
+        pcorr.set_elem({0, 1}, -0.959374);
+        pcorr.set_elem({1, 0}, -0.959374);
+        pcorr.set_elem({1, 1}, -1.120958);
 
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
 
@@ -59,10 +57,10 @@ TEMPLATE_LIST_TEST_CASE("Fock Matrix Builder", "", test_scf::float_types) {
         chemist::braket::BraKet f_mn(aos, f_e, aos);
         const auto& F = mod.template run_as<pt>(f_mn);
 
-        pcorr->set_elem({0, 0}, -0.319459);
-        pcorr->set_elem({0, 1}, -0.571781);
-        pcorr->set_elem({1, 0}, -0.571781);
-        pcorr->set_elem({1, 1}, -0.319459);
+        pcorr.set_elem({0, 0}, -0.319459);
+        pcorr.set_elem({0, 1}, -0.571781);
+        pcorr.set_elem({1, 0}, -0.571781);
+        pcorr.set_elem({1, 1}, -0.319459);
 
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
 

@@ -40,10 +40,9 @@ MODULE_RUN(AOsOnGrid) {
     auto n_aos                   = ao_basis.n_aos();
     using float_type             = double;
 
-    tensorwrapper::allocator::Eigen<float_type> allocator(get_runtime());
     tensorwrapper::shape::Smooth matrix_shape{n_aos, n_points};
-    tensorwrapper::layout::Physical layout(matrix_shape);
-    auto buffer = allocator.allocate(layout);
+    auto buffer =
+      tensorwrapper::buffer::make_contiguous<float_type>(matrix_shape);
 
     std::vector<std::size_t> idx{0, 0};
     for(const auto& atomic_basis : ao_basis) {
@@ -59,7 +58,7 @@ MODULE_RUN(AOsOnGrid) {
                     auto norm = std::sqrt(std::pow(2.0 * exponent / M_PI, 1.5));
                     ao_value += norm * val;
                 }
-                buffer->set_elem(idx, ao_value);
+                buffer.set_elem(idx, ao_value);
             }
             idx[0] += shell_i.size();
             idx[1] = 0;

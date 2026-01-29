@@ -37,9 +37,9 @@ TEMPLATE_LIST_TEST_CASE("DeterminantDriver", "", test_scf::float_types) {
     wf_type psi(index_set{0}, test_scf::h2_cmos<float_type>());
     simde::type::many_electrons es{2};
 
-    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+    using tensorwrapper::buffer::make_contiguous;
     tensorwrapper::shape::Smooth shape_corr{};
-    auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
+    auto pcorr = make_contiguous<float_type>(shape_corr);
     using tensorwrapper::operations::approximately_equal;
 
     SECTION("Calling Kinetic") {
@@ -48,7 +48,7 @@ TEMPLATE_LIST_TEST_CASE("DeterminantDriver", "", test_scf::float_types) {
         erased_type<wf_type> copy_braket(braket);
         const auto& T = mod.template run_as<pt<wf_type>>(copy_braket);
 
-        pcorr->set_elem({}, 0.637692);
+        pcorr.set_elem({}, 0.637692);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, T, 1E-6));
     }
@@ -60,7 +60,7 @@ TEMPLATE_LIST_TEST_CASE("DeterminantDriver", "", test_scf::float_types) {
         erased_type<wf_type> copy_braket(braket);
         const auto& V = mod.template run_as<pt<wf_type>>(copy_braket);
 
-        pcorr->set_elem({}, -1.96830777255516853);
+        pcorr.set_elem({}, -1.96830777255516853);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, V, 1E-6));
     }
@@ -72,7 +72,7 @@ TEMPLATE_LIST_TEST_CASE("DeterminantDriver", "", test_scf::float_types) {
         erased_type<wf_type> copy_braket(braket);
         const auto& J = mod.template run_as<pt<wf_type>>(copy_braket);
 
-        pcorr->set_elem({}, 0.76056339681664897);
+        pcorr.set_elem({}, 0.76056339681664897);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, J, 1E-6));
     }
@@ -84,7 +84,7 @@ TEMPLATE_LIST_TEST_CASE("DeterminantDriver", "", test_scf::float_types) {
         erased_type<wf_type> copy_braket(braket);
         const auto& K = mod.template run_as<pt<wf_type>>(copy_braket);
 
-        pcorr->set_elem({}, 0.76056339681664897);
+        pcorr.set_elem({}, 0.76056339681664897);
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, K, 1E-6));
     }

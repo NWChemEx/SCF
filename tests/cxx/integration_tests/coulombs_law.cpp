@@ -24,9 +24,9 @@ TEMPLATE_LIST_TEST_CASE("CoulombsLaw", "", test_scf::float_types) {
     auto mm          = test_scf::load_modules<float_type>();
     auto& mod        = mm.at("Coulomb's Law");
 
-    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
     tensorwrapper::shape::Smooth shape_corr{};
-    auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
+    using tensorwrapper::buffer::make_contiguous;
+    auto pcorr = make_contiguous<float_type>(shape_corr);
     using tensorwrapper::operations::approximately_equal;
 
     auto h2_nuclei = test_scf::make_h2<simde::type::nuclei>();
@@ -37,7 +37,7 @@ TEMPLATE_LIST_TEST_CASE("CoulombsLaw", "", test_scf::float_types) {
 
     auto e_nuclear = mod.run_as<pt>(qs, qs);
 
-    pcorr->set_elem({}, 0.71510297482837526);
+    pcorr.set_elem({}, 0.71510297482837526);
     tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
     REQUIRE(approximately_equal(corr, e_nuclear, 1E-6));
 }

@@ -26,13 +26,11 @@ auto tw_to_eigen(const tensorwrapper::Tensor& t) {
     auto m = t.logical_layout().shape().as_smooth().extent(1);
     Eigen::Matrix<FloatType, Eigen::Dynamic, Eigen::Dynamic> t_eigen(n, m);
 
-    const auto& rt = t.buffer().allocator().runtime();
-    tensorwrapper::allocator::Eigen<FloatType> alloc(rt);
-
-    auto t_vector = alloc.rebind(t.buffer());
-    auto begin    = t_vector.get_immutable_data();
-    auto end      = begin + (n * m);
-    std::copy(begin, end, t_eigen.data());
+    auto t_vector = tensorwrapper::buffer::make_contiguous(t.buffer());
+    auto t_data   = t_vector.get_immutable_data();
+    auto begin = wtf::buffer::contiguous_buffer_cast<const FloatType>(t_data);
+    auto end   = begin.data() + (n * m);
+    std::copy(begin.data(), end, t_eigen.data());
     return t_eigen;
 }
 
@@ -40,16 +38,14 @@ template<typename FloatType>
 auto eigen_to_tw(
   const Eigen::Matrix<FloatType, Eigen::Dynamic, Eigen::Dynamic>& t_eigen,
   const parallelzone::runtime::RuntimeView& rt) {
-    tensorwrapper::allocator::Eigen<FloatType> alloc(rt);
     auto n = static_cast<std::size_t>(t_eigen.rows());
     auto m = static_cast<std::size_t>(t_eigen.cols());
 
     tensorwrapper::shape::Smooth shape{n, m};
-    tensorwrapper::layout::Physical layout(shape);
-    auto pbuffer = alloc.allocate(layout);
+    auto pbuffer = tensorwrapper::buffer::make_contiguous<FloatType>(shape);
     for(std::size_t i = 0; i < n; ++i) {
         for(std::size_t j = 0; j < m; ++j)
-            pbuffer->set_elem({i, j}, t_eigen(i, j));
+            pbuffer.set_elem({i, j}, t_eigen(i, j));
     }
     return tensorwrapper::Tensor(std::move(shape), std::move(pbuffer));
 }
