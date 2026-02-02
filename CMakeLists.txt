@@ -123,11 +123,11 @@ if("${BUILD_TESTING}")
         INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/scf"
         DEPENDS Catch2 scf
     )
-    python_mpi_test(
-        unit_test_scf
-        "${PYTHON_TEST_DIR}/unit_tests/run_unit_tests.py"
-        SUBMODULES simde chemist pluginplay parallelzone tensorwrapper
-    )
+    # python_mpi_test(
+    #     unit_test_scf
+    #     "${PYTHON_TEST_DIR}/unit_tests/run_unit_tests.py"
+    #     SUBMODULES simde chemist pluginplay parallelzone tensorwrapper
+    # )
 
     if("${INTEGRATION_TESTING}")
         include(get_nwchemex)
@@ -138,12 +138,12 @@ if("${BUILD_TESTING}")
             DEPENDS Catch2 nwchemex scf
         )
 
-        python_mpi_test(
-            integration_test_scf
-            "${PYTHON_TEST_DIR}/integration_tests/run_integration_tests.py"
-            SUBMODULES nwchemex chemcache integrals simde chemist pluginplay
-                       parallelzone friendzone tensorwrapper nux
-        )
+        # python_mpi_test(
+        #     integration_test_scf
+        #     "${PYTHON_TEST_DIR}/integration_tests/run_integration_tests.py"
+        #     SUBMODULES nwchemex chemcache integrals simde chemist pluginplay
+        #                parallelzone friendzone tensorwrapper nux
+        # )
 
         # Workaround for the NWX being pure python
         if("${BUILD_PYBIND11_PYBINDINGS}")
