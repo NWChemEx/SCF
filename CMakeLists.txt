@@ -146,19 +146,19 @@ if("${BUILD_TESTING}")
         # )
 
         # Workaround for the NWX being pure python
-        if("${BUILD_PYBIND11_PYBINDINGS}")
-            get_test_property(
-                py_integration_test_scf
-                ENVIRONMENT py_path
-            )
-            set(
-                py_path "${py_path}:${nwchemex_SOURCE_DIR}/src/python"
-            )
-            set_tests_properties(
-                py_integration_test_scf
-                PROPERTIES ENVIRONMENT "${py_path}"
-            )
-        endif()
+        # if("${BUILD_PYBIND11_PYBINDINGS}")
+        #     get_test_property(
+        #         py_integration_test_scf
+        #         ENVIRONMENT py_path
+        #     )
+        #     set(
+        #         py_path "${py_path}:${nwchemex_SOURCE_DIR}/src/python"
+        #     )
+        #     set_tests_properties(
+        #         py_integration_test_scf
+        #         PROPERTIES ENVIRONMENT "${py_path}"
+        #     )
+        # endif()
     endif()
 endif()
 
