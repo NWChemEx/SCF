@@ -49,11 +49,10 @@ TEST_CASE("XCPotential") {
         chemist::braket::BraKet xc_ij(aos, xc_op, aos);
         auto vxc = mod.run_as<pt>(xc_ij);
 
-        tensorwrapper::allocator::Eigen<double> alloc(mm.get_runtime());
+        using tensorwrapper::buffer::make_contiguous;
         tensorwrapper::shape::Smooth shape_corr{1, 1};
-        auto pcorr =
-          alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
-        pcorr->set_elem({0, 0}, -0.526535);
+        auto pcorr = make_contiguous<double>(shape_corr);
+        pcorr.set_elem({0, 0}, -0.526535);
         simde::type::tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(vxc, corr, 1E-5));
     }

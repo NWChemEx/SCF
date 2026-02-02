@@ -22,19 +22,22 @@ namespace {
 
 // Comparison between convergence metrics based on floating point type
 struct Kernel {
-    using rv_t = parallelzone::runtime::RuntimeView;
+    double m_tol;
 
-    explicit Kernel(rv_t rv) : m_rv(rv) {}
+    explicit Kernel(double tol) : m_tol(tol) {}
 
     template<typename FloatType>
-    auto run(const tensorwrapper::buffer::BufferBase& a, double tol) {
-        tensorwrapper::allocator::Eigen<FloatType> allocator(m_rv);
-        const auto& eigen_a = allocator.rebind(a);
-        return tensorwrapper::types::fabs(eigen_a.get_data(0)) < FloatType(tol);
+    auto operator()(const std::span<FloatType>& a) {
+        using tensorwrapper::types::fabs;
+        return fabs(a[0]) < std::decay_t<FloatType>(m_tol);
     }
-
-    rv_t m_rv;
 };
+
+auto check_tolerance(const tensorwrapper::buffer::BufferBase& v, double tol) {
+    Kernel kernel(tol);
+    const auto& buffer = tensorwrapper::buffer::make_contiguous(v);
+    return tensorwrapper::buffer::visit_contiguous_buffer(kernel, buffer);
+}
 
 // Pull out nuclear-nuclear interaction term, if there is one.
 struct GrabNuclear : chemist::qm_operator::OperatorVisitor {
@@ -46,6 +49,34 @@ struct GrabNuclear : chemist::qm_operator::OperatorVisitor {
 
     const V_nn_type* m_pv = nullptr;
 };
+
+struct ChangeTypeVisitor {
+    double m_val;
+    explicit ChangeTypeVisitor(double val) : m_val(val) {}
+
+    template<typename FloatType>
+    void operator()(std::span<FloatType> out) {
+        if constexpr(std::is_const_v<FloatType>) {
+            throw std::runtime_error(
+              "ChangeTypeVisitor: Cannot write to const buffer");
+        } else {
+            out[0] = std::decay_t<FloatType>(m_val);
+        }
+    }
+};
+
+// corr_type is only non-const so underlying type has correct cv-qualifiers
+auto convert_e_nuclear(simde::type::tensor& corr_type,
+                       const simde::type::tensor& e_nuc) {
+    using tensorwrapper::buffer::make_contiguous;
+    const auto& nuc_buffer = make_contiguous(e_nuc.buffer());
+    auto val = wtf::fp::float_cast<double>(nuc_buffer.get_elem({}));
+    tensorwrapper::shape::Smooth shape{};
+    ChangeTypeVisitor visitor(val);
+    auto temp_buffer = make_contiguous(corr_type.buffer(), shape);
+    tensorwrapper::buffer::visit_contiguous_buffer(visitor, temp_buffer);
+    return simde::type::tensor(shape, std::move(temp_buffer));
+}
 
 const auto desc = R"(
 )";
@@ -75,8 +106,6 @@ using pt = simde::Optimize<egy_pt<WfType>, WfType>;
 
 template<typename WfType>
 using update_pt = simde::UpdateGuess<WfType>;
-
-using tensorwrapper::utilities::floating_point_dispatch;
 
 MODULE_CTOR(SCFLoop) {
     using wf_type = simde::type::rscf_wf;
@@ -243,10 +272,9 @@ MODULE_RUN(SCFLoop) {
             logger.log("  dG = " + grad_norm.to_string());
 
             // Check for convergence
-            Kernel k(get_runtime());
-            auto e_conv = floating_point_dispatch(k, de.buffer(), e_tol);
-            auto g_conv = floating_point_dispatch(k, grad_norm.buffer(), g_tol);
-            auto dp_conv = floating_point_dispatch(k, dp_norm.buffer(), dp_tol);
+            auto e_conv  = check_tolerance(de.buffer(), e_tol);
+            auto g_conv  = check_tolerance(grad_norm.buffer(), g_tol);
+            auto dp_conv = check_tolerance(dp_norm.buffer(), dp_tol);
             if(e_conv && g_conv && dp_conv) converged = true;
 
             // If using DIIS and not converged, extrapolate new Fock matrix
@@ -271,17 +299,9 @@ MODULE_RUN(SCFLoop) {
 
     tensor_t e_total;
 
-    // e_nuclear is a double. This hack converts it to udouble (if needed)
-    tensorwrapper::allocator::Eigen<double> dalloc(get_runtime());
-    using tensorwrapper::types::udouble;
-    tensorwrapper::allocator::Eigen<udouble> ualloc(get_runtime());
+    // This is a hack because WTF doesn't do auto-conversions yet
+    e_nuclear = convert_e_nuclear(e_old, e_nuclear);
 
-    if(ualloc.can_rebind(e_old.buffer())) {
-        tensor_t temp(e_old);
-        auto val = dalloc.rebind(e_nuclear.buffer()).get_data(0);
-        ualloc.rebind(temp.buffer()).set_data(0, val);
-        e_nuclear = temp;
-    }
     e_total("") = e_old("") + e_nuclear("");
 
     auto rv = results();

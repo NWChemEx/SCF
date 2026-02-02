@@ -58,11 +58,8 @@ MODULE_RUN(Gau2Grid) {
     using float_type    = double;
     auto flattened_grid = flatten_grid<float_type>(grid);
 
-    tensorwrapper::allocator::Eigen<float_type> allocator(get_runtime());
     tensorwrapper::shape::Smooth matrix_shape{ao_basis.n_aos(), n_points};
-    tensorwrapper::layout::Physical layout(matrix_shape);
-    auto matrix_buffer = allocator.allocate(layout);
-    auto matrix_data   = matrix_buffer->get_mutable_data();
+    std::vector<float_type> matrix_data(matrix_shape.size());
 
     std::size_t ao_i = 0;
     for(const auto& atomic_basis : ao_basis) {
@@ -89,7 +86,7 @@ MODULE_RUN(Gau2Grid) {
             auto order   = is_pure ? GG_SPHERICAL_CCA : GG_CARTESIAN_CCA;
 
             auto offset       = ao_i * n_points;
-            auto shell_i_data = matrix_data + offset;
+            auto shell_i_data = matrix_data.data() + offset;
             gg_collocation(static_cast<int>(L), static_cast<int>(n_points),
                            flattened_grid.data(), 3,
                            static_cast<int>(n_primitives), coefficients.data(),
@@ -99,7 +96,8 @@ MODULE_RUN(Gau2Grid) {
             ao_i += n_aos;
         }
     }
-
+    tensorwrapper::buffer::Contiguous matrix_buffer(std::move(matrix_data),
+                                                    matrix_shape);
     simde::type::tensor collocation_matrix(matrix_shape,
                                            std::move(matrix_buffer));
 

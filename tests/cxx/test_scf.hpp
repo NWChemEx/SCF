@@ -163,60 +163,48 @@ inline auto he_aos() {
 
 template<typename FloatType>
 inline auto h2_mos() {
-    using mos_type       = simde::type::mos;
-    using tensor_type    = typename mos_type::transform_type;
-    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
-    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    using mos_type    = simde::type::mos;
+    using tensor_type = typename mos_type::transform_type;
     tensorwrapper::shape::Smooth shape{2, 2};
-    tensorwrapper::layout::Physical l(shape);
-    auto c_buffer = alloc.allocate(l);
-    c_buffer->set_elem({0, 0}, -0.565516);
-    c_buffer->set_elem({0, 1}, -1.07019);
-    c_buffer->set_elem({1, 0}, -0.565516);
-    c_buffer->set_elem({1, 1}, 1.07019);
+    auto c_buffer = tensorwrapper::buffer::make_contiguous<FloatType>(shape);
+    c_buffer.set_elem({0, 0}, FloatType{-0.565516});
+    c_buffer.set_elem({0, 1}, FloatType{-1.07019});
+    c_buffer.set_elem({1, 0}, FloatType{-0.565516});
+    c_buffer.set_elem({1, 1}, FloatType{1.07019});
     tensor_type t(shape, std::move(c_buffer));
     return mos_type(h2_aos(), std::move(t));
 }
 
 template<typename FloatType>
 inline auto he_mos() {
-    using mos_type       = simde::type::mos;
-    using tensor_type    = typename mos_type::transform_type;
-    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
-    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    using mos_type    = simde::type::mos;
+    using tensor_type = typename mos_type::transform_type;
     tensorwrapper::shape::Smooth shape{1, 1};
-    tensorwrapper::layout::Physical l(shape);
-    auto c_buffer = alloc.allocate(l);
-    c_buffer->set_elem({0, 0}, 1.0000);
+    auto c_buffer = tensorwrapper::buffer::make_contiguous<FloatType>(shape);
+    c_buffer.set_elem({0, 0}, FloatType{1.0000});
     tensor_type t(shape, std::move(c_buffer));
     return mos_type(he_aos(), std::move(t));
 }
 
 template<typename FloatType>
 inline auto h2_cmos() {
-    using cmos_type      = simde::type::cmos;
-    using tensor_type    = typename cmos_type::transform_type;
-    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
-    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    using cmos_type   = simde::type::cmos;
+    using tensor_type = typename cmos_type::transform_type;
     tensorwrapper::shape::Smooth shape{2};
-    tensorwrapper::layout::Physical l(shape);
-    auto e_buffer = alloc.allocate(l);
-    e_buffer->set_elem({0}, -1.25330893);
-    e_buffer->set_elem({1}, -0.47506974);
+    auto e_buffer = tensorwrapper::buffer::make_contiguous<FloatType>(shape);
+    e_buffer.set_elem({0}, FloatType{-1.25330893});
+    e_buffer.set_elem({1}, FloatType{-0.47506974});
     tensor_type e(shape, std::move(e_buffer));
     return cmos_type(std::move(e), h2_aos(), h2_mos<FloatType>().transform());
 }
 
 template<typename FloatType>
 inline auto he_cmos() {
-    using cmos_type      = simde::type::cmos;
-    using tensor_type    = typename cmos_type::transform_type;
-    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
-    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    using cmos_type   = simde::type::cmos;
+    using tensor_type = typename cmos_type::transform_type;
     tensorwrapper::shape::Smooth shape{1};
-    tensorwrapper::layout::Physical l(shape);
-    auto e_buffer = alloc.allocate(l);
-    e_buffer->set_elem({0}, -0.876036);
+    auto e_buffer = tensorwrapper::buffer::make_contiguous<FloatType>(shape);
+    e_buffer.set_elem({0}, FloatType{-0.876036});
     tensor_type e(shape, std::move(e_buffer));
     return cmos_type(std::move(e), he_aos(), he_mos<FloatType>().transform());
 }
@@ -238,26 +226,22 @@ inline auto he_wave_function() {
 
 template<typename FloatType>
 inline auto h2_density() {
-    using density_type   = simde::type::decomposable_e_density;
-    using tensor_type    = typename density_type::value_type;
-    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
-    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    using density_type = simde::type::decomposable_e_density;
+    using tensor_type  = typename density_type::value_type;
     tensorwrapper::shape::Smooth shape{2, 2};
-    tensorwrapper::layout::Physical l(shape);
-    auto pbuffer = alloc.construct(l, 0.31980835);
+    FloatType init{0.31980835};
+    auto pbuffer = tensorwrapper::buffer::make_contiguous(shape, init);
     tensor_type t(shape, std::move(pbuffer));
     return density_type(std::move(t), h2_mos<FloatType>());
 }
 
 template<typename FloatType>
 inline auto he_density() {
-    using density_type   = simde::type::decomposable_e_density;
-    using tensor_type    = typename density_type::value_type;
-    using allocator_type = tensorwrapper::allocator::Eigen<FloatType>;
-    allocator_type alloc(parallelzone::runtime::RuntimeView{});
+    using density_type = simde::type::decomposable_e_density;
+    using tensor_type  = typename density_type::value_type;
     tensorwrapper::shape::Smooth shape{1, 1};
-    tensorwrapper::layout::Physical l(shape);
-    auto pbuffer = alloc.construct(l, 1.000);
+    FloatType init{1.000};
+    auto pbuffer = tensorwrapper::buffer::make_contiguous(shape, init);
     tensor_type t(shape, std::move(pbuffer));
     return density_type(std::move(t), he_mos<FloatType>());
 }

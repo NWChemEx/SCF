@@ -22,25 +22,38 @@ namespace scf::eigen_solver {
 
 namespace {
 struct Kernel {
+    std::size_t m_n_rows;
+    std::size_t m_n_cols;
+
+    using tensor_t = simde::type::tensor;
+    using return_t = std::pair<tensor_t, tensor_t>;
+
+    Kernel(std::size_t n_rows, std::size_t n_cols) :
+      m_n_rows(n_rows), m_n_cols(n_cols) {}
+
+    template<typename FloatType0, typename FloatType1>
+    return_t operator()(const std::span<FloatType0>& A,
+                        const std::span<FloatType1>& B) {
+        throw std::runtime_error(
+          "EigenGeneralized Kernel: Mixed float types not supported");
+    }
+
     template<typename FloatType>
-    auto run(const tensorwrapper::buffer::BufferBase& A,
-             const tensorwrapper::buffer::BufferBase& B,
-             parallelzone::runtime::RuntimeView& rv) {
+    return_t operator()(const std::span<FloatType>& A,
+                        const std::span<FloatType>& B) {
+        using clean_t = std::decay_t<FloatType>;
         // Convert to Eigen buffers
-        tensorwrapper::allocator::Eigen<FloatType> allocator(rv);
-        const auto& eigen_A = allocator.rebind(A);
-        const auto& eigen_B = allocator.rebind(B);
 
         // Wrap the tensors in Eigen::Map objects to avoid copy
-        const auto* pA      = eigen_A.get_immutable_data();
-        const auto* pB      = eigen_B.get_immutable_data();
-        const auto& shape_A = eigen_A.layout().shape().as_smooth();
-        auto rows           = shape_A.extent(0);
-        auto cols           = shape_A.extent(1);
+        const auto* pA = A.data();
+        const auto* pB = B.data();
+        auto rows      = m_n_rows;
+        auto cols      = m_n_cols;
 
         constexpr auto rmajor = Eigen::RowMajor;
         constexpr auto edynam = Eigen::Dynamic;
-        using matrix_type = Eigen::Matrix<FloatType, edynam, edynam, rmajor>;
+        using clean_type      = std::decay_t<FloatType>;
+        using matrix_type = Eigen::Matrix<clean_type, edynam, edynam, rmajor>;
         using map_type    = Eigen::Map<const matrix_type>;
 
         map_type A_map(pA, rows, cols);
@@ -57,13 +70,15 @@ struct Kernel {
         tensorwrapper::layout::Physical vector_layout(vector_shape);
         tensorwrapper::layout::Physical matrix_layout(matrix_shape);
 
-        auto pvalues_buffer  = allocator.allocate(vector_layout);
-        auto pvectors_buffer = allocator.allocate(matrix_layout);
+        using tensorwrapper::buffer::make_contiguous;
+
+        auto pvalues_buffer  = make_contiguous<clean_t>(vector_shape);
+        auto pvectors_buffer = make_contiguous<clean_t>(matrix_shape);
 
         for(decltype(rows) i = 0; i < rows; ++i) {
-            pvalues_buffer->set_elem({i}, eigen_values(i));
+            pvalues_buffer.set_elem({i}, eigen_values(i));
             for(decltype(cols) j = 0; j < cols; ++j) {
-                pvectors_buffer->set_elem({i, j}, eigen_vectors(i, j));
+                pvectors_buffer.set_elem({i, j}, eigen_vectors(i, j));
             }
         }
 
@@ -91,13 +106,13 @@ MODULE_CTOR(EigenGeneralized) {
 MODULE_RUN(EigenGeneralized) {
     auto&& [A, B] = pt::unwrap_inputs(inputs);
 
-    using tensorwrapper::utilities::floating_point_dispatch;
-
-    auto r = get_runtime();
-    Kernel k;
-    const auto& A_buffer   = A.buffer();
-    const auto& B_buffer   = B.buffer();
-    auto [values, vectors] = floating_point_dispatch(k, A_buffer, B_buffer, r);
+    using tensorwrapper::buffer::make_contiguous;
+    const auto& A_buffer = make_contiguous(A.buffer());
+    const auto& B_buffer = make_contiguous(B.buffer());
+    const auto& A_shape  = A_buffer.shape();
+    Kernel k(A_shape.extent(0), A_shape.extent(1));
+    using tensorwrapper::buffer::visit_contiguous_buffer;
+    auto [values, vectors] = visit_contiguous_buffer(k, A_buffer, B_buffer);
 
     auto rv = results();
     return pt::wrap_results(rv, values, vectors);

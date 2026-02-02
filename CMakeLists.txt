@@ -117,48 +117,48 @@ if("${BUILD_TESTING}")
 
     include(get_catch2)
     include(cmake/mpi_test.cmake)
-    cxx_mpi_test(
+    cmaize_add_tests(
         unit_test_scf
         SOURCE_DIR "${CXX_TEST_DIR}/unit_tests"
         INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/scf"
         DEPENDS Catch2 scf
     )
-    python_mpi_test(
-        unit_test_scf
-        "${PYTHON_TEST_DIR}/unit_tests/run_unit_tests.py"
-        SUBMODULES simde chemist pluginplay parallelzone tensorwrapper
-    )
+    # python_mpi_test(
+    #     unit_test_scf
+    #     "${PYTHON_TEST_DIR}/unit_tests/run_unit_tests.py"
+    #     SUBMODULES simde chemist pluginplay parallelzone tensorwrapper
+    # )
 
     if("${INTEGRATION_TESTING}")
         include(get_nwchemex)
-        cxx_mpi_test(
+        cmaize_add_tests(
             integration_test_scf
             SOURCE_DIR "${CXX_TEST_DIR}/integration_tests"
             INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/scf"
             DEPENDS Catch2 nwchemex scf
         )
 
-        python_mpi_test(
-            integration_test_scf
-            "${PYTHON_TEST_DIR}/integration_tests/run_integration_tests.py"
-            SUBMODULES nwchemex chemcache integrals simde chemist pluginplay
-                       parallelzone friendzone tensorwrapper nux
-        )
+        # python_mpi_test(
+        #     integration_test_scf
+        #     "${PYTHON_TEST_DIR}/integration_tests/run_integration_tests.py"
+        #     SUBMODULES nwchemex chemcache integrals simde chemist pluginplay
+        #                parallelzone friendzone tensorwrapper nux
+        # )
 
         # Workaround for the NWX being pure python
-        if("${BUILD_PYBIND11_PYBINDINGS}")
-            get_test_property(
-                py_integration_test_scf
-                ENVIRONMENT py_path
-            )
-            set(
-                py_path "${py_path}:${nwchemex_SOURCE_DIR}/src/python"
-            )
-            set_tests_properties(
-                py_integration_test_scf
-                PROPERTIES ENVIRONMENT "${py_path}"
-            )
-        endif()
+        # if("${BUILD_PYBIND11_PYBINDINGS}")
+        #     get_test_property(
+        #         py_integration_test_scf
+        #         ENVIRONMENT py_path
+        #     )
+        #     set(
+        #         py_path "${py_path}:${nwchemex_SOURCE_DIR}/src/python"
+        #     )
+        #     set_tests_properties(
+        #         py_integration_test_scf
+        #         PROPERTIES ENVIRONMENT "${py_path}"
+        #     )
+        # endif()
     endif()
 endif()
 

@@ -32,9 +32,9 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
     auto mm   = test_scf::load_modules<float_type>();
     auto& mod = mm.at("Loop");
 
-    tensorwrapper::allocator::Eigen<float_type> alloc(mm.get_runtime());
+    using tensorwrapper::buffer::make_contiguous;
     tensorwrapper::shape::Smooth shape_corr{};
-    auto pcorr = alloc.allocate(tensorwrapper::layout::Physical(shape_corr));
+    auto pcorr = make_contiguous<float_type>(shape_corr);
     using tensorwrapper::operations::approximately_equal;
 
     SECTION("H2") {
@@ -47,14 +47,14 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
             mod.change_input("DIIS", true);
 
             const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
-            pcorr->set_elem({}, -1.1167592336);
+            pcorr.set_elem({}, float_type{-1.1167592336});
             tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
             REQUIRE(approximately_equal(corr, e, 1E-6));
         }
 
         SECTION("With DIIS") {
             const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
-            pcorr->set_elem({}, -1.1167592336);
+            pcorr.set_elem({}, float_type{-1.1167592336});
             tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
             REQUIRE(approximately_equal(corr, e, 1E-6));
         }
@@ -70,7 +70,7 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
             mod.change_input("DIIS", true);
             const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
 
-            pcorr->set_elem({}, -2.807783957539);
+            pcorr.set_elem({}, float_type{-2.807783957539});
             tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
             REQUIRE(approximately_equal(corr, e, 1E-6));
         }
@@ -78,7 +78,7 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
         SECTION("With DIIS") {
             const auto& [e, psi] = mod.template run_as<pt<wf_type>>(H_00, psi0);
 
-            pcorr->set_elem({}, -2.807783957539);
+            pcorr.set_elem({}, float_type{-2.807783957539});
             tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
             REQUIRE(approximately_equal(corr, e, 1E-6));
         }
