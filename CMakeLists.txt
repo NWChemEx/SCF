@@ -117,7 +117,7 @@ if("${BUILD_TESTING}")
 
     include(get_catch2)
     include(cmake/mpi_test.cmake)
-    cxx_mpi_test(
+    cmaize_add_tests(
         unit_test_scf
         SOURCE_DIR "${CXX_TEST_DIR}/unit_tests"
         INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/scf"
@@ -131,7 +131,7 @@ if("${BUILD_TESTING}")
 
     if("${INTEGRATION_TESTING}")
         include(get_nwchemex)
-        cxx_mpi_test(
+        cmaize_add_tests(
             integration_test_scf
             SOURCE_DIR "${CXX_TEST_DIR}/integration_tests"
             INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/scf"
