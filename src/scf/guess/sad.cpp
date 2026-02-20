@@ -39,15 +39,17 @@ using simde::type::tensor;
 struct NElectronCounter : public chemist::qm_operator::OperatorVisitor {
     NElectronCounter() : chemist::qm_operator::OperatorVisitor(false) {}
 
-    void run(const simde::type::T_e_type& T_e) { set_n(T_e.particle().size()); }
+    void run(const simde::type::T_e_type& T_e) {
+        set_n(T_e.get_particle().size());
+    }
 
     void run(const simde::type::V_en_type& V_en) {
-        set_n(V_en.lhs_particle().size());
+        set_n(V_en.get_lhs_particle().size());
     }
 
     void run(const simde::type::V_ee_type& V_ee) {
-        set_n(V_ee.lhs_particle().size());
-        set_n(V_ee.rhs_particle().size());
+        set_n(V_ee.get_lhs_particle().size());
+        set_n(V_ee.get_rhs_particle().size());
     }
 
     void set_n(unsigned int n) {

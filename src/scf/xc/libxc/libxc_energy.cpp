@@ -51,8 +51,8 @@ MODULE_RUN(LibXCEnergy) {
     if(bra_wf != ket_wf)
         throw std::runtime_error("Expected the same basis set");
 
-    const auto func_name = xc_op.functional_name();
-    const auto& P        = xc_op.rhs_particle();
+    const auto func_name = xc_op.get_functional_name();
+    const auto& P        = xc_op.get_rhs_particle();
     const auto& aos      = P.basis_set().ao_basis_set();
 
     // Molecule from AOs

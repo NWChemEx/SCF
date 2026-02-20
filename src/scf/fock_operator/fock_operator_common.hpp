@@ -35,7 +35,7 @@ public:
     }
 
     void run(const V_en_term& V_en) {
-        auto rhs     = V_en.rhs_particle().as_nuclei();
+        auto rhs     = V_en.get_rhs_particle().as_nuclei();
         using v_type = Coulomb<ElectronType, simde::type::nuclei>;
         auto v       = std::make_unique<v_type>(get_e_(V_en), rhs);
         m_pF_->emplace_back(1.0, std::move(v));
@@ -47,7 +47,7 @@ protected:
         if constexpr(std::is_same_v<ElectronType, simde::type::electron>) {
             return simde::type::electron{};
         } else {
-            return op.template at<0>();
+            return op.template get<0>();
         }
     }
 
