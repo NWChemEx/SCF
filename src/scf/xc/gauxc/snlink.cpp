@@ -37,7 +37,7 @@ MODULE_CTOR(snLinK) {
 MODULE_RUN(snLinK) {
     const auto&& [braket] = k_type::unwrap_inputs(inputs);
     const auto& bra       = braket.bra();
-    const auto& P         = braket.op().rhs_particle();
+    const auto& P         = braket.op().get_rhs_particle();
     const auto& ket       = braket.ket();
 
     if(bra != ket || P.basis_set() != bra)

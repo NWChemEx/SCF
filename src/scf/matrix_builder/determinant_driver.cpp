@@ -58,19 +58,19 @@ public:
 
     void run(const V_en_type& V_en) {
         simde::type::electron e;
-        simde::type::v_en_type v_en(e, V_en.rhs_particle().as_nuclei());
+        simde::type::v_en_type v_en(e, V_en.get_rhs_particle().as_nuclei());
         run_(v_en);
     }
 
     void run(const J_e_type& J_e) {
         simde::type::electron e;
-        simde::type::j_e_type j_e(e, J_e.rhs_particle());
+        simde::type::j_e_type j_e(e, J_e.get_rhs_particle());
         run_(j_e);
     }
 
     void run(const K_e_type& K_e) {
         simde::type::electron e;
-        simde::type::k_e_type k_e(e, K_e.rhs_particle());
+        simde::type::k_e_type k_e(e, K_e.get_rhs_particle());
         run_(k_e);
     }
 

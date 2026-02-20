@@ -173,9 +173,9 @@ MODULE_RUN(SCFLoop) {
     tensor_t e_nuclear(0.0);
     if(has_nn) {
         const auto& V_nn       = *visitor.m_pv;
-        const auto n_lhs       = V_nn.lhs_particle().as_nuclei();
+        const auto n_lhs       = V_nn.get_lhs_particle().as_nuclei();
         const auto qs_lhs_view = n_lhs.charges();
-        const auto n_rhs       = V_nn.rhs_particle().as_nuclei();
+        const auto n_rhs       = V_nn.get_rhs_particle().as_nuclei();
         const auto qs_rhs_view = n_rhs.charges();
         simde::type::charges qs_lhs;
         simde::type::charges qs_rhs;
