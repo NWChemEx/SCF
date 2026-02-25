@@ -31,6 +31,7 @@ pluginplay::ModuleManager load_modules() {
     pluginplay::ModuleManager mm(rv);
     scf::load_modules(mm);
     integrals::load_modules(mm);
+    integrals::set_defaults(mm);
     nux::load_modules(mm);
     chemcache::load_modules(mm);
 
