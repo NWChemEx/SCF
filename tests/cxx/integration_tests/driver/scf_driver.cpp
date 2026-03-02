@@ -94,15 +94,16 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
                   0.725554 * a2b);
         atom_t H1("H", 1ul, H_mass, -0.607485 * a2b, 0.010955 * a2b,
                   0.056172 * a2b);
-        atom_t O0("O", 8ul, O_mass, -1.538963, 0.004548, -0.117331);
+        atom_t O0("O", 8ul, O_mass, -1.538963 * a2b, 0.004548 * a2b,
+                  -0.117331 * a2b);
         molecule_t water{H0, H1, O0};
         auto aos =
           mm.template run_as<simde::MolecularBasisSet>("STO-3G", water);
 
         simde::type::chemical_system water_cs(water);
         auto e = mm.template run_as<pt>("SCF Driver", aos, water_cs);
-        // pcorr.set_elem({}, float_type{-74.9603445303});
-        // REQUIRE(approximately_equal(corr, e, 1E-6));
-        std::cout << e << std::endl;
+        pcorr.set_elem({}, float_type{-74.9602586404361944});
+        simde::type::tensor corr(shape_corr, std::move(pcorr));
+        REQUIRE(approximately_equal(corr, e, 1E-6));
     }
 }
