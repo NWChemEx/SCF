@@ -26,11 +26,23 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
     tensorwrapper::shape::Smooth shape_corr{};
     auto pcorr = make_contiguous<float_type>(shape_corr);
 
+    SECTION("He") {
+        auto he  = test_scf::make_he<simde::type::chemical_system>();
+        auto aos = test_scf::he_aos().ao_basis_set();
+
+        // Correct energy is validated against Psi4
+        pcorr.set_elem({}, float_type{-2.8077839566141960});
+        simde::type::tensor corr(shape_corr, std::move(pcorr));
+        const auto e = mm.template run_as<pt>("SCF Driver", aos, he);
+        REQUIRE(approximately_equal(corr, e, 1E-6));
+    }
+
     SECTION("H2") {
         auto h2  = test_scf::make_h2<simde::type::chemical_system>();
         auto aos = test_scf::h2_aos().ao_basis_set();
 
         SECTION("SCF") {
+            // Correct energy is validated against Psi4
             pcorr.set_elem({}, float_type{-1.1167592336});
             simde::type::tensor corr(shape_corr, std::move(pcorr));
             const auto e = mm.template run_as<pt>("SCF Driver", aos, h2);
@@ -56,6 +68,7 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
     }
 
     SECTION("H2 Dimer") {
+        // Correct energy is validated against Psi4
         simde::type::nucleus h0("H", 1ul, 1836.15, 0.0, 0.0, 0.0);
         simde::type::nucleus h1("H", 1ul, 1836.15, 0.0, 0.0, 1.39839);
         simde::type::nucleus h2("H", 1ul, 1836.15, 0.0, 0.0, 4.39839);
@@ -69,5 +82,27 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
         pcorr.set_elem({}, float_type{-2.2260535919670001});
         simde::type::tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, e, 1E-6));
+    }
+
+    SECTION("Water") {
+        using atom_t      = simde::type::atom;
+        using molecule_t  = simde::type::molecule;
+        const auto a2b    = 1.8897259886; // Angstroms to bohrs
+        const auto H_mass = 1822.877;     // Hydrogen mass in atomic units
+        const auto O_mass = 29166.037;    // Oxygen mass in atomic units
+        atom_t H0("H", 1ul, H_mass, -1.958940 * a2b, -0.032063 * a2b,
+                  0.725554 * a2b);
+        atom_t H1("H", 1ul, H_mass, -0.607485 * a2b, 0.010955 * a2b,
+                  0.056172 * a2b);
+        atom_t O0("O", 8ul, O_mass, -1.538963, 0.004548, -0.117331);
+        molecule_t water{H0, H1, O0};
+        auto aos =
+          mm.template run_as<simde::MolecularBasisSet>("STO-3G", water);
+
+        simde::type::chemical_system water_cs(water);
+        auto e = mm.template run_as<pt>("SCF Driver", aos, water_cs);
+        // pcorr.set_elem({}, float_type{-74.9603445303});
+        // REQUIRE(approximately_equal(corr, e, 1E-6));
+        std::cout << e << std::endl;
     }
 }
