@@ -50,10 +50,15 @@ pluginplay::ModuleManager load_modules() {
     mm.change_submod("SAD guess", "SAD Density", "sto-3g SAD density");
 
     if constexpr(!std::is_same_v<FloatType, double>) {
+        mm.change_submod("Four center J builder", "Four-center ERI",
+                         "UQ Driver");
+        mm.change_submod("Four center K builder", "Four-center ERI",
+                         "UQ Driver");
         mm.change_input("Evaluate 2-Index BraKet", "With UQ?", true);
         mm.change_input("Evaluate 4-Index BraKet", "With UQ?", true);
         mm.change_input("Overlap", "With UQ?", true);
-        mm.change_input("ERI4", "With UQ?", true);
+        mm.change_input("ERI4", "With UQ?", false);
+        mm.change_input("Benchmark ERI4", "With UQ?", false);
         mm.change_input("Kinetic", "With UQ?", true);
         mm.change_input("Nuclear", "With UQ?", true);
         mm.change_input("sto-3g atomic density matrix", "With UQ?", true);
