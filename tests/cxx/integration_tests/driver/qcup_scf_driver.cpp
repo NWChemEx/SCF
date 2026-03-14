@@ -71,7 +71,6 @@ TEST_CASE("QCUP-SCFDriver") {
           mm.template run_as<pt>("SCF Driver", ao_bs, h2_dimer_sys);
         pcorr.set_elem({}, float_type{-2.2260535919670001});
         simde::type::tensor corr(shape_corr, std::move(pcorr));
-        std::cout << e << " " << corr << std::endl;
         REQUIRE(approximately_equal(corr, e, 1E-6));
     }
 
