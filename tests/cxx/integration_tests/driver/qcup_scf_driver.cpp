@@ -19,12 +19,16 @@
 using pt = simde::AOEnergy;
 using tensorwrapper::operations::approximately_equal;
 
-/* These tests use the default SCF, which by default does NOT use QCUP even
- * when floating point types with uncertainty are used.
+/* These tests use QCUP
  */
-TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
-    using float_type = TestType;
+TEST_CASE("QCUP-SCFDriver") {
+    using float_type = tensorwrapper::types::udouble;
     auto mm          = test_scf::load_modules<float_type>();
+    auto key         = "UQ Atom Symm Blocked Driver";
+    mm.change_submod("Four center J builder", "Four-center ERI", key);
+    mm.change_submod("Four center K builder", "Four-center ERI", key);
+    mm.change_input(key, "Mean Type", "max");
+    mm.change_input("ERI4", "With UQ?", false);
     using tensorwrapper::buffer::make_contiguous;
     tensorwrapper::shape::Smooth shape_corr{};
     auto pcorr = make_contiguous<float_type>(shape_corr);
@@ -51,23 +55,6 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
             const auto e = mm.template run_as<pt>("SCF Driver", aos, h2);
             REQUIRE(approximately_equal(corr, e, 1E-6));
         }
-        SECTION("DFT") {
-            // GauXC not currently compatible with Uncertain values
-            if constexpr(!tensorwrapper::types::is_uncertain_v<float_type>) {
-                auto func         = chemist::qm_operator::xc_functional::PBE;
-                const auto RKS_op = "Restricted Kohn-Sham Op";
-                const auto rks_op = "Restricted One-Electron Kohn-Sham Op";
-                mm.change_input(RKS_op, "XC Potential", func);
-                mm.change_input(rks_op, "XC Potential", func);
-                mm.change_submod("Loop", "One-electron Fock operator", rks_op);
-                mm.change_submod("Loop", "Fock operator", RKS_op);
-                mm.change_submod("Core guess", "Build Fock Operator", rks_op);
-                const auto e = mm.template run_as<pt>("SCF Driver", aos, h2);
-                pcorr.set_elem({}, float_type{-1.15207});
-                simde::type::tensor corr(shape_corr, std::move(pcorr));
-                REQUIRE(approximately_equal(corr, e, 1E-5));
-            }
-        }
     }
 
     SECTION("H2 Dimer") {
@@ -84,6 +71,7 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
           mm.template run_as<pt>("SCF Driver", ao_bs, h2_dimer_sys);
         pcorr.set_elem({}, float_type{-2.2260535919670001});
         simde::type::tensor corr(shape_corr, std::move(pcorr));
+        std::cout << e << " " << corr << std::endl;
         REQUIRE(approximately_equal(corr, e, 1E-6));
     }
 
