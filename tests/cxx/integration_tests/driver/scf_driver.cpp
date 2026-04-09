@@ -50,7 +50,8 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", test_scf::float_types) {
         }
         SECTION("DFT") {
             // GauXC not currently compatible with Uncertain values
-            if constexpr(!tensorwrapper::types::is_uncertain_v<float_type>) {
+            if constexpr(!tensorwrapper::types::is_uncertain_v<float_type> &&
+                         !tensorwrapper::types::is_interval_v<float_type>) {
                 auto func         = chemist::qm_operator::xc_functional::PBE;
                 const auto RKS_op = "Restricted Kohn-Sham Op";
                 const auto rks_op = "Restricted One-Electron Kohn-Sham Op";

@@ -24,7 +24,7 @@
 
 namespace test_scf {
 
-using float_types = std::tuple<double, tensorwrapper::types::udouble>;
+using float_types = std::tuple<double, tensorwrapper::types::idouble>;
 
 /// Makes a H nucleus at the point @p x, @p y, @p z
 inline auto h_nucleus(double x, double y, double z) {
