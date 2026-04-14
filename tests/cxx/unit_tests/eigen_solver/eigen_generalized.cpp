@@ -18,7 +18,8 @@
 #include <scf/scf.hpp>
 #include <simde/simde.hpp>
 
-TEMPLATE_LIST_TEST_CASE("EigenGeneralized", "", test_scf::float_types) {
+using types = std::tuple<float, double>;
+TEMPLATE_LIST_TEST_CASE("EigenGeneralized", "", types) {
     using float_type = TestType;
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
@@ -50,6 +51,5 @@ TEMPLATE_LIST_TEST_CASE("EigenGeneralized", "", test_scf::float_types) {
     tensorwrapper::shape::Smooth corr_shape{2};
     tensorwrapper::buffer::Contiguous corr_buffer(expected_values, corr_shape);
     simde::type::tensor corr(corr_shape, std::move(corr_buffer));
-
     REQUIRE(tensorwrapper::operations::approximately_equal(corr, values, 1E-6));
 }

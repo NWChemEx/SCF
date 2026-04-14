@@ -57,6 +57,10 @@ pluginplay::ModuleManager load_modules() {
         mm.change_input("Kinetic", "With UQ?", true);
         mm.change_input("Nuclear", "With UQ?", true);
         mm.change_input("sto-3g atomic density matrix", "With UQ?", true);
+        mm.change_submod("Loop", "Diagonalizer",
+                         "Generalized eigensolve via Ball Arithmetic");
+        mm.change_submod("Diagonalization Fock Update", "Diagonalizer",
+                         "Generalized eigensolve via Ball Arithmetic");
     }
 
     return mm;

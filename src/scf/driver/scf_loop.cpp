@@ -29,7 +29,12 @@ struct Kernel {
     template<typename FloatType>
     auto operator()(const std::span<FloatType>& a) {
         using tensorwrapper::types::fabs;
-        return fabs(a[0]) < std::decay_t<FloatType>(m_tol);
+        if constexpr(tensorwrapper::types::is_interval_v<
+                       std::decay_t<FloatType>>) {
+            return fabs(a[0].median()) < m_tol;
+        } else {
+            return fabs(a[0]) < std::decay_t<FloatType>(m_tol);
+        }
     }
 };
 
