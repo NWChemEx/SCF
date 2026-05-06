@@ -18,7 +18,8 @@
 #include <scf/scf.hpp>
 #include <simde/simde.hpp>
 
-TEMPLATE_LIST_TEST_CASE("EigenGeneralized", "", test_scf::float_types) {
+using types = std::tuple<float, double>;
+TEMPLATE_LIST_TEST_CASE("EigenGeneralized", "", types) {
     using float_type = TestType;
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);

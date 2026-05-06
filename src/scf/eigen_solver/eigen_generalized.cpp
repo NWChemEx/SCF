@@ -44,47 +44,55 @@ struct Kernel {
         using clean_t = std::decay_t<FloatType>;
         // Convert to Eigen buffers
 
-        // Wrap the tensors in Eigen::Map objects to avoid copy
-        const auto* pA = A.data();
-        const auto* pB = B.data();
-        auto rows      = m_n_rows;
-        auto cols      = m_n_cols;
+        if constexpr(tensorwrapper::types::is_interval_v<clean_t>) {
+            throw std::runtime_error(
+              "EigenGeneralized Kernel: Interval types not supported");
+        } else {
+            // Wrap the tensors in Eigen::Map objects to avoid copy
+            const auto* pA = A.data();
+            const auto* pB = B.data();
+            auto rows      = m_n_rows;
+            auto cols      = m_n_cols;
 
-        constexpr auto rmajor = Eigen::RowMajor;
-        constexpr auto edynam = Eigen::Dynamic;
-        using clean_type      = std::decay_t<FloatType>;
-        using matrix_type = Eigen::Matrix<clean_type, edynam, edynam, rmajor>;
-        using map_type    = Eigen::Map<const matrix_type>;
+            constexpr auto rmajor = Eigen::RowMajor;
+            constexpr auto edynam = Eigen::Dynamic;
+            using clean_type      = std::decay_t<FloatType>;
+            using matrix_type =
+              Eigen::Matrix<clean_type, edynam, edynam, rmajor>;
+            using map_type = Eigen::Map<const matrix_type>;
 
-        map_type A_map(pA, rows, cols);
-        map_type B_map(pB, rows, cols);
+            map_type A_map(pA, rows, cols);
+            map_type B_map(pB, rows, cols);
 
-        // Compute
-        Eigen::GeneralizedSelfAdjointEigenSolver<matrix_type> ges(A_map, B_map);
-        auto eigen_values  = ges.eigenvalues();
-        auto eigen_vectors = ges.eigenvectors();
+            // Compute
+            Eigen::GeneralizedSelfAdjointEigenSolver<matrix_type> ges(A_map,
+                                                                      B_map);
+            auto eigen_values  = ges.eigenvalues();
+            auto eigen_vectors = ges.eigenvectors();
 
-        // Wrap in TensorWrapper Tensor
-        tensorwrapper::shape::Smooth vector_shape{rows};
-        tensorwrapper::shape::Smooth matrix_shape{rows, cols};
-        tensorwrapper::layout::Physical vector_layout(vector_shape);
-        tensorwrapper::layout::Physical matrix_layout(matrix_shape);
+            // Wrap in TensorWrapper Tensor
+            tensorwrapper::shape::Smooth vector_shape{rows};
+            tensorwrapper::shape::Smooth matrix_shape{rows, cols};
+            tensorwrapper::layout::Physical vector_layout(vector_shape);
+            tensorwrapper::layout::Physical matrix_layout(matrix_shape);
 
-        using tensorwrapper::buffer::make_contiguous;
+            using tensorwrapper::buffer::make_contiguous;
 
-        auto pvalues_buffer  = make_contiguous<clean_t>(vector_shape);
-        auto pvectors_buffer = make_contiguous<clean_t>(matrix_shape);
+            auto pvalues_buffer  = make_contiguous<clean_t>(vector_shape);
+            auto pvectors_buffer = make_contiguous<clean_t>(matrix_shape);
 
-        for(decltype(rows) i = 0; i < rows; ++i) {
-            pvalues_buffer.set_elem({i}, eigen_values(i));
-            for(decltype(cols) j = 0; j < cols; ++j) {
-                pvectors_buffer.set_elem({i, j}, eigen_vectors(i, j));
+            for(decltype(rows) i = 0; i < rows; ++i) {
+                pvalues_buffer.set_elem({i}, eigen_values(i));
+                for(decltype(cols) j = 0; j < cols; ++j) {
+                    pvectors_buffer.set_elem({i, j}, eigen_vectors(i, j));
+                }
             }
-        }
 
-        simde::type::tensor values(vector_shape, std::move(pvalues_buffer));
-        simde::type::tensor vectors(matrix_shape, std::move(pvectors_buffer));
-        return std::make_pair(values, vectors);
+            simde::type::tensor values(vector_shape, std::move(pvalues_buffer));
+            simde::type::tensor vectors(matrix_shape,
+                                        std::move(pvectors_buffer));
+            return std::make_pair(values, vectors);
+        }
     }
 };
 } // namespace

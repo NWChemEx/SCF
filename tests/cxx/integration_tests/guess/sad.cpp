@@ -28,7 +28,8 @@ using initial_rho_pt = simde::InitialDensity;
 
 using tensorwrapper::operations::approximately_equal;
 
-TEMPLATE_LIST_TEST_CASE("SAD", "", test_scf::float_types) {
+using types = std::tuple<double, tensorwrapper::types::udouble>;
+TEMPLATE_LIST_TEST_CASE("SAD", "", types) {
     using float_type = TestType;
 
     auto mm  = test_scf::load_modules<float_type>();
