@@ -23,6 +23,24 @@
 #include <simde/simde.hpp>
 
 namespace test_scf {
+namespace {
+[[maybe_unused]] void configure_uq(pluginplay::ModuleManager& mm,
+                                   const std::string& uq_type) {
+    mm.change_input("Evaluate 2-Index BraKet", "UQ Type", uq_type);
+    mm.change_input("Evaluate 4-Index BraKet", "UQ Type", uq_type);
+    mm.change_input("Overlap", "UQ Type", uq_type);
+    mm.change_input("ERI4", "UQ Type", uq_type);
+    mm.change_input("Kinetic", "UQ Type", uq_type);
+    mm.change_input("Nuclear", "UQ Type", uq_type);
+    mm.change_input("sto-3g atomic density matrix", "With UQ?", true);
+    if(uq_type == "interval") {
+        mm.change_submod("Loop", "Diagonalizer",
+                         "Generalized eigensolve via Ball Arithmetic");
+        mm.change_submod("Diagonalization Fock Update", "Diagonalizer",
+                         "Generalized eigensolve via Ball Arithmetic");
+    }
+}
+} // namespace
 
 /// Factors out setting submodules for SCF plugin from other plugins
 template<typename FloatType>
@@ -50,14 +68,7 @@ pluginplay::ModuleManager load_modules() {
     mm.change_submod("SAD guess", "SAD Density", "sto-3g SAD density");
 
     if constexpr(std::is_same_v<FloatType, tensorwrapper::types::udouble>) {
-        std::string key = "uncertain";
-        mm.change_input("Evaluate 2-Index BraKet", "UQ Type", key);
-        mm.change_input("Evaluate 4-Index BraKet", "UQ Type", key);
-        mm.change_input("Overlap", "UQ Type", key);
-        mm.change_input("ERI4", "UQ Type", key);
-        mm.change_input("Kinetic", "UQ Type", key);
-        mm.change_input("Nuclear", "UQ Type", key);
-        mm.change_input("sto-3g atomic density matrix", "With UQ?", true);
+        configure_uq(mm, "uncertain");
     } else if constexpr(tensorwrapper::types::is_interval_v<FloatType>) {
         std::string key = "interval";
         mm.at("Generalized eigensolve via Eigen").turn_off_memoization();
@@ -68,16 +79,7 @@ pluginplay::ModuleManager load_modules() {
         mm.at("Restricted Fock Op").turn_off_memoization();
         mm.at("Four center J builder").turn_off_memoization();
         mm.at("Four center K builder").turn_off_memoization();
-        mm.change_input("Evaluate 2-Index BraKet", "UQ Type", key);
-        mm.change_input("Evaluate 4-Index BraKet", "UQ Type", key);
-        mm.change_input("Overlap", "UQ Type", key);
-        mm.change_input("ERI4", "UQ Type", key);
-        mm.change_input("Kinetic", "UQ Type", key);
-        mm.change_input("Nuclear", "UQ Type", key);
-        mm.change_submod("Loop", "Diagonalizer",
-                         "Generalized eigensolve via Ball Arithmetic");
-        mm.change_submod("Diagonalization Fock Update", "Diagonalizer",
-                         "Generalized eigensolve via Ball Arithmetic");
+        configure_uq(mm, "interval");
     }
 
     return mm;

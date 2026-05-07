@@ -19,7 +19,8 @@
 using pt = simde::AOEnergy;
 using tensorwrapper::operations::approximately_equal;
 
-using types = std::tuple<double, tensorwrapper::types::udouble>;
+using types = std::tuple<double, tensorwrapper::types::udouble,
+                         tensorwrapper::types::interval_type<double>>;
 
 TEMPLATE_LIST_TEST_CASE("SCFDriver", "", types) {
     using float_type = TestType;

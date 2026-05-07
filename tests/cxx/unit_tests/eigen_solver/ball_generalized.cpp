@@ -17,7 +17,7 @@
 #include "../../test_scf.hpp"
 #include <scf/scf.hpp>
 #include <simde/simde.hpp>
-
+#ifdef ENABLE_SIGMA
 namespace {
 
 // 7x7 Fock / overlap-style fixtures and expected generalized eigenvalues
@@ -315,3 +315,4 @@ TEMPLATE_LIST_TEST_CASE("BallGeneralized", "", types) {
         }
     }
 }
+#endif

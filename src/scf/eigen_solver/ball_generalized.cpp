@@ -33,9 +33,11 @@
 #include "eigen_solver.hpp"
 #include "submodule_request.hpp"
 #include "wtf/fp/float_view.hpp"
-#include <sigma/sigma.hpp>
+
 #include <simde/simde.hpp>
 #include <tensorwrapper/tensorwrapper.hpp>
+#ifdef ENABLE_SIGMA
+#include <sigma/sigma.hpp>
 
 using pt = simde::GeneralizedEigenSolve;
 
@@ -263,3 +265,18 @@ MODULE_RUN(BallGeneralized) {
     return pt::wrap_results(rv, L_ball, C_ball);
 }
 } // namespace scf::eigen_solver
+#else
+namespace scf::eigen_solver {
+using pt = simde::GeneralizedEigenSolve;
+MODULE_CTOR(BallGeneralized) {
+    description("Sigma was not enabled.");
+    satisfies_property_type<pt>();
+
+    add_submodule<pt>("Eigen Solve");
+}
+
+MODULE_RUN(BallGeneralized) {
+    throw std::runtime_error("Sigma was not enabled.");
+}
+} // namespace scf::eigen_solver
+#endif
