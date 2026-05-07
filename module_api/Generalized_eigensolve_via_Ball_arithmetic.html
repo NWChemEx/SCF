@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SCF Driver &mdash; SCF 1.0.0 documentation</title>
+  <title>Generalized eigensolve via Ball arithmetic &mdash; SCF 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="SCF integral driver" href="SCF_integral_driver.html" />
-    <link rel="prev" title="SAD guess" href="SAD_guess.html" /> 
+    <link rel="next" title="Generalized eigensolve via Eigen" href="Generalized_eigensolve_via_Eigen.html" />
+    <link rel="prev" title="GauXC XC Potential" href="GauXC_XC_Potential.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -69,18 +69,7 @@
 <li class="toctree-l2"><a class="reference internal" href="GauXC_Quadrature_Batches.html">GauXC Quadrature Batches</a></li>
 <li class="toctree-l2"><a class="reference internal" href="GauXC_XC_Energy.html">GauXC XC Energy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="GauXC_XC_Potential.html">GauXC XC Potential</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Generalized_eigensolve_via_Ball_arithmetic.html">Generalized eigensolve via Ball arithmetic</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Generalized_eigensolve_via_Eigen.html">Generalized eigensolve via Eigen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Grid_From_File.html">Grid From File</a></li>
-<li class="toctree-l2"><a class="reference internal" href="LibXC_Energy.html">LibXC Energy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="LibXC_Potential.html">LibXC Potential</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Loop.html">Loop</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Restricted_Fock_Op.html">Restricted Fock Op</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Restricted_Kohn-Sham_Op.html">Restricted Kohn-Sham Op</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Restricted_One-Electron_Fock_Op.html">Restricted One-Electron Fock Op</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Restricted_One-Electron_Kohn-Sham_Op.html">Restricted One-Electron Kohn-Sham Op</a></li>
-<li class="toctree-l2"><a class="reference internal" href="SAD_guess.html">SAD guess</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">SCF Driver</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Generalized eigensolve via Ball arithmetic</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#please-cite">Please Cite</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#property-types">Property Types</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-inputs">Module Inputs</a><ul>
@@ -92,6 +81,17 @@
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="Generalized_eigensolve_via_Eigen.html">Generalized eigensolve via Eigen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Grid_From_File.html">Grid From File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LibXC_Energy.html">LibXC Energy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LibXC_Potential.html">LibXC Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Loop.html">Loop</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Restricted_Fock_Op.html">Restricted Fock Op</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Restricted_Kohn-Sham_Op.html">Restricted Kohn-Sham Op</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Restricted_One-Electron_Fock_Op.html">Restricted One-Electron Fock Op</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Restricted_One-Electron_Kohn-Sham_Op.html">Restricted One-Electron Kohn-Sham Op</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SAD_guess.html">SAD guess</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SCF_Driver.html">SCF Driver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="SCF_integral_driver.html">SCF integral driver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="snLinK.html">snLinK</a></li>
 </ul>
@@ -114,9 +114,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Modules API</a></li>
-      <li class="breadcrumb-item active">SCF Driver</li>
+      <li class="breadcrumb-item active">Generalized eigensolve via Ball arithmetic</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/module_api/SCF_Driver.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/module_api/Generalized_eigensolve_via_Ball_arithmetic.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -124,8 +124,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="scf-driver">
-<h1>SCF Driver<a class="headerlink" href="#scf-driver" title="Link to this heading"></a></h1>
+  <section id="generalized-eigensolve-via-ball-arithmetic">
+<h1>Generalized eigensolve via Ball arithmetic<a class="headerlink" href="#generalized-eigensolve-via-ball-arithmetic" title="Link to this heading"></a></h1>
+<p>Sigma was not enabled.</p>
 <section id="please-cite">
 <h2>Please Cite<a class="headerlink" href="#please-cite" title="Link to this heading"></a></h2>
 <p>No citations</p>
@@ -134,7 +135,7 @@
 <h2>Property Types<a class="headerlink" href="#property-types" title="Link to this heading"></a></h2>
 <p>The following is a list of property types that this module satisfies.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">simde::AOEnergy</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simde::GeneralizedEigenSolve</span></code></p></li>
 </ul>
 </section>
 <section id="module-inputs">
@@ -160,13 +161,13 @@ module. The columns are:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>AOs</p></td>
+<tr class="row-even"><td><p>Matrix</p></td>
 <td><p>N/A</p></td>
-<td><p>The atomic orbital basis set</p></td>
+<td><p>The matrix to diagonalize.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Chemical System</p></td>
+<tr class="row-odd"><td><p>Metric</p></td>
 <td><p>N/A</p></td>
-<td><p>N/A</p></td>
+<td><p>Metric for the basis set of “Matrix”.</p></td>
 </tr>
 </tbody>
 </table>
@@ -183,30 +184,30 @@ subsection we list:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">Opaque?</span></code> : Does the value of the input influence memoization?.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Domain</span> <span class="pre">Restrictions</span></code> : Criteria a value must obey to be deemed valid.</p></li>
 </ul>
-<section id="aos">
-<h4>AOs<a class="headerlink" href="#aos" title="Link to this heading"></a></h4>
+<section id="matrix">
+<h4>Matrix<a class="headerlink" href="#matrix" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><p>Description : The atomic orbital basis set</p></li>
+<li><p>Description : The matrix to diagonalize.</p></li>
 <li><p>Default Value : N/A</p></li>
 <li><p>Optional? : False</p></li>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == chemist::basis_set::AOBasisSet&lt;chemist::basis_set::AtomicBasisSet&lt;chemist::basis_set::Shell&lt;chemist::basis_set::ContractedGaussian&lt;chemist::basis_set::Primitive&lt;double&gt;&gt;&gt;&gt;&gt;</p></li>
+<li><p>Type == tensorwrapper::Tensor</p></li>
 </ul>
 </li>
 </ul>
 </section>
-<section id="chemical-system">
-<h4>Chemical System<a class="headerlink" href="#chemical-system" title="Link to this heading"></a></h4>
+<section id="metric">
+<h4>Metric<a class="headerlink" href="#metric" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><p>Description : N/A</p></li>
+<li><p>Description : Metric for the basis set of “Matrix”.</p></li>
 <li><p>Default Value : N/A</p></li>
 <li><p>Optional? : False</p></li>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == chemist::ChemicalSystem</p></li>
+<li><p>Type == tensorwrapper::Tensor</p></li>
 </ul>
 </li>
 </ul>
@@ -236,7 +237,11 @@ the Module class’s advanced API.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Energy</p></td>
+<tr class="row-even"><td><p>Eigen values</p></td>
+<td><p>tensorwrapper::Tensor</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>Eigen vectors</p></td>
 <td><p>tensorwrapper::Tensor</p></td>
 <td><p>N/A</p></td>
 </tr>
@@ -260,16 +265,8 @@ submodule we have listed:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Guess</p></td>
-<td><p>simde::InitialGuess&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-odd"><td><p>Hamiltonian</p></td>
-<td><p>simde::Convert&lt;chemist::qm_operator::Hamiltonian, chemist::ChemicalSystem&gt;</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-even"><td><p>Optimizer</p></td>
-<td><p>simde::Optimize&lt;simde::EvaluateBraKet&lt;chemist::braket::BraKet&lt;chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;, chemist::qm_operator::Hamiltonian, chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;&gt;, chemist::wavefunction::Determinant&lt;chemist::wavefunction::CMOs&gt;&gt;</p></td>
+<tr class="row-even"><td><p>Eigen Solve</p></td>
+<td><p>simde::GeneralizedEigenSolve</p></td>
 <td><p>N/A</p></td>
 </tr>
 </tbody>
@@ -281,8 +278,8 @@ submodule we have listed:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="SAD_guess.html" class="btn btn-neutral float-left" title="SAD guess" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="SCF_integral_driver.html" class="btn btn-neutral float-right" title="SCF integral driver" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="GauXC_XC_Potential.html" class="btn btn-neutral float-left" title="GauXC XC Potential" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Generalized_eigensolve_via_Eigen.html" class="btn btn-neutral float-right" title="Generalized eigensolve via Eigen" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
