@@ -17,37 +17,34 @@
 #include "test_eigen_solver.hpp"
 
 using types = std::tuple<float, double>;
+using namespace test_eigen_solver;
+using namespace tensorwrapper::generate;
+
 TEMPLATE_LIST_TEST_CASE("EigenNormal", "", types) {
-    using float_type = TestType;
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
 
     auto& mod = mm.at("Eigen Solve via Eigen");
-
+    auto rtol = std::is_same_v<TestType, float> ? 5e-4 : 1e-5;
+    using pt  = simde::EigenSolve;
     SECTION("classic 2 by 2") {
-        auto system = test_eigen_solver::classic_2x2();
-        auto A      = test_eigen_solver::matrix_as<float_type>(system);
-        auto [values, vectors] = mod.run_as<simde::EigenSolve>(A);
-        test_eigen_solver::require_eigenvalues_approx<float_type>(
-          values, test_eigen_solver::eigenvalues_vector(system), 1e-6);
-        test_eigen_solver::require_eigenpair_residual<float_type>(
-          A, values, vectors, 1e-5);
+        auto system            = test_eigen_solver::classic_2x2<TestType>();
+        auto [values, vectors] = mod.run_as<pt>(system.matrix);
+
+        require_eigenvalues_approx(values, system.eigenvalues, rtol);
+        require_eigenpair_residual(system.matrix, values, vectors, rtol);
     }
 
     SECTION("generated n=4 condition number 1e3") {
         test_eigen_solver::SymmetricMatrixSpec spec;
-        spec.n                = 4;
-        spec.condition_number = 1e3;
-        spec.spacing          = test_eigen_solver::EigenvalueSpacing::Linear;
-        spec.seed             = 11;
-        auto system = tensorwrapper::generate::generate_eigen_system(spec);
-        auto A      = test_eigen_solver::matrix_as<float_type>(system);
-        auto [values, vectors] = mod.run_as<simde::EigenSolve>(A);
-        const auto rtol = std::is_same_v<float_type, float> ? 5e-4 : 1e-5;
-        test_eigen_solver::require_eigenvalues_approx<float_type>(
-          values, test_eigen_solver::eigenvalues_vector(system), rtol);
-        test_eigen_solver::require_eigenpair_residual<float_type>(
-          A, values, vectors, rtol);
+        spec.n                 = 4;
+        spec.condition_number  = 1e3;
+        spec.spacing           = test_eigen_solver::EigenvalueSpacing::Linear;
+        spec.seed              = 11;
+        auto system            = generate_eigen_system<TestType>(spec);
+        auto [values, vectors] = mod.run_as<pt>(system.matrix);
+        require_eigenvalues_approx(values, system.eigenvalues, rtol);
+        require_eigenpair_residual(system.matrix, values, vectors, rtol);
     }
 
     SECTION("generated clustered n=6") {
@@ -58,10 +55,9 @@ TEMPLATE_LIST_TEST_CASE("EigenNormal", "", types) {
         spec.n_clusters       = 3;
         spec.cluster_width    = 1e-8;
         spec.seed             = 23;
-        auto system = tensorwrapper::generate::generate_eigen_system(spec);
-        auto A      = test_eigen_solver::matrix_as<float_type>(system);
-        auto [values, vectors] = mod.run_as<simde::EigenSolve>(A);
-        test_eigen_solver::require_eigenvalues_approx<float_type>(
-          values, test_eigen_solver::eigenvalues_vector(system), 1e-4);
+        auto system           = generate_eigen_system<TestType>(spec);
+        auto [values, vectors] = mod.run_as<pt>(system.matrix);
+        require_eigenvalues_approx(values, system.eigenvalues, rtol);
+        require_eigenpair_residual(system.matrix, values, vectors, rtol);
     }
 }

@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
+#include "h2_dimer_pencil.hpp"
 #include "test_eigen_solver.hpp"
 
 using types = std::tuple<float, double>;
-TEMPLATE_LIST_TEST_CASE("EigenGeneralized", "", types) {
-    using float_type = TestType;
+using namespace test_eigen_solver;
+
+TEMPLATE_LIST_TEST_CASE("EigenGeneralized H2 dimer", "", types) {
+    using pt = simde::GeneralizedEigenSolve;
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
 
-    using pt  = simde::GeneralizedEigenSolve;
-    auto& mod = mm.at("Generalized eigensolve via Eigen");
+    auto rtol = std::is_same_v<TestType, float> ? 5e-4 : 1e-5;
+    auto A    = h2_dimer_fock_as<TestType>();
+    auto B    = h2_dimer_overlap_as<TestType>();
 
-    SECTION("classic 2 by 2 with B = I") {
-        auto system = test_eigen_solver::classic_2x2();
-        auto A      = test_eigen_solver::matrix_as<float_type>(system);
-        auto B      = test_eigen_solver::matrix_as<float_type>(
-          test_eigen_solver::identity_system(system.n));
-        auto [values, vectors] = mod.run_as<pt>(A, B);
-        test_eigen_solver::require_eigenvalues_approx<float_type>(
-          values, test_eigen_solver::eigenvalues_vector(system), 1e-6);
-    }
+    auto& mod              = mm.at("Generalized eigensolve via Eigen");
+    auto [values, vectors] = mod.run_as<pt>(A, B);
+    auto eval_corr         = h2_dimer_evals<TestType>();
+    require_eigenvalues_approx(values, eval_corr, rtol);
+    require_eigenpair_residual(A, values, vectors, rtol);
 }

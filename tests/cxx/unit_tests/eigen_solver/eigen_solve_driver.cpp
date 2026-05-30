@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 NWChemEx-Project
+ * Copyright 2026 NWChemEx-Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-#include "h2_dimer_pencil.hpp"
 #include "test_eigen_solver.hpp"
 
 using types = std::tuple<float, double>;
 using namespace test_eigen_solver;
 
-TEMPLATE_LIST_TEST_CASE("GeneralizedEigenSolver H2 dimer", "", types) {
-    using pt = simde::GeneralizedEigenSolve;
+TEMPLATE_LIST_TEST_CASE("EigenSolveDriver", "", types) {
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
+    auto& mod = mm.at("Eigen Solve");
+    using pt  = simde::EigenSolve;
 
-    auto rtol = std::is_same_v<TestType, float> ? 5e-4 : 1e-5;
-    auto A    = h2_dimer_fock_as<TestType>();
-    auto B    = h2_dimer_overlap_as<TestType>();
-
-    auto& mod              = mm.at("Generalized eigensolve");
-    auto [values, vectors] = mod.run_as<pt>(A, B);
-    auto eval_corr         = h2_dimer_evals<TestType>();
-    require_eigenvalues_approx(values, eval_corr, rtol);
-    require_eigenpair_residual(A, values, vectors, rtol);
+    auto rtol              = std::is_same_v<TestType, float> ? 5e-4 : 1e-5;
+    auto system            = classic_2x2<TestType>();
+    auto [values, vectors] = mod.run_as<pt>(system.matrix);
+    require_eigenvalues_approx(values, system.eigenvalues, rtol);
+    require_eigenpair_residual(system.matrix, values, vectors, rtol);
 }

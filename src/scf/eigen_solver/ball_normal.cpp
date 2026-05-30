@@ -26,19 +26,23 @@ using pt = simde::EigenSolve;
 
 namespace scf::eigen_solver {
 namespace {
+
 const auto desc = R"(
  Eigen Solve via Ball Arithmetic
  -------------------------------------------
- https://www.texmacs.org/joris/ball/ball.html
- TODO: Write me!!!
- H = TMT - L
- n = number of rows (or columns)
- k = max[max(1/(|L_jj -Lii|)), max(1/L_ii)]
- Omega_n = n by n matrix 0+/-1
- eta = 6 sqrt(n) k ||H||
- T_ball = T(1 + eta Omega_n)
- L_ball = B(1, eta) * L
+ https://www.texmacs.org/joris/ball/ball.html section 6.3
+
+ H = T^T M T - Λ
+ κ = max[max(1/|Λ_jj - Λ_ii|), max(1/|Λ_ii|)]
+ certification when ||H|| <= 1 / (80 n κ^2 ||Λ||)
+ η = 6 n sqrt(κ) ||H||
+ T_ball = T (1 + η Ω_n)
+ L_ball = B(1, η) Λ
  )";
+
+constexpr int kMaxNewtonIter = 50;
+constexpr double kNewtonTol  = 1e-14;
+
 } // namespace
 
 MODULE_CTOR(BallNormal) {
@@ -51,29 +55,50 @@ MODULE_CTOR(BallNormal) {
 MODULE_RUN(BallNormal) {
     auto&& [A] = pt::unwrap_inputs(inputs);
 
-    using uq_type = tensorwrapper::types::idouble;
+    using uq_type    = tensorwrapper::types::idouble;
+    using float_type = uq_type::value_t;
     using namespace tensorwrapper::buffer;
     using namespace tensorwrapper::shape;
 
-    auto A_buf = make_contiguous(A.buffer());
-    auto shape = A_buf.shape().make_smooth();
-    auto n     = shape.extent(0);
+    auto A_buf    = make_contiguous(A.buffer());
+    auto shape    = A_buf.shape().make_smooth();
+    auto n        = shape.extent(0);
+    auto A_median = median_matrix<uq_type>(A_buf);
 
     auto eigen_solver_mod = submods.at("Eigen Solve");
     auto [values, vectors] =
       wrap_subdiagonalization<uq_type>(A_buf, eigen_solver_mod);
 
-    auto k = compute_k<uq_type::value_t>(values);
+    auto clusters = finest_cluster(n);
+    auto T        = vectors;
 
-    auto [uq_values, uq_vectors] = convert_to_uq<uq_type>(values, vectors);
+    for(int it = 0; it < kMaxNewtonIter; ++it) {
+        auto [T_new, lambda] =
+          fundamental_iteration_step(T, A_median, clusters);
 
-    auto H = compute_residual<uq_type>(A, uq_vectors, uq_values);
+        tensorwrapper::Tensor TA, M;
+        TA("i,k") = T("j,i") * A_median("j,k");
+        M("i,k")  = TA("i,j") * T("j,k");
 
-    using tensorwrapper::utilities::diagonal_matrix;
-    auto H_norm      = ball_matrix_norm<uq_type>(H);
-    auto eval_matrix = diagonal_matrix(uq_values);
-    auto eval_norm   = ball_matrix_norm<uq_type>(eval_matrix);
-    auto eta_val     = 6.0 * std::sqrt(n) * k * H_norm;
+        auto off_norm = off_block_max_norm_double(M, clusters);
+        T             = T_new;
+        values        = lambda;
+        if(off_norm < kNewtonTol) break;
+    }
+
+    auto [uq_values, uq_vectors] = convert_to_uq<uq_type>(values, T);
+
+    auto H           = compute_residual<uq_type>(A, uq_vectors, uq_values);
+    auto h_norm      = ball_matrix_norm<uq_type>(H);
+    auto kappa       = compute_kappa<float_type>(values);
+    auto lambda_norm = diagonal_vector_norm<float_type>(values);
+
+    if(!certification_condition_met(h_norm, n, kappa, lambda_norm)) {
+        throw std::runtime_error(
+          "BallNormal: certification condition (32) not satisfied");
+    }
+
+    auto eta_val = compute_eta(h_norm, n, kappa);
 
     auto C_ball = t_ball<uq_type>(uq_vectors, eta_val);
     auto L_ball = l_ball<uq_type>(uq_values, eta_val);

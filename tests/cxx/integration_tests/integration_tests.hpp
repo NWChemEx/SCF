@@ -34,10 +34,13 @@ namespace {
     mm.change_input("Nuclear", "UQ Type", uq_type);
     mm.change_input("sto-3g atomic density matrix", "With UQ?", true);
     if(uq_type == "interval") {
-        mm.change_submod("Loop", "Diagonalizer",
-                         "Generalized eigensolve via Ball Arithmetic");
-        mm.change_submod("Diagonalization Fock Update", "Diagonalizer",
-                         "Generalized eigensolve via Ball Arithmetic");
+        mm.change_submod("Loop", "Diagonalizer", "Generalized eigensolve");
+        mm.change_submod("Generalized eigensolve", "Eigen Solve",
+                         "Eigen Solve via Ball arithmetic");
+        mm.change_submod("Diagonalization Fock update", "Diagonalizer",
+                         "Generalized eigensolve");
+        mm.change_submod("Generalized eigensolve", "Eigen Solve",
+                         "Eigen Solve via Ball arithmetic");
     }
 }
 } // namespace
