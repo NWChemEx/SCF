@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-#include "../../test_scf.hpp"
-#include <scf/scf.hpp>
-#include <simde/simde.hpp>
+#include "test_eigen_solver.hpp"
 #ifdef ENABLE_SIGMA
 namespace {
 
@@ -252,67 +250,74 @@ inline simde::type::tensor l_ball_corr() {
 } // namespace
 
 using types = std::tuple<tensorwrapper::types::idouble>;
-TEMPLATE_LIST_TEST_CASE("BallGeneralized", "", types) {
-    using uq_type    = TestType;
-    using float_type = typename uq_type::value_t;
+TEMPLATE_LIST_TEST_CASE("GeneralizedEigenSolver", "", types) {
+    using uq_type = TestType;
+    using pt      = simde::GeneralizedEigenSolve;
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
+    auto& ball_mod = mm.at("Eigen Solve via Ball arithmetic");
+    (void)ball_mod;
 
-    using pt = simde::GeneralizedEigenSolve;
+    // The interval generalized solver diagonalizes B with ball arithmetic, so
+    // B must be a genuinely well-separated SPD metric: an (even slightly)
+    // degenerate B widens the B^{-1/2} step until it straddles zero. We use a
+    // generated SPD B with a moderate condition number and verify the pencil
+    // eigenvalues against the reference "Generalized eigensolve via Eigen"
+    // module on the exact matrices.
+    SECTION("generated 2 by 2 pencil via harness") {
+        test_eigen_solver::SymmetricMatrixSpec a_spec;
+        a_spec.n                = 2;
+        a_spec.condition_number = 5.0;
+        a_spec.seed             = 17;
+        auto a_system = tensorwrapper::generate::generate_eigen_system(a_spec);
 
-    auto& mod = mm.at("Generalized eigensolve via Ball Arithmetic");
+        test_eigen_solver::SymmetricMatrixSpec b_spec;
+        b_spec.n                = 2;
+        b_spec.condition_number = 4.0;
+        b_spec.min_eigenvalue   = 1.0;
+        b_spec.seed             = 5;
+        auto b_system = tensorwrapper::generate::generate_eigen_system(b_spec);
 
-    SECTION("2 by 2 test case") {
-        tensorwrapper::shape::Smooth shape{2, 2};
-        using tensorwrapper::buffer::make_contiguous;
-        auto A_buffer    = make_contiguous<uq_type>(shape);
-        float_type noise = 0.001;
+        auto& ref_mod = mm.at("Generalized eigensolve via Eigen");
+        auto [ref_values, ref_vectors] =
+          ref_mod.run_as<pt>(test_eigen_solver::matrix_as<double>(a_system),
+                             test_eigen_solver::matrix_as<double>(b_system));
+        (void)ref_vectors;
+        auto expected = test_eigen_solver::tensor_eigenvalues(ref_values);
+        std::sort(expected.begin(), expected.end());
 
-        A_buffer.set_elem({0, 0}, uq_type{1.0 - noise, 1.0 + noise});
-        A_buffer.set_elem({0, 1}, uq_type{2.0 - noise, 2.0 + noise});
-        A_buffer.set_elem({1, 0}, uq_type{2.0 - noise, 2.0 + noise});
-        A_buffer.set_elem({1, 1}, uq_type{3.0 - noise, 3.0 + noise});
+        auto A = test_eigen_solver::noisy_matrix<uq_type>(a_system, 1e-7);
+        auto B = test_eigen_solver::noisy_matrix<uq_type>(b_system, 1e-7);
 
-        auto B_buffer = make_contiguous<uq_type>(shape);
-        B_buffer.set_elem({0, 0}, uq_type{1.0 - noise, 1 + noise});
-        B_buffer.set_elem({0, 1}, uq_type{0.0 - noise, 0.0 + noise});
-        B_buffer.set_elem({1, 0}, uq_type{0.0 - noise, 0.0 + noise});
-        B_buffer.set_elem({1, 1}, uq_type{1.0 - noise, 1.0 + noise});
-
-        simde::type::tensor A(shape, std::move(A_buffer));
-        simde::type::tensor B(shape, std::move(B_buffer));
-
-        auto&& [values, vector] = mod.run_as<pt>(A, B);
-
-        std::vector<uq_type> expected_values{-0.236068, 4.236068};
-        tensorwrapper::shape::Smooth corr_shape{2};
-        tensorwrapper::buffer::Contiguous corr_buffer(expected_values,
-                                                      corr_shape);
-        auto value_buffer = make_contiguous(values.buffer());
-        for(std::size_t i = 0; i < corr_buffer.shape().size(); ++i) {
-            auto corr_value = corr_buffer.get_elem({i});
-            auto value      = value_buffer.get_elem({i});
-            auto corr_uq    = wtf::fp::float_cast<uq_type>(corr_value);
-            auto value_uq   = wtf::fp::float_cast<uq_type>(value);
-            REQUIRE(value_uq.contains(corr_uq.median()));
-        }
+        auto& mod = mm.at("Generalized eigensolve");
+        mm.change_submod("Generalized eigensolve", "Eigen Solve",
+                         "Eigen Solve via Ball arithmetic");
+        auto [values, vectors] = mod.run_as<pt>(A, B);
+        test_eigen_solver::require_uq_eigenvalues_contain<uq_type>(values,
+                                                                   expected);
     }
 
+    // Hand-transcribed 7x7 Fock/overlap pencil with a genuine SPD metric. Kept
+    // as a regression anchor against the reference eigenvalue balls.
     SECTION("7 by 7 test case") {
-        auto A                  = uncertain_A();
-        auto B                  = uncertain_B();
-        auto&& [values, vector] = mod.run_as<pt>(A, B);
-        auto L_ball             = l_ball_corr();
+        auto A = uncertain_A();
+        auto B = uncertain_B();
 
-        auto value_buffer = make_contiguous(values.buffer());
-        auto corr_buffer  = make_contiguous(L_ball.buffer());
-        for(std::size_t i = 0; i < corr_buffer.shape().size(); ++i) {
-            auto corr_value = corr_buffer.get_elem({i});
-            auto value      = value_buffer.get_elem({i});
-            auto corr_uq    = wtf::fp::float_cast<uq_type>(corr_value);
-            auto value_uq   = wtf::fp::float_cast<uq_type>(value);
-            REQUIRE(value_uq.contains(corr_uq.median()));
+        auto& mod = mm.at("Generalized eigensolve");
+        mm.change_submod("Generalized eigensolve", "Eigen Solve",
+                         "Eigen Solve via Ball arithmetic");
+        auto&& [values, vector] = mod.run_as<pt>(A, B);
+
+        auto L_ball = l_ball_corr();
+        std::vector<double> expected;
+        auto corr_buffer =
+          tensorwrapper::buffer::make_contiguous(L_ball.buffer());
+        for(std::size_t i = 0; i < corr_buffer.shape().extent(0); ++i) {
+            expected.push_back(
+              wtf::fp::float_cast<uq_type>(corr_buffer.get_elem({i})).median());
         }
+        test_eigen_solver::require_uq_eigenvalues_contain<uq_type>(values,
+                                                                   expected);
     }
 }
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 NWChemEx-Project
+ * Copyright 2026 NWChemEx-Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,22 @@
  */
 
 #include "test_eigen_solver.hpp"
+#ifdef ENABLE_SIGMA
+using types = std::tuple<tensorwrapper::types::idouble>;
 
-using types = std::tuple<float, double>;
-TEMPLATE_LIST_TEST_CASE("EigenGeneralized", "", types) {
-    using float_type = TestType;
+TEMPLATE_LIST_TEST_CASE("BallNormal", "", types) {
+    using uq_type = TestType;
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
 
-    using pt  = simde::GeneralizedEigenSolve;
-    auto& mod = mm.at("Generalized eigensolve via Eigen");
+    auto& mod = mm.at("Eigen Solve via Ball arithmetic");
 
-    SECTION("classic 2 by 2 with B = I") {
+    SECTION("classic 2 by 2 with noise") {
         auto system = test_eigen_solver::classic_2x2();
-        auto A      = test_eigen_solver::matrix_as<float_type>(system);
-        auto B      = test_eigen_solver::matrix_as<float_type>(
-          test_eigen_solver::identity_system(system.n));
-        auto [values, vectors] = mod.run_as<pt>(A, B);
-        test_eigen_solver::require_eigenvalues_approx<float_type>(
-          values, test_eigen_solver::eigenvalues_vector(system), 1e-6);
+        auto A      = test_eigen_solver::noisy_matrix<uq_type>(system, 0.001);
+        auto [values, vectors] = mod.run_as<simde::EigenSolve>(A);
+        test_eigen_solver::require_uq_eigenvalues_contain<uq_type>(
+          values, test_eigen_solver::eigenvalues_vector(system));
     }
 }
+#endif

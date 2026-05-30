@@ -19,18 +19,23 @@
 
 namespace scf::eigen_solver {
 
-DECLARE_MODULE(BallGeneralized);
+DECLARE_MODULE(GeneralizedEigenSolver);
+DECLARE_MODULE(BallNormal);
 DECLARE_MODULE(EigenGeneralized);
+DECLARE_MODULE(EigenNormal);
 
 inline void set_defaults(pluginplay::ModuleManager& mm) {
-    mm.change_submod("Generalized eigensolve via Ball arithmetic",
-                     "Eigen Solve", "Generalized eigensolve via Eigen");
+    mm.change_submod("Eigen Solve via Ball arithmetic", "Eigen Solve",
+                     "Eigen Solve via Eigen");
+    mm.change_submod("Generalized eigensolve", "Eigen Solve",
+                     "Eigen Solve via Ball arithmetic");
 }
 
 inline void load_modules(pluginplay::ModuleManager& mm) {
+    mm.add_module<BallNormal>("Eigen Solve via Ball arithmetic");
+    mm.add_module<EigenNormal>("Eigen Solve via Eigen");
     mm.add_module<EigenGeneralized>("Generalized eigensolve via Eigen");
-    mm.add_module<BallGeneralized>(
-      "Generalized eigensolve via Ball arithmetic");
+    mm.add_module<GeneralizedEigenSolver>("Generalized eigensolve");
     set_defaults(mm);
 }
 
