@@ -80,164 +80,46 @@ inline void require_eigenpair_residual(const simde::type::tensor& A,
     REQUIRE(approximately_equal(VAV, L_diag, rtol));
 }
 
-// #ifdef ENABLE_SIGMA
+#ifdef ENABLE_SIGMA
+template<typename UQType>
+inline void require_uq_eigenvalues_contain(const simde::type::tensor& values,
+                                           const simde::type::tensor& expected,
+                                           double noise_level) {
+    using tensorwrapper::buffer::make_contiguous;
+    using wtf::fp::float_cast;
 
-// template<typename UQType>
-// inline void require_uq_eigenvalues_contain(
-//   const simde::type::tensor& values, const std::vector<double>& expected) {
-//     using tensorwrapper::buffer::make_contiguous;
-//     using wtf::fp::float_cast;
+    auto values_data   = get_raw_data<UQType>(values.buffer());
+    auto expected_data = get_raw_data<UQType>(expected.buffer());
+    REQUIRE(values_data.size() == expected_data.size());
 
-//     auto value_buffer = make_contiguous(values.buffer());
-//     REQUIRE(value_buffer.shape().extent(0) == expected.size());
-//     using value_type = typename UQType::value_t;
+    for(std::size_t i = 0; i < values_data.size(); ++i) {
+        REQUIRE(values_data[i].contains(expected_data[i].median()));
+        // Ensure width did not grow too much
+        REQUIRE(values_data[i].width() <= 50 * noise_level);
+    }
+}
 
-//     std::vector<UQType> balls;
-//     balls.reserve(expected.size());
-//     for(std::size_t i = 0; i < expected.size(); ++i) {
-//         const auto elem = value_buffer.get_elem({i});
-//         try {
-//             balls.push_back(float_cast<UQType>(elem));
-//         } catch(const std::runtime_error&) {
-//             const auto median = float_cast<value_type>(elem);
-//             balls.emplace_back(median);
-//         }
-//     }
+template<typename UQType>
+inline void require_uq_eigenpair_residual(const simde::type::tensor& A,
+                                          const simde::type::tensor& L,
+                                          const simde::type::tensor& C,
+                                          double noise_level) {
+    using tensorwrapper::operations::approximately_equal;
+    using tensorwrapper::utilities::diagonal_matrix;
+    auto L_diag = diagonal_matrix(L);
 
-//     auto expected_sorted = expected;
-//     std::sort(expected_sorted.begin(), expected_sorted.end());
-//     std::sort(balls.begin(), balls.end(), [](const UQType& a, const UQType&
-//     b) {
-//         return a.median() < b.median();
-//     });
+    tensorwrapper::Tensor VA, VAV, H;
+    VA("i,k")  = C("j,i") * A("j,k");
+    VAV("i,k") = VA("i,j") * C("j,k");
+    H("i,j")   = VAV("i,j") - L_diag("i,j");
 
-//     for(std::size_t i = 0; i < expected_sorted.size(); ++i) {
-//         REQUIRE(balls[i].contains(expected_sorted[i]));
-//     }
-// }
+    auto H_data = get_raw_data<UQType>(H.buffer());
+    for(std::size_t i = 0; i < H_data.size(); ++i) {
+        REQUIRE(H_data[i].contains(0.0));
+        REQUIRE(H_data[i].width() <= 50 * noise_level);
+    }
+}
 
-// template<typename UQType>
-// inline void require_uq_eigenvalues_contain_balls(
-//   const simde::type::tensor& values, const std::vector<UQType>& expected) {
-//     using tensorwrapper::buffer::make_contiguous;
-//     using wtf::fp::float_cast;
-
-//     auto value_buffer = make_contiguous(values.buffer());
-//     REQUIRE(value_buffer.shape().extent(0) == expected.size());
-//     for(std::size_t i = 0; i < expected.size(); ++i) {
-//         auto value_uq = float_cast<UQType>(value_buffer.get_elem({i}));
-//         REQUIRE(value_uq.contains(expected[i].median()));
-//     }
-// }
-
-// template<typename UQType>
-// inline void require_clustered_eigenvalues(const simde::type::tensor& values,
-//                                           double center, double rtol = 1e-6)
-//                                           {
-//     using tensorwrapper::buffer::get_raw_data;
-//     using tensorwrapper::buffer::make_contiguous;
-
-//     using wtf::fp::float_cast;
-//     auto value_buffer = make_contiguous(values.buffer());
-//     REQUIRE(value_buffer.shape().extent(0) >= 2);
-//     auto read_uq = [](const auto& elem) -> UQType {
-//         using wtf::fp::float_cast;
-//         using value_type = typename UQType::value_t;
-//         try {
-//             return float_cast<UQType>(elem);
-//         } catch(const std::runtime_error&) {
-//             const auto m = float_cast<value_type>(elem);
-//             return UQType(m, m);
-//         }
-//     };
-//     auto v0 = read_uq(value_buffer.get_elem({0}));
-//     auto v1 = read_uq(value_buffer.get_elem({1}));
-//     // Each certified eigenvalue ball should bracket the (shared) cluster
-//     // center, and the two medians should themselves be clustered together to
-//     // within the requested tolerance.
-//     const auto m0  = v0.median();
-//     const auto m1  = v1.median();
-//     const auto tol = rtol * (1.0 + std::abs(center));
-//     REQUIRE(std::abs(m0 - center) <= tol);
-//     REQUIRE(std::abs(m1 - center) <= tol);
-//     REQUIRE(std::abs(m0 - m1) <= tol);
-// }
-
-// template<typename UQType>
-// inline void require_uq_eigenvalues_approx(const simde::type::tensor& values,
-//                                           const std::vector<double>&
-//                                           expected, double rtol = 1e-6) {
-//     using value_type = typename UQType::value_t;
-//     using tensorwrapper::buffer::make_contiguous;
-//     using tensorwrapper::utilities::make_tensor;
-//     using wtf::fp::float_cast;
-
-//     auto value_buffer = make_contiguous(values.buffer());
-//     REQUIRE(value_buffer.shape().extent(0) == expected.size());
-//     std::vector<double> computed(value_buffer.shape().extent(0));
-//     for(std::size_t i = 0; i < computed.size(); ++i) {
-//         const auto elem = value_buffer.get_elem({i});
-//         try {
-//             computed[i] =
-//               static_cast<double>(float_cast<UQType>(elem).median());
-//         } catch(const std::runtime_error&) {
-//             computed[i] = static_cast<double>(float_cast<value_type>(elem));
-//         }
-//     }
-//     auto corr = computed;
-//     auto ref  = expected;
-//     std::sort(corr.begin(), corr.end());
-//     std::sort(ref.begin(), ref.end());
-//     auto corr_tensor = make_tensor({corr.size()}, corr);
-//     auto ref_tensor  = make_tensor({ref.size()}, ref);
-//     REQUIRE(tensorwrapper::operations::approximately_equal(corr_tensor,
-//                                                            ref_tensor,
-//                                                            rtol));
-// }
-
-// template<typename UQType>
-// inline simde::type::tensor uq_tensor_as_double(const simde::type::tensor& M)
-// {
-//     using value_type = typename UQType::value_t;
-//     using tensorwrapper::buffer::make_contiguous;
-//     using tensorwrapper::shape::Smooth;
-//     using wtf::fp::float_cast;
-
-//     auto in          = make_contiguous(M.buffer());
-//     auto shape       = in.shape().make_smooth();
-//     const auto n0    = shape.extent(0);
-//     const auto n1    = shape.rank() == 1 ? 1 : shape.extent(1);
-//     Smooth out_shape = shape.rank() == 1 ? Smooth{n0} : Smooth{n0, n1};
-//     auto out         = make_contiguous<double>(out_shape);
-//     if(shape.rank() == 1) {
-//         for(std::size_t i = 0; i < n0; ++i) {
-//             const auto elem = in.get_elem({i});
-//             try {
-//                 out.set_elem(
-//                   {i},
-//                   static_cast<double>(float_cast<UQType>(elem).median()));
-//             } catch(const std::runtime_error&) {
-//                 out.set_elem({i},
-//                              static_cast<double>(float_cast<value_type>(elem)));
-//             }
-//         }
-//     } else {
-//         for(std::size_t i = 0; i < n0; ++i) {
-//             for(std::size_t j = 0; j < n1; ++j) {
-//                 const auto elem = in.get_elem({i, j});
-//                 try {
-//                     out.set_elem({i, j}, static_cast<double>(
-//                                            float_cast<UQType>(elem).median()));
-//                 } catch(const std::runtime_error&) {
-//                     out.set_elem({i, j}, static_cast<double>(
-//                                            float_cast<value_type>(elem)));
-//                 }
-//             }
-//         }
-//     }
-//     return simde::type::tensor(out_shape, std::move(out));
-// }
-
-// #endif
+#endif
 
 } // namespace test_eigen_solver
