@@ -24,6 +24,7 @@ DECLARE_MODULE(EigenSolveDriver);
 DECLARE_MODULE(BallNormal);
 DECLARE_MODULE(EigenGeneralized);
 DECLARE_MODULE(EigenNormal);
+DECLARE_MODULE(QRNormal);
 
 inline void set_defaults(pluginplay::ModuleManager& mm) {
     mm.change_submod("Eigen Solve", "none", "Eigen Solve via Eigen");
@@ -40,6 +41,7 @@ inline void load_modules(pluginplay::ModuleManager& mm) {
     mm.add_module<EigenSolveDriver>("Eigen Solve");
     mm.add_module<BallNormal>("Eigen Solve via Ball arithmetic");
     mm.add_module<EigenNormal>("Eigen Solve via Eigen");
+    mm.add_module<QRNormal>("Eigen Solve via QR");
     mm.add_module<EigenGeneralized>("Generalized eigensolve via Eigen");
     mm.add_module<GeneralizedEigenSolver>("Generalized eigensolve");
     set_defaults(mm);
