@@ -30,21 +30,22 @@ struct Kernel {
     auto operator()(const std::span<FloatType>& a) {
         using tensorwrapper::types::fabs;
         using clean_type = std::decay_t<FloatType>;
-        bool in_noise    = false;
         bool converged   = false;
+        /// For UQ, the center/median of the difference is our best estimate
+        /// for the uncertainty caused by incomplete convergence. It plus/minus
+        // the radius/standard deviation is the total range of uncertainty.
+        // Convergence happens when the center/median is within the tolerance,
+        // regardless of the radius/standard deviation.
         if constexpr(tensorwrapper::types::is_interval_v<clean_type>) {
-            auto abs_val = fabs(a[0]);
-            // If uncertainty is greater than the tolerance, return true
-            in_noise  = abs_val.radius() > m_tol;
-            converged = abs_val.upper() < m_tol;
+            auto abs_val = fabs(a[0].median());
+            converged    = abs_val < m_tol;
         } else if constexpr(tensorwrapper::types::is_uncertain_v<clean_type>) {
             auto abs_val = fabs(a[0]);
-            in_noise     = abs_val.sd() > m_tol;
-            converged    = (abs_val.mean() + abs_val.sd()) < m_tol;
+            converged    = (abs_val.mean()) < m_tol;
         } else {
             converged = fabs(a[0]) < m_tol;
         }
-        return std::make_pair(converged, in_noise);
+        return converged;
     }
 };
 
@@ -290,11 +291,7 @@ MODULE_RUN(SCFLoop) {
             auto e_conv  = check_tolerance(de.buffer(), e_tol);
             auto g_conv  = check_tolerance(grad_norm.buffer(), g_tol);
             auto dp_conv = check_tolerance(dp_norm.buffer(), dp_tol);
-            if(e_conv.first && g_conv.first && dp_conv.first) converged = true;
-            if(e_conv.second) {
-                logger.log("  Energy has converged to within uncertainty");
-                converged = true;
-            }
+            if(e_conv && g_conv && dp_conv) converged = true;
 
             // If using DIIS and not converged, extrapolate new Fock matrix
             if(diis_on && !converged) { F = diis.extrapolate(F, grad); }
