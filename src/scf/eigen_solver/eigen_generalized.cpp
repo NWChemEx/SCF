@@ -44,7 +44,7 @@ struct Kernel {
         using clean_t = std::decay_t<FloatType>;
         // Convert to Eigen buffers
 
-        if constexpr(tensorwrapper::types::is_interval_v<clean_t>) {
+        if constexpr(tensorwrapper::types::is_uq_type_v<clean_t>) {
             throw std::runtime_error(
               "EigenGeneralized Kernel: Interval types not supported");
         } else {

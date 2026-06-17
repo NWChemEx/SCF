@@ -20,7 +20,8 @@ using pt = simde::AOEnergy;
 using tensorwrapper::operations::approximately_equal;
 
 using types = std::tuple<double, tensorwrapper::types::udouble,
-                         tensorwrapper::types::interval_type<double>>;
+                         tensorwrapper::types::interval_type<double>,
+                         tensorwrapper::types::thresholded_affine_type<double>>;
 
 TEMPLATE_LIST_TEST_CASE("SCFDriver", "", types) {
     using float_type = TestType;
@@ -53,8 +54,7 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", types) {
         }
         SECTION("DFT") {
             // GauXC not currently compatible with Uncertain values
-            if constexpr(!tensorwrapper::types::is_uncertain_v<float_type> &&
-                         !tensorwrapper::types::is_interval_v<float_type>) {
+            if constexpr(!tensorwrapper::types::is_uq_type_v<float_type>) {
                 auto func         = chemist::qm_operator::xc_functional::PBE;
                 const auto RKS_op = "Restricted Kohn-Sham Op";
                 const auto rks_op = "Restricted One-Electron Kohn-Sham Op";

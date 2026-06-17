@@ -33,11 +33,9 @@ namespace {
     mm.change_input("Kinetic", "UQ Type", uq_type);
     mm.change_input("Nuclear", "UQ Type", uq_type);
     mm.change_input("sto-3g atomic density matrix", "With UQ?", true);
-    if(uq_type == "interval") {
-        mm.change_submod("Loop", "Diagonalizer", "Generalized eigensolve");
-        mm.change_submod("Diagonalization Fock update", "Diagonalizer",
-                         "Generalized eigensolve");
-    }
+    mm.change_submod("Loop", "Diagonalizer", "Generalized eigensolve");
+    mm.change_submod("Diagonalization Fock update", "Diagonalizer",
+                     "Generalized eigensolve");
 }
 } // namespace
 
@@ -70,17 +68,15 @@ pluginplay::ModuleManager load_modules() {
         configure_uq(mm, "uncertain");
     } else if constexpr(tensorwrapper::types::is_interval_v<FloatType>) {
         std::string key = "interval";
-        mm.at("Generalized eigensolve via Eigen").turn_off_memoization();
-        mm.at("Density matrix builder").turn_off_memoization();
-        mm.at("Electronic energy").turn_off_memoization();
-        mm.at("Fock matrix builder").turn_off_memoization();
-        mm.at("Restricted One-Electron Fock Op").turn_off_memoization();
-        mm.at("Restricted Fock Op").turn_off_memoization();
-        mm.at("Four center J builder").turn_off_memoization();
-        mm.at("Four center K builder").turn_off_memoization();
-        configure_uq(mm, "interval");
+        configure_uq(mm, key);
+    } else if constexpr(tensorwrapper::types::is_affine_v<FloatType>) {
+        std::string key = "affine";
+        configure_uq(mm, key);
+    } else if constexpr(tensorwrapper::types::is_thresholded_affine_v<
+                          FloatType>) {
+        std::string key = "thresholded affine";
+        configure_uq(mm, key);
     }
-
     return mm;
 }
 

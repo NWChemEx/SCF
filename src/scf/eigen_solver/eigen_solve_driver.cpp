@@ -54,10 +54,11 @@ struct Router {
     template<typename FloatType>
     return_t operator()(const std::span<FloatType>&) {
         using clean_t = std::decay_t<FloatType>;
-        if constexpr(tensorwrapper::types::is_interval_v<clean_t>) {
-            return m_submods.at(kIntervalSubmodule).run_as<pt>(m_A);
-        } else if constexpr(tensorwrapper::types::is_uncertain_v<clean_t>) {
+
+        if constexpr(tensorwrapper::types::is_uncertain_v<clean_t>) {
             return m_submods.at(kUncertainSubmodule).run_as<pt>(m_A);
+        } else if constexpr(tensorwrapper::types::is_uq_type_v<clean_t>) {
+            return m_submods.at(kIntervalSubmodule).run_as<pt>(m_A);
         } else {
             return m_submods.at(kNoneSubmodule).run_as<pt>(m_A);
         }

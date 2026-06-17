@@ -28,24 +28,14 @@ struct Kernel {
 
     template<typename FloatType>
     auto operator()(const std::span<FloatType>& a) {
-        using tensorwrapper::types::fabs;
-        using clean_type = std::decay_t<FloatType>;
-        bool converged   = false;
+        using tensorwrapper::types::uq_center;
         /// For UQ, the center/median of the difference is our best estimate
         /// for the uncertainty caused by incomplete convergence. It plus/minus
         // the radius/standard deviation is the total range of uncertainty.
         // Convergence happens when the center/median is within the tolerance,
         // regardless of the radius/standard deviation.
-        if constexpr(tensorwrapper::types::is_interval_v<clean_type>) {
-            auto abs_val = fabs(a[0].median());
-            converged    = abs_val < m_tol;
-        } else if constexpr(tensorwrapper::types::is_uncertain_v<clean_type>) {
-            auto abs_val = fabs(a[0]);
-            converged    = (abs_val.mean()) < m_tol;
-        } else {
-            converged = fabs(a[0]) < m_tol;
-        }
-        return converged;
+        auto abs_val = std::fabs(uq_center(a[0]));
+        return abs_val < m_tol;
     }
 };
 

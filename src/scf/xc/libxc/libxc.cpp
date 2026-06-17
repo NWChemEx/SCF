@@ -293,7 +293,7 @@ struct BatchedDotKernel {
         // AOs on rows, grid points on columns
         if(m_sum_row) {
             for(std::size_t grid_i = 0; grid_i < m_n_grid; ++grid_i) {
-                clean_type sum = 0.0;
+                clean_type sum(0.0);
                 for(std::size_t ao_i = 0; ao_i < m_n_aos; ++ao_i) {
                     const auto idx = ao_i * m_n_grid + grid_i;
                     sum += aos_on_grid[idx] * X[idx];
@@ -302,7 +302,7 @@ struct BatchedDotKernel {
             }
         } else {
             for(std::size_t ao_i = 0; ao_i < m_n_aos; ++ao_i) {
-                clean_type sum = 0.0;
+                clean_type sum(0.0);
                 for(std::size_t grid_i = 0; grid_i < m_n_grid; ++grid_i) {
                     const auto idx = ao_i * m_n_grid + grid_i;
                     sum += aos_on_grid[idx] * X[idx];
