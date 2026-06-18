@@ -196,25 +196,6 @@ void jacobi_sweep(dynamic_matrix<T>& S, dynamic_matrix<T>& V, std::size_t n) {
     }
 }
 
-// template<typename T>
-// void jacobi_sweep(dynamic_matrix<T>& S, dynamic_matrix<T>& V, std::size_t n)
-// {
-//     if constexpr(tensorwrapper::types::is_uq_type_v<T>) {
-//         jacobi_interval::jacobi_sweep_interval(S, V, n);
-//     } else {
-//         for(std::size_t p = 0; p < n; ++p) {
-//             for(std::size_t q = p + 1; q < n; ++q) {
-//                 Eigen::JacobiRotation<T> J;
-//                 if(J.makeJacobi(S, p, q)) {
-//                     S.applyOnTheLeft(p, q, J.adjoint());
-//                     S.applyOnTheRight(p, q, J);
-//                     V.applyOnTheRight(p, q, J);
-//                 }
-//             }
-//         }
-//     }
-// }
-
 template<typename T>
 inline std::pair<std::vector<T>, std::vector<T>> symmetric_jacobi_eigen(
   std::span<const T> A, std::size_t n, double tol, std::size_t max_sweeps) {
