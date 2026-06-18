@@ -43,6 +43,8 @@ TEMPLATE_LIST_TEST_CASE("EigenNormal", "", types) {
         spec.seed              = 11;
         auto system            = generate_eigen_system<TestType>(spec);
         auto [values, vectors] = mod.run_as<pt>(system.matrix);
+        std::cout << values << std::endl;
+        std::cout << system.eigenvalues << std::endl;
         require_eigenvalues_approx(values, system.eigenvalues, rtol);
         require_eigenpair_residual(system.matrix, values, vectors, rtol);
     }
