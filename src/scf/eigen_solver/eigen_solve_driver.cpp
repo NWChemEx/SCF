@@ -42,7 +42,7 @@ constexpr const char* kIntervalSubmodule  = "interval";
 using pt = simde::EigenSolve;
 
 struct Router {
-    using return_t = std::pair<simde::type::tensor, simde::type::tensor>;
+    using return_t = std::tuple<simde::type::tensor, simde::type::tensor>;
 
     const simde::type::tensor& m_A;
     pluginplay::type::submodule_map& m_submods;
