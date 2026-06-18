@@ -25,7 +25,7 @@ TEMPLATE_LIST_TEST_CASE("EigenNormal", "", types) {
     scf::load_modules(mm);
 
     auto& mod = mm.at("Eigen Solve via Eigen");
-    auto rtol = std::is_same_v<TestType, float> ? 5e-4 : 1e-5;
+    auto rtol = std::is_same_v<TestType, float> ? 1e-4 : 1e-5;
     using pt  = simde::EigenSolve;
     SECTION("classic 2 by 2") {
         auto system            = test_eigen_solver::classic_2x2<TestType>();
