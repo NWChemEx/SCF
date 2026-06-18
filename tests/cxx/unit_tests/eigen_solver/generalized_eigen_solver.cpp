@@ -20,7 +20,7 @@
 using types = std::tuple<float, double>;
 using namespace test_eigen_solver;
 
-TEMPLATE_LIST_TEST_CASE("EigenGeneralized H2 dimer", "", types) {
+TEMPLATE_LIST_TEST_CASE("GeneralizedEigenSolver H2 dimer", "", types) {
     using pt = simde::GeneralizedEigenSolve;
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
@@ -29,7 +29,7 @@ TEMPLATE_LIST_TEST_CASE("EigenGeneralized H2 dimer", "", types) {
     auto A    = h2_dimer_fock_as<TestType>();
     auto B    = h2_dimer_overlap_as<TestType>();
 
-    auto& mod              = mm.at("Generalized eigensolve via Eigen");
+    auto& mod              = mm.at("Generalized eigensolve");
     auto [values, vectors] = mod.run_as<pt>(A, B);
     auto eval_corr         = h2_dimer_evals<TestType>();
     require_eigenvalues_approx(values, eval_corr, rtol);

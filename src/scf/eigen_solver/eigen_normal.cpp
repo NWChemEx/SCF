@@ -31,26 +31,17 @@ struct Kernel {
     Kernel(std::size_t n_rows, std::size_t n_cols) :
       m_n_rows(n_rows), m_n_cols(n_cols) {}
 
-    template<typename FloatType0, typename FloatType1>
-    return_t operator()(const std::span<FloatType0>& A,
-                        const std::span<FloatType1>& B) {
-        throw std::runtime_error(
-          "EigenGeneralized Kernel: Mixed float types not supported");
-    }
-
     template<typename FloatType>
-    return_t operator()(const std::span<FloatType>& A,
-                        const std::span<FloatType>& B) {
+    return_t operator()(const std::span<FloatType>& A) {
         using clean_t = std::decay_t<FloatType>;
         // Convert to Eigen buffers
 
         if constexpr(tensorwrapper::types::is_uq_type_v<clean_t>) {
             throw std::runtime_error(
-              "EigenGeneralized Kernel: Interval types not supported");
+              "EigenNormalKernel: Interval types not supported");
         } else {
             // Wrap the tensors in Eigen::Map objects to avoid copy
             const auto* pA = A.data();
-            const auto* pB = B.data();
             auto rows      = m_n_rows;
             auto cols      = m_n_cols;
 
@@ -62,13 +53,11 @@ struct Kernel {
             using map_type = Eigen::Map<const matrix_type>;
 
             map_type A_map(pA, rows, cols);
-            map_type B_map(pB, rows, cols);
 
             // Compute
-            Eigen::GeneralizedSelfAdjointEigenSolver<matrix_type> ges(A_map,
-                                                                      B_map);
-            auto eigen_values  = ges.eigenvalues();
-            auto eigen_vectors = ges.eigenvectors();
+            Eigen::SelfAdjointEigenSolver<matrix_type> es(A_map);
+            auto eigen_values  = es.eigenvalues();
+            auto eigen_vectors = es.eigenvectors();
 
             // Wrap in TensorWrapper Tensor
             tensorwrapper::shape::Smooth vector_shape{rows};
@@ -97,30 +86,29 @@ struct Kernel {
 };
 } // namespace
 
-using pt = simde::GeneralizedEigenSolve;
+using pt = simde::EigenSolve;
 
 const auto desc = R"(
-Generalized Eigen Solve via Eigen
----------------------------------
+ Eigen Solve via Eigen
+ ---------------------------------
 
-TODO: Write me!!!
-)";
+ TODO: Write me!!!
+ )";
 
-MODULE_CTOR(EigenGeneralized) {
+MODULE_CTOR(EigenNormal) {
     description(desc);
     satisfies_property_type<pt>();
 }
 
-MODULE_RUN(EigenGeneralized) {
-    auto&& [A, B] = pt::unwrap_inputs(inputs);
+MODULE_RUN(EigenNormal) {
+    auto&& [A] = pt::unwrap_inputs(inputs);
 
     using tensorwrapper::buffer::make_contiguous;
     const auto& A_buffer = make_contiguous(A.buffer());
-    const auto& B_buffer = make_contiguous(B.buffer());
     const auto& A_shape  = A_buffer.shape();
     Kernel k(A_shape.extent(0), A_shape.extent(1));
     using tensorwrapper::buffer::visit_contiguous_buffer;
-    auto [values, vectors] = visit_contiguous_buffer(k, A_buffer, B_buffer);
+    auto [values, vectors] = visit_contiguous_buffer(k, A_buffer);
 
     auto rv = results();
     return pt::wrap_results(rv, values, vectors);
