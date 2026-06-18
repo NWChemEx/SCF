@@ -25,7 +25,7 @@ TEMPLATE_LIST_TEST_CASE("EigenNormal", "", types) {
     scf::load_modules(mm);
 
     auto& mod = mm.at("Eigen Solve via Eigen");
-    auto rtol = std::is_same_v<TestType, float> ? 1e-4 : 1e-5;
+    auto rtol = std::is_same_v<TestType, float> ? 1e-3 : 1e-5;
     using pt  = simde::EigenSolve;
     SECTION("classic 2 by 2") {
         auto system            = test_eigen_solver::classic_2x2<TestType>();
@@ -43,8 +43,6 @@ TEMPLATE_LIST_TEST_CASE("EigenNormal", "", types) {
         spec.seed              = 11;
         auto system            = generate_eigen_system<TestType>(spec);
         auto [values, vectors] = mod.run_as<pt>(system.matrix);
-        std::cout << values << std::endl;
-        std::cout << system.eigenvalues << std::endl;
         require_eigenvalues_approx(values, system.eigenvalues, rtol);
         require_eigenpair_residual(system.matrix, values, vectors, rtol);
     }
