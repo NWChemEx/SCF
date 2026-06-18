@@ -16,6 +16,9 @@ Modules API
    Density2Grid
    Determinant_driver
    Diagonalization_Fock_update
+   Eigen_Solve
+   Eigen_Solve_via_Eigen
+   Eigen_Solve_via_Jacobi
    Electronic_energy
    Fock_matrix_builder
    Gau2Grid
@@ -25,7 +28,7 @@ Modules API
    GauXC_Quadrature_Batches
    GauXC_XC_Energy
    GauXC_XC_Potential
-   Generalized_eigensolve_via_Ball_arithmetic
+   Generalized_eigensolve
    Generalized_eigensolve_via_Eigen
    Grid_From_File
    LibXC_Energy
