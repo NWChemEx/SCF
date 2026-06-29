@@ -40,19 +40,19 @@ module. The columns are:
 - ``Default`` : The initial value, if one exists, and
 - ``Description`` : A human readable description of what the option is used for.
 
-+------------------------+-------------------------------------+-------------+
-| Key                    | Default                             | Description |
-+========================+=====================================+=============+
-| AO Basis               | N/A                                 | N/A         |
-+------------------------+-------------------------------------+-------------+
-| Grid Type              | UltraFine                           | N/A         |
-+------------------------+-------------------------------------+-------------+
-| On GPU                 | 0                                   | N/A         |
-+------------------------+-------------------------------------+-------------+
-| Pruning Scheme         | <N5GauXC13PruningSchemeE 0xf5bfcd8> | N/A         |
-+------------------------+-------------------------------------+-------------+
-| Radial Quadrature Type | <N5GauXC10RadialQuadE 0xf5bfe88>    | N/A         |
-+------------------------+-------------------------------------+-------------+
++------------------------+--------------------------------------+-------------+
+| Key                    | Default                              | Description |
++========================+======================================+=============+
+| AO Basis               | N/A                                  | N/A         |
++------------------------+--------------------------------------+-------------+
+| Grid Type              | UltraFine                            | N/A         |
++------------------------+--------------------------------------+-------------+
+| On GPU                 | 0                                    | N/A         |
++------------------------+--------------------------------------+-------------+
+| Pruning Scheme         | <N5GauXC13PruningSchemeE 0x3e320458> | N/A         |
++------------------------+--------------------------------------+-------------+
+| Radial Quadrature Type | <N5GauXC10RadialQuadE 0x3e320608>    | N/A         |
++------------------------+--------------------------------------+-------------+
 
 
 Detailed Descriptions
@@ -105,7 +105,7 @@ Pruning Scheme
 --------------
 
 - Description : N/A
-- Default Value : <N5GauXC13PruningSchemeE 0xf5bfcd8>
+- Default Value : <N5GauXC13PruningSchemeE 0x3e320458>
 - Optional? : False
 - Opaque? : True
 - Domain Restrictions :
@@ -116,7 +116,7 @@ Radial Quadrature Type
 ----------------------
 
 - Description : N/A
-- Default Value : <N5GauXC10RadialQuadE 0xf5bfe88>
+- Default Value : <N5GauXC10RadialQuadE 0x3e320608>
 - Optional? : False
 - Opaque? : True
 - Domain Restrictions :

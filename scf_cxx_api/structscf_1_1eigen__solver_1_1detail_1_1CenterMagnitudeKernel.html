@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>scf: src/scf/eigen_solver Directory Reference</title>
+<title>scf: scf::eigen_solver::detail::CenterMagnitudeKernel Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -69,34 +69,35 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_a419911e885a1f0d28fc2be30ad7aaa6.html">scf</a></li><li class="navelem"><a class="el" href="dir_cd796f3439a57d18b2328eb65e01596d.html">eigen_solver</a></li>  </ul>
+<li class="navelem"><b>scf</b></li><li class="navelem"><b>eigen_solver</b></li><li class="navelem"><b>detail</b></li><li class="navelem"><a class="el" href="structscf_1_1eigen__solver_1_1detail_1_1CenterMagnitudeKernel.html">CenterMagnitudeKernel</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
-  <div class="headertitle"><div class="title">eigen_solver Directory Reference</div></div>
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="structscf_1_1eigen__solver_1_1detail_1_1CenterMagnitudeKernel-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">scf::eigen_solver::detail::CenterMagnitudeKernel Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="dynheader">
-Directory dependency graph for eigen_solver:</div>
-<div class="dyncontent">
-<div class="center"><img src="dir_cd796f3439a57d18b2328eb65e01596d_dep.png" border="0" usemap="#adir__cd796f3439a57d18b2328eb65e01596d__dep" alt="src/scf/eigen_solver"/></div>
-<map name="adir__cd796f3439a57d18b2328eb65e01596d__dep" id="adir__cd796f3439a57d18b2328eb65e01596d__dep">
-<area shape="rect" href="dir_cd796f3439a57d18b2328eb65e01596d.html" title="eigen_solver" alt="" coords="26,52,131,77"/>
-<area shape="rect" href="dir_a419911e885a1f0d28fc2be30ad7aaa6.html" title="scf" alt="" coords="16,16,141,88"/>
-</map>
-</div>
+
+<p>Returns the absolute value of the center of element 0.  
+ <a href="structscf_1_1eigen__solver_1_1detail_1_1CenterMagnitudeKernel.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="inflate__uncertainty_8hpp_source.html">inflate_uncertainty.hpp</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="files" name="files"></a>
-Files</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a href="eigen__solver_8hpp_source.html"><span class="icondoc"></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>eigen_solver.hpp</b></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a href="eigenvector__uncertainty_8hpp_source.html"><span class="icondoc"></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>eigenvector_uncertainty.hpp</b></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a href="inflate__uncertainty_8hpp_source.html"><span class="icondoc"></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>inflate_uncertainty.hpp</b></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top"><a href="jacobi__eigen__helpers_8hpp_source.html"><span class="icondoc"></span></a>&#160;</td><td class="memItemRight" valign="bottom"><b>jacobi_eigen_helpers.hpp</b></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a62c51d5c6620b68b6c7b3b00edf94eb9" id="r_a62c51d5c6620b68b6c7b3b00edf94eb9"><td class="memTemplParams" colspan="2"><a id="a62c51d5c6620b68b6c7b3b00edf94eb9" name="a62c51d5c6620b68b6c7b3b00edf94eb9"></a>
+template&lt;typename FloatType &gt; </td></tr>
+<tr class="memitem:a62c51d5c6620b68b6c7b3b00edf94eb9"><td class="memTemplItemLeft" align="right" valign="top">double&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator()</b> (std::span&lt; FloatType &gt; data) const</td></tr>
+<tr class="separator:a62c51d5c6620b68b6c7b3b00edf94eb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Returns the absolute value of the center of element 0. </p>
+<p>For a convergence residual (e.g. de = e - e_old) this is the quantity the convergence check bounds by the tolerance &ndash; the incomplete-convergence error &ndash; NOT the propagated uncertainty (which is the radius and is of the same order as the energy's own uncertainty). Dispatched on the element type; for non-UQ types the center is just the value. </p>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<li>src/scf/eigen_solver/<a class="el" href="inflate__uncertainty_8hpp_source.html">inflate_uncertainty.hpp</a></li>
+</ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
