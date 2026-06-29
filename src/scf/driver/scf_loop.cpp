@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "../eigen_solver/eigenvector_uncertainty.hpp"
+#include "../eigen_solver/inflate_uncertainty.hpp"
 #include "driver.hpp"
 #include <scf/driver/commutator.hpp>
 
@@ -204,6 +206,12 @@ MODULE_RUN(SCFLoop) {
     tensor_t e_old;
     tensor_t F_old;
 
+    // Converged-iteration residuals, captured for post-convergence UQ
+    // inflation: de is the final change in energy, dp the final change in the
+    // density matrix. They drive the extra energy/MO uncertainty below.
+    tensor_t de;
+    tensor_t dp;
+
     // Initialize loop
     unsigned int iter = 0;
     auto& logger      = get_runtime().logger();
@@ -258,11 +266,9 @@ MODULE_RUN(SCFLoop) {
         bool converged = false;
         if(iter > 0) {
             // Change in the energy
-            tensor_t de;
             de("") = e("") - e_old("");
 
             // Change in the density
-            tensor_t dp;
             const auto& P_old = rho_old.value();
             dp("m,n")         = rho.value()("m,n") - P_old("m,n");
             auto dp_norm      = tensorwrapper::operations::infinity_norm(dp);
@@ -303,12 +309,45 @@ MODULE_RUN(SCFLoop) {
     }
     if(iter == max_iter) throw std::runtime_error("SCF failed to converge");
 
+    // One-shot: attach first-order MO-coefficient uncertainty to the converged
+    // orbitals. The SCF iterates on the centers, so the eigenvector spread is
+    // NOT fed back through the density (which would compound it); it is applied
+    // once, here, to the converged Fock and only reported. See
+    // eigen_solver/eigenvector_uncertainty.hpp.
+    {
+        const auto&& [evalues, evectors] =
+          diagonalizer_mod.run_as<diagonalizer_pt>(F_old, S);
+        auto corrected_vectors = evectors;
+        eigen_solver::attach_eigenvector_uncertainty(corrected_vectors, F_old,
+                                                     evalues);
+
+        // Inflate each MO coefficient by an independent uncertainty of radius
+        // |dP_mn|, using the converged density change dp as the per-element dP.
+        // The density P = sum_i C_mi C_ni then picks up a first-order change of
+        // order |C| * dP ~ dP per element, so each density-matrix element's
+        // uncertainty lands at ~dP (its converged residual). No-op unless a UQ
+        // type is active. See inflate_uncertainty.hpp for why this is dP and
+        // not sqrt(dP).
+        eigen_solver::inflate_uncertainty_from(corrected_vectors, dp);
+
+        cmos_t cmos(evalues, aos, corrected_vectors);
+        psi_old = wf_type(psi_old.orbital_indices(), cmos);
+    }
+
     tensor_t e_total;
 
     // This is a hack because WTF doesn't do auto-conversions yet
     e_nuclear = convert_e_nuclear(e_old, e_nuclear);
 
     e_total("") = e_old("") + e_nuclear("");
+
+    // Add an extra independent uncertainty to the converged total energy equal
+    // to the magnitude of the final energy change |center(de)| -- the
+    // incomplete-convergence error (bounded by the energy tolerance), NOT de's
+    // propagated uncertainty radius (which is ~the energy's own uncertainty and
+    // would roughly double it). No-op unless a UQ float type is active.
+    eigen_solver::inflate_uncertainty(e_total,
+                                      eigen_solver::uq_center_magnitude(de));
 
     auto rv = results();
     return pt<wf_type>::wrap_results(rv, e_total, psi_old);
