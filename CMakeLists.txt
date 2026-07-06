@@ -1,4 +1,4 @@
-# Copyright 2024 NWChemEx-Project
+# Copyright 2026 NWChemEx-Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,152 +14,107 @@
 
 cmake_minimum_required(VERSION 3.14)
 
-# Downloads common CMake modules used throughout NWChemEx
-
-#Sets the version to whatever git thinks it is
-#include(get_version_from_git)
-#get_version_from_git(scf_version "${CMAKE_CURRENT_LIST_DIR}")
-project(scf VERSION "1.0.0" LANGUAGES CXX)
-set(CMAKE_CXX_STANDARD 20)
+# Downloads common CMake modules used throughout NWChemEx. Included before
+# project() so nwx_set_version() is available to compute the version.
 include(cmake/get_nwx_cmake.cmake)
 
-include(get_cmaize)
+# Version from scikit-build-core (wheels/sdists) or the latest git tag.
+include(nwx_set_version)
+nwx_set_version(scf_version "${CMAKE_CURRENT_LIST_DIR}")
+project(scf VERSION "${scf_version}" LANGUAGES CXX)
+
+include(disable_in_source_builds)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
+option(BUILD_TESTING           "Whether to build the unit tests"        OFF)
+option(BUILD_PYBIND11_BINDINGS "Build Python bindings via pybind11"     ON)
+option(BUILD_LIBXC             "Build libxc-backed XC functionals?"     ON)
+option(INTEGRATION_TESTING     "Should we build the integration tests?" OFF)
+
+# Documentation target (no-op unless BUILD_DOCS is on)
 include(nwx_cxx_api_docs)
+nwx_cxx_api_docs("cxx/include" "cxx/src")
 
-set(SCF_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(SCF_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
-set(SCF_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests")
-
-nwx_cxx_api_docs("${SCF_SOURCE_DIR}" "${SCF_INCLUDE_DIR}")
-
-### Options ###
-
-cmaize_option_list(
-    BUILD_TESTING OFF "Should we build the tests?"
-    BUILD_PYBIND11_PYBINDINGS ON "Build Python bindings with pybind11?"
-    BUILD_TAMM_SCF OFF "Should we build modules that rely on TAMM/Exachem?"
-    BUILD_LIBXC ON "Should we build libxc?"
-    INTEGRATION_TESTING OFF "Should we build the integration tests?"
-)
-
-if("${BUILD_TAMM_SCF}")
-    set(DEPENDENCIES simde gauxc tamm exachem chemcache)
-    include(get_libint2)
-else()
-    set(DEPENDENCIES simde gauxc)
+### Dependencies ###
+# simde is the only PUBLIC dep; gauxc/eigen/gau2grid/libxc are implementation
+# details of the XC and eigensolver internals (PRIVATE).
+set(scf_private_deps gauxc eigen gau2grid)
+if(BUILD_LIBXC)
+    list(APPEND scf_private_deps libxc)
 endif()
 
-foreach(dependency_i ${DEPENDENCIES})
-    include(get_${dependency_i})
-endforeach()
+include(get_dependencies)
+get_dependencies(simde ${scf_private_deps})
 
-cmaize_find_or_build_dependency(
-    eigen
-    NAME Eigen3
-    URL https://www.gitlab.com/libeigen/eigen
-    VERSION 2e76277bd049f7bec36b0f908c69734a42c5234f
-    BUILD_TARGET eigen
-    FIND_TARGET Eigen3::Eigen
-    CMAKE_ARGS EIGEN_BUILD_TESTING=OFF
-)
-
-cmaize_find_or_build_dependency(
-    gau2grid
-    NAME Gau2grid
-    URL https://github.com/psi4/gau2grid
-    VERSION master
-    BUILD_TARGET gg
-    FIND_TARGET gg
-
-)
-
-set(BUILD_TESTING_BACKUP ${BUILD_TESTING})
-set(BUILD_TESTING OFF)
-cmaize_find_or_build_optional_dependency(
-    libxc
-    BUILD_LIBXC
-    NAME Libxc
-    URL https://gitlab.com/libxc/libxc
-    VERSION devel
-    BUILD_TARGET xc
-    FIND_TARGET Libxc::xc
-    CMAKE_ARGS BUILD_TESTING=OFF
-)
-set(BUILD_TESTING ${BUILD_TESTING_BACKUP})
-
-cmaize_add_library(
-    scf
-    SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/src/scf"
-    INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/include/scf"
-    DEPENDS "${DEPENDENCIES}" eigen gau2grid libxc
-)
-
-if("${BUILD_TAMM_SCF}")
-    target_compile_definitions(scf PRIVATE BUILD_TAMM_SCF)
-    cmaize_add_executable(
-        scf_driver
-        SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/examples/driver"
-        DEPENDS scf Libint2
-    )
+### Library ###
+include(nwx_library)
+nwx_library(${PROJECT_NAME} "cxx/include" "cxx/src"
+    simde PRIVATE ${scf_private_deps})
+if(BUILD_LIBXC)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE BUILD_LIBXC)
 endif()
 
-include(nwx_pybind11)
-nwx_add_pybind11_module(
-    ${PROJECT_NAME}
-    SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/src/python"
-    DEPENDS "${PROJECT_NAME}"
-)
+### Python bindings (no-op unless BUILD_PYBIND11_BINDINGS is on) ###
+include(nwx_python_module)
+nwx_python_module(${PROJECT_NAME} "cxx/src")
 
-if("${BUILD_TESTING}")
-    include(CTest)
-    set(PYTHON_TEST_DIR "${SCF_TESTS_DIR}/python")
-    set(CXX_TEST_DIR "${SCF_TESTS_DIR}/cxx")
+### Tests ###
+if(BUILD_TESTING)
+    include(nwx_find_mpi)
+    nwx_find_mpi()
 
-    include(get_catch2)
-    include(cmake/mpi_test.cmake)
-    cmaize_add_tests(
-        unit_test_scf
-        SOURCE_DIR "${CXX_TEST_DIR}/unit_tests"
-        INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/scf"
-        DEPENDS Catch2 scf
+    # The unit tests white-box XC/eigensolver private headers that pull the
+    # external headers (libxc's <xc.h>, gauxc, Eigen), so those externals must
+    # be linked into the test executable in addition to scf itself.
+    set(scf_test_libs
+        ${PROJECT_NAME}
+        ${NWX_DEP_TARGET_gauxc}
+        ${NWX_DEP_TARGET_eigen}
+        ${NWX_DEP_TARGET_gau2grid}
     )
-    # python_mpi_test(
-    #     unit_test_scf
-    #     "${PYTHON_TEST_DIR}/unit_tests/run_unit_tests.py"
-    #     SUBMODULES simde chemist pluginplay parallelzone tensorwrapper
-    # )
+    if(BUILD_LIBXC)
+        list(APPEND scf_test_libs ${NWX_DEP_TARGET_libxc})
+    endif()
 
-    if("${INTEGRATION_TESTING}")
-        include(get_nwchemex)
-        cmaize_add_tests(
-            integration_test_scf
-            SOURCE_DIR "${CXX_TEST_DIR}/integration_tests"
-            INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/src/scf"
-            DEPENDS Catch2 nwchemex scf
+    include(catch2_tests_from_dir)
+    catch2_tests_from_dir(
+        "test_unit_${PROJECT_NAME}"
+        "tests/cxx/unit_tests"
+        ${scf_test_libs}
+        PRIVATE_INCLUDES "cxx/src" "cxx/src/${PROJECT_NAME}"
+    )
+    if(BUILD_LIBXC)
+        target_compile_definitions(test_unit_${PROJECT_NAME} PRIVATE BUILD_LIBXC)
+    endif()
+
+    # The C++ unit tests can also be run under MPI with 2 ranks. Left wired but
+    # disabled by default (mirrors ParallelZone); enable if a build needs it.
+    include(nwx_mpi_test)
+    #nwx_mpi_test(test_unit_${PROJECT_NAME}_mpi test_unit_${PROJECT_NAME} NPROC 2)
+
+    include(nwx_python_test)
+    nwx_python_test(
+        py_unit_test_${PROJECT_NAME}
+        "${CMAKE_CURRENT_LIST_DIR}/tests/python/unit_tests/run_unit_tests.py"
+    )
+
+    if(INTEGRATION_TESTING)
+        get_dependencies(nwchemex)
+        catch2_tests_from_dir(
+            "test_integration_${PROJECT_NAME}"
+            "tests/cxx/integration_tests"
+            ${scf_test_libs} ${NWX_DEP_TARGET_nwchemex}
+            PRIVATE_INCLUDES "cxx/src" "cxx/src/${PROJECT_NAME}"
         )
-
-        # python_mpi_test(
-        #     integration_test_scf
-        #     "${PYTHON_TEST_DIR}/integration_tests/run_integration_tests.py"
-        #     SUBMODULES nwchemex chemcache integrals simde chemist pluginplay
-        #                parallelzone friendzone tensorwrapper nux
-        # )
-
-        # Workaround for the NWX being pure python
-        # if("${BUILD_PYBIND11_PYBINDINGS}")
-        #     get_test_property(
-        #         py_integration_test_scf
-        #         ENVIRONMENT py_path
-        #     )
-        #     set(
-        #         py_path "${py_path}:${nwchemex_SOURCE_DIR}/src/python"
-        #     )
-        #     set_tests_properties(
-        #         py_integration_test_scf
-        #         PROPERTIES ENVIRONMENT "${py_path}"
-        #     )
-        # endif()
+        if(BUILD_LIBXC)
+            target_compile_definitions(
+                test_integration_${PROJECT_NAME} PRIVATE BUILD_LIBXC
+            )
+        endif()
+        nwx_python_test(
+            py_integration_test_${PROJECT_NAME}
+            "${CMAKE_CURRENT_LIST_DIR}/tests/python/integration_tests/run_integration_tests.py"
+        )
     endif()
 endif()
-
-cmaize_add_package(${PROJECT_NAME} NAMESPACE nwx::)
