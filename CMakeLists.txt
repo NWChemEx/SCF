@@ -24,13 +24,8 @@ nwx_set_version(scf_version "${CMAKE_CURRENT_LIST_DIR}")
 project(scf VERSION "${scf_version}" LANGUAGES CXX)
 
 include(disable_in_source_builds)
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
-
-option(BUILD_TESTING           "Whether to build the unit tests"        OFF)
-option(BUILD_PYBIND11_BINDINGS "Build Python bindings via pybind11"     ON)
+include(set_default_nwx_options)
 option(BUILD_LIBXC             "Build libxc-backed XC functionals?"     ON)
-option(INTEGRATION_TESTING     "Should we build the integration tests?" OFF)
 
 # Documentation target (no-op unless BUILD_DOCS is on)
 include(nwx_cxx_api_docs)
