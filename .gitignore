@@ -50,3 +50,6 @@ cache.db
 uuid.db
 
 install/
+
+# MacOS files
+.DS_Store
