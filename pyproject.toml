@@ -18,6 +18,11 @@ requires = [
     "pybind11",
     "setuptools-scm>=8",
     "nwchemex-nwxcmake @ git+https://github.com/ryanmrichard/NWXCMake",
+    # gau2grid (fetched transitively via GauXC) invokes a Python codegen
+    # script at CMake configure/build time that imports numpy -- needed in
+    # the isolated build env even though scikit-build-core's build-system
+    # deps are otherwise C++-only.
+    "numpy",
 ]
 build-backend = "scikit_build_core.build"
 
