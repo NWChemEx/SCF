@@ -21,8 +21,13 @@ requires = [
     # gau2grid (fetched transitively via GauXC) invokes a Python codegen
     # script at CMake configure/build time that imports numpy -- needed in
     # the isolated build env even though scikit-build-core's build-system
-    # deps are otherwise C++-only.
-    "numpy",
+    # deps are otherwise C++-only. Capped below 2: newer numpy releases only
+    # ship manylinux2014 wheels for a GCC >= 10.3 build, and manylinux2014's
+    # own GCC 10.2.1 can't build numpy from source either, so an unpinned
+    # requirement falls back to a source build that fails outright. This
+    # cap only affects the isolated build env, not the runtime numpy version
+    # a user ends up with (see requirements.txt for that).
+    "numpy<2",
 ]
 build-backend = "scikit_build_core.build"
 
