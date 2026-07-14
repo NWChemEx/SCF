@@ -81,6 +81,18 @@ class TestSCFDriver(unittest.TestCase):
         self.mm.change_submod(
             "AO integral driver", "Exchange matrix", "Four center K builder"
         )
+        # These four calls live directly in integrals::set_defaults (not in
+        # one of the libint/ao_integrals/utils sub-namespace helpers above).
+        self.mm.change_submod("AO integral driver", "Kinetic", "Kinetic")
+        self.mm.change_submod(
+            "AO integral driver", "Electron-Nuclear attraction", "Nuclear"
+        )
+        self.mm.change_submod("Four center J builder", "Four-center ERI", "ERI4")
+        self.mm.change_submod("Four center K builder", "Four-center ERI", "ERI4")
+        self.mm.change_submod(
+            "Density Fitting Integral", "Three-center ERI", "ERI3"
+        )
+        self.mm.change_submod("Coulomb Metric", "Two-center ERI", "ERI2")
         self.mm.change_submod(
             "Density Fitted J builder", "DF ERI", "Density Fitting Integral"
         )
