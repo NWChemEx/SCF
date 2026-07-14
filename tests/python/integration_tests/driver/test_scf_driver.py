@@ -51,6 +51,56 @@ class TestSCFDriver(unittest.TestCase):
         nux.load_modules(self.mm)
         nwx.load_modules(self.mm)
 
+        # integrals.set_defaults(mm) isn't exposed to Python (EXPORT_PLUGIN
+        # only binds load_modules), so replicate its submodule wiring here --
+        # see integrals::libint::set_defaults, integrals::ao_integrals::
+        # set_defaults, and integrals::utils::set_defaults in
+        # cxx/src/integrals/{libint,ao_integrals,utils}/*.{cpp,hpp}.
+        self.mm.change_submod(
+            "CauchySchwarz Estimator", "Decontract Basis Set",
+            "Decontract Basis Set"
+        )
+        self.mm.copy_module("ERI4", "Benchmark ERI4")
+        self.mm.change_input("Benchmark ERI4", "Threshold", 1.0e-16)
+        self.mm.change_submod("CauchySchwarz Estimator", "ERI4", "Benchmark ERI4")
+        self.mm.change_submod("Analytic Error", "ERI4s", "Benchmark ERI4")
+        self.mm.change_submod(
+            "Raw Primitive ERI4", "Decontract Basis Set", "Decontract Basis Set"
+        )
+        self.mm.change_submod(
+            "Primitive Contractor ERI4", "Raw Primitive ERI4",
+            "Raw Primitive ERI4"
+        )
+        self.mm.change_submod(
+            "Primitive Contractor ERI4", "Primitive Normalization",
+            "Primitive Normalization"
+        )
+        self.mm.change_submod(
+            "AO integral driver", "Coulomb matrix", "Four center J builder"
+        )
+        self.mm.change_submod(
+            "AO integral driver", "Exchange matrix", "Four center K builder"
+        )
+        self.mm.change_submod(
+            "Density Fitted J builder", "DF ERI", "Density Fitting Integral"
+        )
+        self.mm.change_submod(
+            "Density Fitted K builder", "DF ERI", "Density Fitting Integral"
+        )
+        self.mm.change_submod(
+            "Density Fitting Integral", "Coulomb Metric", "Coulomb Metric"
+        )
+        self.mm.change_submod("UQ Driver", "ERIs", "ERI4")
+        self.mm.change_submod("UQ Driver", "ERI Error", "Primitive Error Model")
+        self.mm.change_submod("UQ Atom Symm Blocked Driver", "ERIs", "ERI4")
+        self.mm.change_submod(
+            "UQ Atom Symm Blocked Driver", "ERI Error", "Primitive Error Model"
+        )
+        self.mm.change_submod(
+            "Screen Primitive Pairs", "Primitive Pair Estimator",
+            "Black Box Primitive Pair Estimator"
+        )
+
         # Set Submods
         self.mm.change_submod(
             "SCF Driver", "Hamiltonian", "Born-Oppenheimer Approximation"
@@ -62,6 +112,7 @@ class TestSCFDriver(unittest.TestCase):
             "Diagonalization Fock update", "Overlap matrix builder", "Overlap"
         )
         self.mm.change_submod("Loop", "Overlap matrix builder", "Overlap")
+        self.mm.change_submod("SAD guess", "SAD Density", "sto-3g SAD density")
 
         # Property Types
         self.mol = simde.MoleculeFromString()
