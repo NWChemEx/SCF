@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">scf<span id="projectnumber">&#160;1.0.0</span>
+   <div id="projectname">scf<span id="projectnumber">&#160;0.1.0</span>
    </div>
   </td>
  </tr>
@@ -107,7 +107,7 @@ double&#160;</td><td class="memItemRight" valign="bottom"><b>m_delta</b></td></t
 <p>For each element x the kernel forms x + e, where e is a brand-new error term of radius <code>delta</code> centered at zero (built with construct_uq_type). A new error symbol is minted per element, so the added uncertainties are mutually independent.</p>
 <p>The body is only instantiated/selected for a writable buffer whose element type is an actual UQ type. For plain float/double it is a no-op, so the inflation only happens "when UQ is enabled". (construct_uq_type on a non-UQ type returns center + radius, which would SHIFT rather than widen &ndash; another reason to gate on is_uq_type_v.) </p>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
-<li>src/scf/eigen_solver/<a class="el" href="inflate__uncertainty_8hpp_source.html">inflate_uncertainty.hpp</a></li>
+<li>cxx/src/scf/eigen_solver/<a class="el" href="inflate__uncertainty_8hpp_source.html">inflate_uncertainty.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">scf<span id="projectnumber">&#160;1.0.0</span>
+   <div id="projectname">scf<span id="projectnumber">&#160;0.1.0</span>
    </div>
   </td>
  </tr>
@@ -114,7 +114,7 @@ const tensorwrapper::buffer::Contiguous &amp;&#160;</td><td class="memItemRight"
 </pre><p> where G(j,i) is the off-diagonal coupling v_j^T (delta F) v_i evaluated in native UQ arithmetic (so the spread shares F's error symbols) and the gap divisor uses centers only. sigma is the max abs row-sum of the off-diagonal coupling radii; couplings across gaps &lt;= 2*sigma are dropped (near-degenerate block: gauge freedom + avoids an ill-conditioned ~0 divisor).</p>
 <p>Runs for every UQ type, intervals included. This is sound here because the correction is applied ONCE to a converged solution and only reported &ndash; it is not propagated back through the SCF iterations, so the interval dependency problem cannot compound it. </p>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
-<li>src/scf/eigen_solver/<a class="el" href="eigenvector__uncertainty_8hpp_source.html">eigenvector_uncertainty.hpp</a></li>
+<li>cxx/src/scf/eigen_solver/<a class="el" href="eigenvector__uncertainty_8hpp_source.html">eigenvector_uncertainty.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

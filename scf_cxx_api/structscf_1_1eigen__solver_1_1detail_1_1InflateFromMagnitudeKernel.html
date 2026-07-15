@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">scf<span id="projectnumber">&#160;1.0.0</span>
+   <div id="projectname">scf<span id="projectnumber">&#160;0.1.0</span>
    </div>
   </td>
  </tr>
@@ -110,7 +110,7 @@ const tensorwrapper::buffer::Contiguous &amp;&#160;</td><td class="memItemRight"
 <p>data[k] += e_k, where e_k is a new, independent error term of radius |center(source[k])|. Using the magnitude of the (real) center keeps the radius real and non-negative regardless of the sign of the source.</p>
 <p>Applied to the MO coefficients with source = the converged density change dp, the density P = sum_i C_mi C_ni picks up a first-order (linear) change of order |C| * radius per element. With radius = |center(dp_mn)| (~dP) and |C| ~ O(1), each density element's uncertainty lands at ~dP. (A sqrt(dP) radius would instead make the linear term ~sqrt(dP), overshooting by orders of magnitude for small dP.) A no-op for non-UQ types. </p>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
-<li>src/scf/eigen_solver/<a class="el" href="inflate__uncertainty_8hpp_source.html">inflate_uncertainty.hpp</a></li>
+<li>cxx/src/scf/eigen_solver/<a class="el" href="inflate__uncertainty_8hpp_source.html">inflate_uncertainty.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
