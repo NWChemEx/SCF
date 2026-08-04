@@ -14,8 +14,24 @@
 # limitations under the License.
 #
 
+import pathlib
+import sys
+
 import parallelzone as pz
 import pytest
+
+# tests/python/integration_tests/driver/test_scf_driver.py imports nwchemex
+# and calls nwx.load_modules(mm). scf's own CMakeLists.txt CMake-fetches
+# nwchemex's source (for the C++ nwx::nwchemex target), so it already lands
+# at build/_deps/nwchemex-src/ -- including its python/nwchemex package --
+# but nwchemex is never a pip dependency of scf, so nothing puts it on
+# sys.path. Do that here.
+_nwchemex_python_dir = (
+    pathlib.Path(__file__).resolve().parents[2]
+    / "build" / "_deps" / "nwchemex-src" / "python"
+)
+if _nwchemex_python_dir.is_dir():
+    sys.path.insert(0, str(_nwchemex_python_dir))
 
 
 @pytest.fixture(scope="session", autouse=True)

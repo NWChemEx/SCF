@@ -111,5 +111,20 @@ if(BUILD_TESTING)
             py_integration_test_${PROJECT_NAME}
             "${CMAKE_CURRENT_LIST_DIR}/tests/python/integration_tests/run_integration_tests.py"
         )
+        # nwchemex has no C++ of its own (LANGUAGES NONE), so it never
+        # builds a "nwchemex_python" target -- nwx_python_test's PYTHONPATH
+        # (built from NWX_PYTHON_MODULE_DIRS, which only tracks fetched
+        # deps' compiled <dep>_python targets) doesn't include its
+        # pure-Python python/nwchemex package. Append it directly so
+        # tests/python/integration_tests/driver/test_scf_driver.py's
+        # `import nwchemex` succeeds under ctest too (pytest picks it up
+        # separately via tests/python/conftest.py).
+        get_test_property(
+            py_integration_test_${PROJECT_NAME} ENVIRONMENT _scf_pit_env
+        )
+        set_tests_properties(py_integration_test_${PROJECT_NAME} PROPERTIES
+            ENVIRONMENT "${_scf_pit_env}:${nwchemex_SOURCE_DIR}/python"
+        )
+        unset(_scf_pit_env)
     endif()
 endif()
