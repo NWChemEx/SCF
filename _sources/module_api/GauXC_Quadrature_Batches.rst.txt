@@ -49,9 +49,9 @@ module. The columns are:
 +------------------------+--------------------------------------+-------------+
 | On GPU                 | 0                                    | N/A         |
 +------------------------+--------------------------------------+-------------+
-| Pruning Scheme         | <N5GauXC13PruningSchemeE 0x1cdbdc78> | N/A         |
+| Pruning Scheme         | <N5GauXC13PruningSchemeE 0x2cf2bd58> | N/A         |
 +------------------------+--------------------------------------+-------------+
-| Radial Quadrature Type | <N5GauXC10RadialQuadE 0x1cdbde28>    | N/A         |
+| Radial Quadrature Type | <N5GauXC10RadialQuadE 0x2cf2bf08>    | N/A         |
 +------------------------+--------------------------------------+-------------+
 
 
@@ -105,7 +105,7 @@ Pruning Scheme
 --------------
 
 - Description : N/A
-- Default Value : <N5GauXC13PruningSchemeE 0x1cdbdc78>
+- Default Value : <N5GauXC13PruningSchemeE 0x2cf2bd58>
 - Optional? : False
 - Opaque? : True
 - Domain Restrictions :
@@ -116,7 +116,7 @@ Radial Quadrature Type
 ----------------------
 
 - Description : N/A
-- Default Value : <N5GauXC10RadialQuadE 0x1cdbde28>
+- Default Value : <N5GauXC10RadialQuadE 0x2cf2bf08>
 - Optional? : False
 - Opaque? : True
 - Domain Restrictions :
