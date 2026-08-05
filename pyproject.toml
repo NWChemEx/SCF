@@ -15,9 +15,7 @@
 [build-system]
 requires = [
     "scikit-build-core>=0.10",
-    "pybind11",
     "setuptools-scm>=8",
-    "nwchemex-nwxcmake @ git+https://github.com/ryanmrichard/NWXCMake",
     # gau2grid (fetched transitively via GauXC) invokes a Python codegen
     # script at CMake configure/build time that imports numpy -- needed in
     # the isolated build env even though scikit-build-core's build-system
@@ -38,6 +36,8 @@ description = "Self-consistent field (SCF) methods for the NWChemEx ecosystem"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.8"
 dependencies = [
+    "pybind11",
+    "nwchemex-nwxcmake @ git+https://github.com/ryanmrichard/NWXCMake",
     "nwchemex-simde @ git+https://github.com/ryanmrichard/SimDE",
 ]
 
