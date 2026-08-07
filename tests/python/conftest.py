@@ -28,7 +28,10 @@ import pytest
 # sys.path. Do that here.
 _nwchemex_python_dir = (
     pathlib.Path(__file__).resolve().parents[2]
-    / "build" / "_deps" / "nwchemex-src" / "python"
+    / "build"
+    / "_deps"
+    / "nwchemex-src"
+    / "python"
 )
 if _nwchemex_python_dir.is_dir():
     sys.path.insert(0, str(_nwchemex_python_dir))

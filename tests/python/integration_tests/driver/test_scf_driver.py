@@ -57,23 +57,30 @@ class TestSCFDriver(unittest.TestCase):
         # set_defaults, and integrals::utils::set_defaults in
         # cxx/src/integrals/{libint,ao_integrals,utils}/*.{cpp,hpp}.
         self.mm.change_submod(
-            "CauchySchwarz Estimator", "Decontract Basis Set",
-            "Decontract Basis Set"
+            "CauchySchwarz Estimator",
+            "Decontract Basis Set",
+            "Decontract Basis Set",
         )
         self.mm.copy_module("ERI4", "Benchmark ERI4")
         self.mm.change_input("Benchmark ERI4", "Threshold", 1.0e-16)
-        self.mm.change_submod("CauchySchwarz Estimator", "ERI4", "Benchmark ERI4")
+        self.mm.change_submod(
+            "CauchySchwarz Estimator", "ERI4", "Benchmark ERI4"
+        )
         self.mm.change_submod("Analytic Error", "ERI4s", "Benchmark ERI4")
         self.mm.change_submod(
-            "Raw Primitive ERI4", "Decontract Basis Set", "Decontract Basis Set"
+            "Raw Primitive ERI4",
+            "Decontract Basis Set",
+            "Decontract Basis Set",
         )
         self.mm.change_submod(
-            "Primitive Contractor ERI4", "Raw Primitive ERI4",
-            "Raw Primitive ERI4"
+            "Primitive Contractor ERI4",
+            "Raw Primitive ERI4",
+            "Raw Primitive ERI4",
         )
         self.mm.change_submod(
-            "Primitive Contractor ERI4", "Primitive Normalization",
-            "Primitive Normalization"
+            "Primitive Contractor ERI4",
+            "Primitive Normalization",
+            "Primitive Normalization",
         )
         self.mm.change_submod(
             "AO integral driver", "Coulomb matrix", "Four center J builder"
@@ -87,8 +94,12 @@ class TestSCFDriver(unittest.TestCase):
         self.mm.change_submod(
             "AO integral driver", "Electron-Nuclear attraction", "Nuclear"
         )
-        self.mm.change_submod("Four center J builder", "Four-center ERI", "ERI4")
-        self.mm.change_submod("Four center K builder", "Four-center ERI", "ERI4")
+        self.mm.change_submod(
+            "Four center J builder", "Four-center ERI", "ERI4"
+        )
+        self.mm.change_submod(
+            "Four center K builder", "Four-center ERI", "ERI4"
+        )
         self.mm.change_submod(
             "Density Fitting Integral", "Three-center ERI", "ERI3"
         )
@@ -103,14 +114,17 @@ class TestSCFDriver(unittest.TestCase):
             "Density Fitting Integral", "Coulomb Metric", "Coulomb Metric"
         )
         self.mm.change_submod("UQ Driver", "ERIs", "ERI4")
-        self.mm.change_submod("UQ Driver", "ERI Error", "Primitive Error Model")
+        self.mm.change_submod(
+            "UQ Driver", "ERI Error", "Primitive Error Model"
+        )
         self.mm.change_submod("UQ Atom Symm Blocked Driver", "ERIs", "ERI4")
         self.mm.change_submod(
             "UQ Atom Symm Blocked Driver", "ERI Error", "Primitive Error Model"
         )
         self.mm.change_submod(
-            "Screen Primitive Pairs", "Primitive Pair Estimator",
-            "Black Box Primitive Pair Estimator"
+            "Screen Primitive Pairs",
+            "Primitive Pair Estimator",
+            "Black Box Primitive Pair Estimator",
         )
 
         # Set Submods
