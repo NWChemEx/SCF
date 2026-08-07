@@ -37,8 +37,8 @@ license = { text = "Apache-2.0" }
 requires-python = ">=3.8"
 dependencies = [
     "pybind11",
-    "nwchemex-nwxcmake @ git+https://github.com/ryanmrichard/NWXCMake",
-    "nwchemex-simde @ git+https://github.com/ryanmrichard/SimDE",
+    "nwchemex-nwxcmake>=0.1.0",
+    "nwchemex-simde>=0.0.77",
 ]
 
 [project.optional-dependencies]
@@ -46,7 +46,7 @@ dependencies = [
 # (see tests/python/conftest.py) -- unlike nwchemex itself, friendzone has no
 # C++/CMake counterpart for scf to fetch, and (unlike nwchemex) it doesn't
 # depend on scf, so it's safe to pull in normally here.
-dev = ["pytest", "pre-commit", "nwchemex-friendzone[molssi] @ git+https://github.com/ryanmrichard/FriendZone"]
+dev = ["pytest", "pre-commit", "nwchemex-friendzone[molssi]>=1.0.23"]
 
 [tool.scikit-build]
 metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
