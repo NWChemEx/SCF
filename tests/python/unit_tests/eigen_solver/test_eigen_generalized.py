@@ -17,10 +17,9 @@ import unittest
 import numpy as np
 import parallelzone as pz
 import pluginplay as pp
+import scf
 import simde
 import tensorwrapper as tw
-
-import scf
 
 
 class TestEigenGeneralized(unittest.TestCase):

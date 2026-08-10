@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
+#include "export_scf.hpp"
 #include <pluginplay/plugin/plugin.hpp>
-#include <pybind11/pybind11.h>
 #include <scf/scf.hpp>
 
 namespace scf {
