@@ -30,7 +30,10 @@ jobs:
       doc_target: "scf_cxx_api"
 
   test_cmake_build:
-    uses: NWChemEx/.github/.github/workflows/test_nwx_cmake_build.yaml@master
+    # TEMPORARY: pinned to a diagnostics branch to capture an lldb backtrace
+    # for the macOS segfault (see scf-macos-pybind11-segfault.md). Revert to
+    # @master once a trace is captured and before this PR merges.
+    uses: NWChemEx/.github/.github/workflows/test_nwx_cmake_build.yaml@macos-crash-diagnostics
     with:
       run_python_tests: "true"
       cmake_opts: "-DINTEGRATION_TESTING=ON"
