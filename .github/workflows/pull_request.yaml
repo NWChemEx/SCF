@@ -39,7 +39,7 @@ jobs:
       run_python_tests: "true"
       cmake_opts: "-DINTEGRATION_TESTING=ON"
       python_version: "3.12"
-      extra_pip_packages: "nwchemex --extra-index-url https://test.pypi.org/simple/"
+      extra_pip_packages: "nwchemex"
       allow_macos_failure: "true"
 
   test_pip_build:
