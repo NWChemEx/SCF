@@ -19,13 +19,22 @@ requires = [
     # gau2grid (fetched transitively via GauXC) invokes a Python codegen
     # script at CMake configure/build time that imports numpy -- needed in
     # the isolated build env even though scikit-build-core's build-system
-    # deps are otherwise C++-only. Capped below 2: newer numpy releases only
-    # ship manylinux2014 wheels for a GCC >= 10.3 build, and manylinux2014's
-    # own GCC 10.2.1 can't build numpy from source either, so an unpinned
-    # requirement falls back to a source build that fails outright. This
-    # cap only affects the isolated build env, not the runtime numpy version
-    # a user ends up with (see requirements.txt for that).
-    "numpy<2",
+    # deps are otherwise C++-only. Capped below 2 on Linux only: newer numpy
+    # releases only ship manylinux2014 wheels for a GCC >= 10.3 build, and
+    # manylinux2014's own GCC 10.2.1 can't build numpy from source either, so
+    # an unpinned requirement falls back to a source build that fails
+    # outright there. This cap only affects the isolated build env, not the
+    # runtime numpy version a user ends up with (see requirements.txt for
+    # that). macOS has no such manylinux/GCC-ABI constraint -- its wheel tags
+    # are keyed on the deployment target, not the build GCC -- so leaving it
+    # unpinned there lets pip resolve a real numpy>=2 wheel for whatever
+    # Python is active (e.g. cp314), instead of falling back to a numpy<2
+    # source build that has no cp314 wheel and fails distinctly: Homebrew's
+    # gcc-14 has no bundled linker, so it shells out to Apple's system ld,
+    # and meson's linker-detection probe (`gcc-14 -Wl,--version`) fails
+    # against it ("ld: unknown options: --version") on current macOS/Xcode.
+    "numpy<2 ; sys_platform == 'linux'",
+    "numpy ; sys_platform != 'linux'",
 ]
 build-backend = "scikit_build_core.build"
 
