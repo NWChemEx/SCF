@@ -61,47 +61,57 @@ struct EigenvectorUncertaintyKernel {
         using clean_t = std::decay_t<FloatType>;
         // The dispatch instantiates const-qualified spans too; the writing body
         // is only valid (and only selected at runtime) for the mutable buffer.
-        if constexpr(!std::is_const_v<FloatType> &&
-                     tensorwrapper::types::is_uq_type_v<clean_t>) {
+        if constexpr(!std::is_const_v<FloatType>) {
             using tensorwrapper::buffer::get_raw_data;
-            using tensorwrapper::types::uq_center;
-            using tensorwrapper::types::uq_upper;
-            using value_t = decltype(uq_center(std::declval<clean_t>()));
-            const auto n  = m_n;
-            auto radius   = [](const clean_t& x) {
-                return uq_upper(x) - uq_center(x);
-            };
+            const auto n = m_n;
+            auto C       = get_raw_data<clean_t>(m_C);
 
-            auto C   = get_raw_data<clean_t>(m_C);
-            auto G   = get_raw_data<clean_t>(m_G);
-            auto eps = get_raw_data<clean_t>(m_eps);
-
-            // Degeneracy threshold: max abs row-sum of off-diagonal coupling
-            // radii.
-            value_t sigma(0);
-            for(std::size_t i = 0; i < n; ++i) {
-                value_t row(0);
-                for(std::size_t j = 0; j < n; ++j) {
-                    if(i != j) { row += radius(G[j * n + i]); }
-                }
-                sigma = std::max(sigma, row);
-            }
-
-            // Eigenvalue centers.
-            std::vector<value_t> eps_c(n);
-            for(std::size_t i = 0; i < n; ++i) { eps_c[i] = uq_center(eps[i]); }
-
-            // out = C + correction, accumulated from the ORIGINAL columns so
-            // one column's correction never feeds into another.
+            // out starts as a plain copy of C: for non-UQ types this copy IS
+            // the whole (correctly no-op) result, since out_buf is otherwise
+            // a freshly-allocated, default-initialized (i.e. all-zero)
+            // buffer -- without this copy, plain-float callers would silently
+            // get back an all-zero eigenvector matrix instead of C unchanged.
             for(std::size_t k = 0; k < n * n; ++k) { out[k] = C[k]; }
-            for(std::size_t i = 0; i < n; ++i) {
-                for(std::size_t j = 0; j < n; ++j) {
-                    if(i == j) { continue; }
-                    const value_t gap = eps_c[i] - eps_c[j];
-                    if(std::abs(gap) <= value_t(2) * sigma) { continue; }
-                    const clean_t coeff = G[j * n + i] / clean_t(gap);
-                    for(std::size_t r = 0; r < n; ++r) {
-                        out[r * n + i] += coeff * C[r * n + j];
+
+            if constexpr(tensorwrapper::types::is_uq_type_v<clean_t>) {
+                using tensorwrapper::types::uq_center;
+                using tensorwrapper::types::uq_upper;
+                using value_t = decltype(uq_center(std::declval<clean_t>()));
+                auto radius   = [](const clean_t& x) {
+                    return uq_upper(x) - uq_center(x);
+                };
+
+                auto G   = get_raw_data<clean_t>(m_G);
+                auto eps = get_raw_data<clean_t>(m_eps);
+
+                // Degeneracy threshold: max abs row-sum of off-diagonal
+                // coupling radii.
+                value_t sigma(0);
+                for(std::size_t i = 0; i < n; ++i) {
+                    value_t row(0);
+                    for(std::size_t j = 0; j < n; ++j) {
+                        if(i != j) { row += radius(G[j * n + i]); }
+                    }
+                    sigma = std::max(sigma, row);
+                }
+
+                // Eigenvalue centers.
+                std::vector<value_t> eps_c(n);
+                for(std::size_t i = 0; i < n; ++i) {
+                    eps_c[i] = uq_center(eps[i]);
+                }
+
+                // out += correction, accumulated from the ORIGINAL columns so
+                // one column's correction never feeds into another.
+                for(std::size_t i = 0; i < n; ++i) {
+                    for(std::size_t j = 0; j < n; ++j) {
+                        if(i == j) { continue; }
+                        const value_t gap = eps_c[i] - eps_c[j];
+                        if(std::abs(gap) <= value_t(2) * sigma) { continue; }
+                        const clean_t coeff = G[j * n + i] / clean_t(gap);
+                        for(std::size_t r = 0; r < n; ++r) {
+                            out[r * n + i] += coeff * C[r * n + j];
+                        }
                     }
                 }
             }
