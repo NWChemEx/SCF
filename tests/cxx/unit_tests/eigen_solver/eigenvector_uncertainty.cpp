@@ -29,7 +29,7 @@ using namespace tensorwrapper::generate;
 // correction adds real uncertainty without blowing up on a single application).
 using uq_types =
   std::tuple<tensorwrapper::types::idouble, tensorwrapper::types::adouble,
-             tensorwrapper::types::tadouble>;
+             tensorwrapper::types::tadouble, tensorwrapper::types::tmdouble>;
 
 TEMPLATE_LIST_TEST_CASE("attach_eigenvector_uncertainty", "", uq_types) {
     using tensorwrapper::buffer::get_raw_data;
