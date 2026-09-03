@@ -81,14 +81,14 @@ TEST_CASE("GridFromFile") {
         mod.change_input("Path to Grid File", p);
         auto grid = mod.run_as<pt>(h2);
         REQUIRE(grid.size() == 2);
-        REQUIRE(grid.at(0).weight() == 4.0);
-        REQUIRE(grid.at(0).point().x() == 1.0);
-        REQUIRE(grid.at(0).point().y() == 2.0);
-        REQUIRE(grid.at(0).point().z() == 3.0);
-        REQUIRE(grid.at(1).weight() == 8.0);
-        REQUIRE(grid.at(1).point().x() == 5.0);
-        REQUIRE(grid.at(1).point().y() == 6.0);
-        REQUIRE(grid.at(1).point().z() == 7.0);
+        REQUIRE(grid.at(0).get_weight().value<double>() == 4.0);
+        REQUIRE(grid.at(0).get_x().value<double>() == 1.0);
+        REQUIRE(grid.at(0).get_y().value<double>() == 2.0);
+        REQUIRE(grid.at(0).get_z().value<double>() == 3.0);
+        REQUIRE(grid.at(1).get_weight().value<double>() == 8.0);
+        REQUIRE(grid.at(1).get_x().value<double>() == 5.0);
+        REQUIRE(grid.at(1).get_y().value<double>() == 6.0);
+        REQUIRE(grid.at(1).get_z().value<double>() == 7.0);
         std::filesystem::remove(p);
     }
 
@@ -102,14 +102,14 @@ TEST_CASE("GridFromFile") {
         mod.change_input("Path to Grid File", p);
         auto grid = mod.run_as<pt>(h2);
         REQUIRE(grid.size() == 2);
-        REQUIRE(grid.at(0).weight() == 4.0);
-        REQUIRE(grid.at(0).point().x() == 1.0);
-        REQUIRE(grid.at(0).point().y() == 2.0);
-        REQUIRE(grid.at(0).point().z() == 3.0);
-        REQUIRE(grid.at(1).weight() == 8.0);
-        REQUIRE(grid.at(1).point().x() == 5.0);
-        REQUIRE(grid.at(1).point().y() == 6.0);
-        REQUIRE(grid.at(1).point().z() == 7.0);
+        REQUIRE(grid.at(0).get_weight().value<double>() == 4.0);
+        REQUIRE(grid.at(0).get_x().value<double>() == 1.0);
+        REQUIRE(grid.at(0).get_y().value<double>() == 2.0);
+        REQUIRE(grid.at(0).get_z().value<double>() == 3.0);
+        REQUIRE(grid.at(1).get_weight().value<double>() == 8.0);
+        REQUIRE(grid.at(1).get_x().value<double>() == 5.0);
+        REQUIRE(grid.at(1).get_y().value<double>() == 6.0);
+        REQUIRE(grid.at(1).get_z().value<double>() == 7.0);
         std::filesystem::remove(p);
     }
 }

@@ -15,6 +15,7 @@
  */
 
 #include "xc.hpp"
+#include <chemist/point/point_class.hpp>
 #include <simde/integration_grids/collocation_matrix.hpp>
 
 namespace scf::xc {
@@ -50,10 +51,15 @@ MODULE_RUN(AOsOnGrid) {
             assert(shell_i.l() == 0); // only s is supported for now
             const auto& cg = shell_i.contracted_gaussian();
             for(; idx[1] < n_points; ++idx[1]) {
-                float_type ao_value = 0.0;
+                float_type ao_value    = 0.0;
+                const auto& grid_point = grid.at(idx[1]);
+                chemist::Point<float_type> r(
+                  grid_point.get_x().value<float_type>(),
+                  grid_point.get_y().value<float_type>(),
+                  grid_point.get_z().value<float_type>());
                 for(const auto& prim : cg) {
                     // TODO: update when eval accounts for normalization
-                    const auto val = prim.evaluate(grid.at(idx[1]).point());
+                    const auto val      = prim.evaluate(r);
                     const auto exponent = prim.exponent();
                     auto norm = std::sqrt(std::pow(2.0 * exponent / M_PI, 1.5));
                     ao_value += norm * val;

@@ -34,9 +34,9 @@ std::vector<T> flatten_grid(const chemist::Grid& grid) {
     std::vector<T> flattened_grid;
     flattened_grid.reserve(grid.size() * 3);
     for(const auto& point : grid) {
-        flattened_grid.push_back(static_cast<T>(point.point().x()));
-        flattened_grid.push_back(static_cast<T>(point.point().y()));
-        flattened_grid.push_back(static_cast<T>(point.point().z()));
+        flattened_grid.push_back(point.get_x().template value<T>());
+        flattened_grid.push_back(point.get_y().template value<T>());
+        flattened_grid.push_back(point.get_z().template value<T>());
     }
     return flattened_grid;
 }

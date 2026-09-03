@@ -170,7 +170,7 @@ simde::type::tensor tensorify_weights(const chemist::Grid& grid,
     tensorwrapper::shape::Smooth shape{n_grid};
     std::vector<double> weights(n_grid);
     for(std::size_t i = 0; i < n_grid; ++i) {
-        weights[i] = grid.at(i).weight();
+        weights[i] = grid.at(i).get_weight().value<double>();
     }
     using namespace tensorwrapper::buffer;
     auto weight_buffer = Contiguous(std::move(weights), shape);

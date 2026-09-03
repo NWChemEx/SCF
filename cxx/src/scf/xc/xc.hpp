@@ -23,6 +23,7 @@ DECLARE_MODULE(AOsOnGrid);
 DECLARE_MODULE(Density2Grid);
 DECLARE_MODULE(Gau2Grid);
 DECLARE_MODULE(GridFromFile);
+DECLARE_MODULE(GridFromIntegratorXX);
 
 void set_defaults(pluginplay::ModuleManager& mm);
 void load_modules(pluginplay::ModuleManager& mm);
