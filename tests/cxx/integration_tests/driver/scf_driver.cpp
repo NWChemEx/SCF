@@ -70,6 +70,40 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", types) {
             }
 #endif
         }
+        SECTION("DFT (LibXC)") {
+#ifdef BUILD_LIBXC
+
+            // LibXC's kernels take a raw double* out of the buffer and
+            // NormalizeKernel throws for anything else, so the uncertain
+            // types are skipped exactly as they are for GauXC above.
+            if constexpr(!tensorwrapper::types::is_uq_type_v<float_type>) {
+                auto func         = chemist::qm_operator::xc_functional::SVWN3;
+                const auto RKS_op = "Restricted Kohn-Sham Op";
+                const auto rks_op = "Restricted One-Electron Kohn-Sham Op";
+                mm.change_submod("SCF integral driver", "XC Potential",
+                                 "LibXC Potential");
+                mm.change_submod("Electronic energy", "XC Energy",
+                                 "LibXC Energy");
+                mm.change_input(RKS_op, "XC Potential", func);
+                mm.change_input(rks_op, "XC Potential", func);
+                mm.change_submod("Loop", "One-electron Fock operator", rks_op);
+                mm.change_submod("Loop", "Fock operator", RKS_op);
+                mm.change_submod("Core guess", "Build Fock Operator", rks_op);
+                const auto e = mm.template run_as<pt>("SCF Driver", aos, h2);
+
+                // Validated against Psi4 1.11: RKS/STO-3G, scf_type pk,
+                // dft_functional = {x: LDA_X, c: LDA_C_VWN_3} (spelled out
+                // because Psi4's "SVWN" alias is Slater+VWN3RPA, a different
+                // parameterization than the XC_LDA_C_VWN_3 that
+                // to_libxc_codes selects). Grid-converged: 75x302, 99x590,
+                // 150x194, and 200x974 unpruned Becke grids all agree to
+                // 1e-10.
+                pcorr.set_elem({}, float_type{-1.121206107});
+                simde::type::tensor corr(shape_corr, std::move(pcorr));
+                REQUIRE(approximately_equal(corr, e, 1E-5));
+            }
+#endif
+        }
     }
 
     SECTION("H2 Dimer") {

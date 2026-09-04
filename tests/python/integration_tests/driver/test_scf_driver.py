@@ -34,11 +34,6 @@ class TestSCFDriver(unittest.TestCase):
         self.assertAlmostEqual(np.array(egy), -74.94208027122616, places=6)
 
     def test_dft_driver(self):
-        # PBE (like every GGA) is only reachable through the GauXC modules.
-        # When SCF is built with BUILD_GAUXC off they aren't registered, and
-        # the LibXC modules backing "XC Potential"/"XC Energy" instead are
-        # LDA-only (see scf::xc::libxc::to_libxc_codes, which throws for
-        # anything but SVWN3/SVWN5), so this reference energy has no analogue.
         if self.mm.count("GauXC XC Potential") == 0:
             self.skipTest("SCF was built without GauXC; PBE is unavailable")
 

@@ -70,4 +70,29 @@ TEMPLATE_LIST_TEST_CASE("ElectronicEnergy", "", test_scf::float_types) {
         }
 #endif
     }
+    SECTION("RKS (LibXC)") {
+#ifdef BUILD_LIBXC
+        if constexpr(std::is_same_v<float_type, double>) {
+            // Wired explicitly so this stays a LibXC test even when
+            mm.change_submod("Electronic energy", "XC Energy", "LibXC Energy");
+            // mod above is a copy taken before the rewiring, so re-fetch.
+            auto& xc_mod = mm.at("Electronic energy");
+            auto func    = chemist::qm_operator::xc_functional::SVWN3;
+            simde::type::XC_e_type XC_e(func, es, rho);
+            simde::type::electronic_hamiltonian H_e(T_e * 2.0 + V_en * 2.0 +
+                                                    J_e * 2.0 + XC_e);
+            chemist::braket::BraKet braket(psi, H_e, psi);
+            const auto& E_elec = xc_mod.template run_as<pt<wf_type>>(braket);
+
+            // Psi4 1.11, STO-3G, at this same (fixed) density:
+            // 2*Tr(PT) + 2*Tr(PV) + 2*Tr(PJ) + E_xc, with E_xc from
+            // {x: LDA_X, c: LDA_C_VWN_3} on a 150x194 unpruned Becke grid.
+            // The same script reproduces this test's RHF reference above and
+            // the LibXCEnergy/LibXCPotential references in
+            // tests/cxx/integration_tests/xc/.
+            tensorwrapper::Tensor corr(-1.87456183);
+            REQUIRE(approximately_equal(corr, E_elec, 1E-5));
+        }
+#endif
+    }
 }
