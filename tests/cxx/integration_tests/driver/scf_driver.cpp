@@ -52,8 +52,8 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", types) {
             const auto e = mm.template run_as<pt>("SCF Driver", aos, h2);
             REQUIRE(approximately_equal(corr, e, 1E-6));
         }
-        SECTION("DFT") {
-            // GauXC not currently compatible with Uncertain values
+        SECTION("DFT (GauXC)") {
+#ifdef BUILD_GAUXC
             if constexpr(!tensorwrapper::types::is_uq_type_v<float_type>) {
                 auto func         = chemist::qm_operator::xc_functional::PBE;
                 const auto RKS_op = "Restricted Kohn-Sham Op";
@@ -68,6 +68,7 @@ TEMPLATE_LIST_TEST_CASE("SCFDriver", "", types) {
                 simde::type::tensor corr(shape_corr, std::move(pcorr));
                 REQUIRE(approximately_equal(corr, e, 1E-5));
             }
+#endif
         }
     }
 

@@ -56,7 +56,8 @@ TEMPLATE_LIST_TEST_CASE("ElectronicEnergy", "", test_scf::float_types) {
         tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
         REQUIRE(approximately_equal(corr, E_elec, 1E-6));
     }
-    SECTION("RKS") {
+    SECTION("RKS (GauXC)") {
+#ifdef BUILD_GAUXC
         if constexpr(std::is_same_v<float_type, double>) {
             auto func = chemist::qm_operator::xc_functional::PBE;
             simde::type::XC_e_type XC_e(func, es, rho);
@@ -67,5 +68,6 @@ TEMPLATE_LIST_TEST_CASE("ElectronicEnergy", "", test_scf::float_types) {
             tensorwrapper::Tensor corr(-1.90692);
             REQUIRE(approximately_equal(corr, E_elec, 1E-5));
         }
+#endif
     }
 }

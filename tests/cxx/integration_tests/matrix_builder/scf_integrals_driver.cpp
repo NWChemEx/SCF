@@ -97,7 +97,8 @@ TEMPLATE_LIST_TEST_CASE("SCFIntegralsDriver", "", test_scf::float_types) {
     //     compare_matrices(F, F_corr);
     // }
 
-    SECTION("Calling XC Potential") {
+    SECTION("Calling XC Potential (GauXC)") {
+#ifdef BUILD_GAUXC
         auto func       = chemist::qm_operator::xc_functional::PBE0;
         auto rho        = test_scf::h2_density<double>();
         const auto& aos = rho.basis_set();
@@ -107,5 +108,6 @@ TEMPLATE_LIST_TEST_CASE("SCFIntegralsDriver", "", test_scf::float_types) {
         auto vxc = mod.template run_as<pt>(copy_braket);
         simde::type::tensor corr{{-0.357302, -0.23347}, {-0.23347, -0.357302}};
         REQUIRE(approximately_equal(vxc, corr, 1E-5));
+#endif
     }
 }
