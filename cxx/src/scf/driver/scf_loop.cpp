@@ -22,6 +22,20 @@
 namespace scf::driver {
 namespace {
 
+struct IsUQTypeKernel {
+    template<typename FloatType>
+    auto operator()(std::span<FloatType> out) {
+        using clean_t = std::decay_t<FloatType>;
+        return tensorwrapper::types::is_uq_type_v<clean_t>;
+    }
+};
+
+auto check_if_uqtype(const tensorwrapper::buffer::BufferBase& buffer) {
+    IsUQTypeKernel kernel;
+    const auto& contiguous = tensorwrapper::buffer::make_contiguous(buffer);
+    return tensorwrapper::buffer::visit_contiguous_buffer(kernel, contiguous);
+}
+
 // Comparison between convergence metrics based on floating point type
 struct Kernel {
     double m_tol;
@@ -314,7 +328,7 @@ MODULE_RUN(SCFLoop) {
     // NOT fed back through the density (which would compound it); it is applied
     // once, here, to the converged Fock and only reported. See
     // eigen_solver/eigenvector_uncertainty.hpp.
-    {
+    if(check_if_uqtype(F_old.buffer())) {
         const auto&& [evalues, evectors] =
           diagonalizer_mod.run_as<diagonalizer_pt>(F_old, S);
         auto corrected_vectors = evectors;

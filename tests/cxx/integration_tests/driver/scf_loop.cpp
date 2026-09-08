@@ -50,6 +50,15 @@ TEMPLATE_LIST_TEST_CASE("SCFLoop", "", test_scf::float_types) {
             pcorr.set_elem({}, float_type{-1.1167592336});
             tensorwrapper::Tensor corr(shape_corr, std::move(pcorr));
             REQUIRE(approximately_equal(corr, e, 1E-6));
+
+            // Spot check to ensure that the MO coefficients aren't returning
+            // zeroes
+            auto& psi_mo_coeffs = psi.orbitals().transform();
+            tensorwrapper::shape::Smooth mat_shape{2, 2};
+            auto zeroes_buffer =
+              make_contiguous(psi_mo_coeffs.buffer(), mat_shape);
+            simde::type::tensor zeroes(mat_shape, std::move(zeroes_buffer));
+            REQUIRE(!approximately_equal(psi_mo_coeffs, zeroes, 1E-6));
         }
 
         SECTION("With DIIS") {
