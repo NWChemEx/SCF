@@ -27,14 +27,21 @@ TEST_CASE("LibXCEnergy") {
 
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
-    mm.change_submod("LibXC Energy", "Integration grid", "Grid From File");
+    mm.change_submod("LibXC Energy", "Integration grid",
+                     "Grid From IntegratorXX");
     auto& mod = mm.at("LibXC Energy");
 
-    auto path = test_scf::get_test_directory_path();
+    // Matches the (radial x angular) point count of the reference
+    // he_grid.txt/h2_grid.txt files (150*194 = 29100, 2*150*194 = 58200)
+    // generated with IntegratorXX's own defaults (MuraKnowles radial,
+    // Lebedev-Laikov angular, unpruned, Becke partition), so this
+    // cross-validates the generated grid against the known-good file-based
+    // one -- not a bit-identical grid, hence the looser tolerance below
+    // (vs. the GridFromFile-based unit tests' 1e-5).
+    mm.change_input("Grid From IntegratorXX", "Radial Size", std::size_t(150));
+    mm.change_input("Grid From IntegratorXX", "Angular Size", std::size_t(194));
 
     SECTION("He") {
-        path += "/he_grid.txt";
-        mm.change_input("Grid From File", "Path to Grid File", path);
         auto rho    = test_scf::he_density<float_type>();
         auto aos    = test_scf::he_aos();
         auto psi    = test_scf::he_wave_function<float_type>();
@@ -45,15 +52,13 @@ TEST_CASE("LibXCEnergy") {
 #ifdef BUILD_LIBXC
         auto exc = mod.run_as<pt>(braket);
         simde::type::tensor corr(-1.01982);
-        REQUIRE(approximately_equal(exc, corr, 1e-5));
+        REQUIRE(approximately_equal(exc, corr, 1e-3));
 #else
         REQUIRE_THROWS_AS(mod.run_as<pt>(braket), std::runtime_error);
 #endif
     }
 
     SECTION("H2") {
-        path += "/h2_grid.txt";
-        mm.change_input("Grid From File", "Path to Grid File", path);
         auto rho    = test_scf::h2_density<float_type>();
         auto aos    = test_scf::h2_aos();
         auto psi    = test_scf::h2_wave_function<float_type>();
@@ -64,7 +69,7 @@ TEST_CASE("LibXCEnergy") {
 #ifdef BUILD_LIBXC
         auto exc = mod.run_as<pt>(braket);
         simde::type::tensor corr(-0.734458);
-        REQUIRE(approximately_equal(exc, corr, 1e-5));
+        REQUIRE(approximately_equal(exc, corr, 1e-3));
 #else
         REQUIRE_THROWS_AS(mod.run_as<pt>(braket), std::runtime_error);
 #endif

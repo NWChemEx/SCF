@@ -46,6 +46,10 @@ void load_modules(pluginplay::ModuleManager& mm) {
 }
 
 void set_defaults(pluginplay::ModuleManager& mm) {
+    mm.change_submod("LibXC Energy", "Integration grid",
+                     "Grid From IntegratorXX");
+    mm.change_submod("LibXC Potential", "Integration grid",
+                     "Grid From IntegratorXX");
     mm.change_submod("LibXC Energy", "Density on a grid", "Density2Grid");
     mm.change_submod("LibXC Potential", "Density on a grid", "Density2Grid");
     mm.change_submod("LibXC Potential", "AOs on a grid", "AOs on a Grid");
@@ -170,7 +174,7 @@ simde::type::tensor tensorify_weights(const chemist::Grid& grid,
     tensorwrapper::shape::Smooth shape{n_grid};
     std::vector<double> weights(n_grid);
     for(std::size_t i = 0; i < n_grid; ++i) {
-        weights[i] = grid.at(i).weight();
+        weights[i] = grid.at(i).get_weight().value<double>();
     }
     using namespace tensorwrapper::buffer;
     auto weight_buffer = Contiguous(std::move(weights), shape);

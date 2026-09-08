@@ -97,7 +97,8 @@ TEMPLATE_LIST_TEST_CASE("SCFIntegralsDriver", "", test_scf::float_types) {
     //     compare_matrices(F, F_corr);
     // }
 
-    SECTION("Calling XC Potential") {
+    SECTION("Calling XC Potential (GauXC)") {
+#ifdef BUILD_GAUXC
         auto func       = chemist::qm_operator::xc_functional::PBE0;
         auto rho        = test_scf::h2_density<double>();
         const auto& aos = rho.basis_set();
@@ -107,5 +108,31 @@ TEMPLATE_LIST_TEST_CASE("SCFIntegralsDriver", "", test_scf::float_types) {
         auto vxc = mod.template run_as<pt>(copy_braket);
         simde::type::tensor corr{{-0.357302, -0.23347}, {-0.23347, -0.357302}};
         REQUIRE(approximately_equal(vxc, corr, 1E-5));
+#endif
+    }
+
+    SECTION("Calling XC Potential (LibXC)") {
+#ifdef BUILD_LIBXC
+        // Wired explicitly so this stays a LibXC test even when BUILD_GAUXC
+        // is on a
+        mm.change_submod("SCF integral driver", "XC Potential",
+                         "LibXC Potential");
+        // mod above is a copy taken before the rewiring, so re-fetch.
+        auto& xc_mod    = mm.at("SCF integral driver");
+        auto func       = chemist::qm_operator::xc_functional::SVWN3;
+        auto rho        = test_scf::h2_density<double>();
+        const auto& aos = rho.basis_set();
+        simde::type::xc_e_type xc_op(func, e, rho);
+        chemist::braket::BraKet xc_ij(aos, xc_op, aos);
+        erased_type copy_braket(xc_ij);
+        auto vxc = xc_mod.template run_as<pt>(copy_braket);
+
+        // Psi4 1.11 VBase, STO-3G, {x: LDA_X, c: LDA_C_VWN_3}, 150x194
+        // unpruned Becke grid, at this same density -- the value the
+        // LibXCPotential test in tests/cxx/integration_tests/xc/ checks too.
+        simde::type::tensor corr{{-0.453301, -0.296985},
+                                 {-0.296985, -0.453301}};
+        REQUIRE(approximately_equal(vxc, corr, 1E-5));
+#endif
     }
 }

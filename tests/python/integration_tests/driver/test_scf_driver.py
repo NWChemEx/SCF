@@ -34,6 +34,9 @@ class TestSCFDriver(unittest.TestCase):
         self.assertAlmostEqual(np.array(egy), -74.94208027122616, places=6)
 
     def test_dft_driver(self):
+        if self.mm.count("GauXC XC Potential") == 0:
+            self.skipTest("SCF was built without GauXC; PBE is unavailable")
+
         func = chemist.qm_operator.xc_functional.PBE
         RKS_op = "Restricted Kohn-Sham Op"
         rks_op = "Restricted One-Electron Kohn-Sham Op"

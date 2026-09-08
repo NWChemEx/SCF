@@ -27,14 +27,16 @@ TEST_CASE("LibXCPotential") {
 
     pluginplay::ModuleManager mm;
     scf::load_modules(mm);
-    mm.change_submod("LibXC Potential", "Integration grid", "Grid From File");
+    mm.change_submod("LibXC Potential", "Integration grid",
+                     "Grid From IntegratorXX");
     auto& mod = mm.at("LibXC Potential");
 
-    auto path = test_scf::get_test_directory_path();
+    // See libxc_energy.cpp's LibXCEnergy test for why these sizes and the
+    // loosened tolerance below.
+    mm.change_input("Grid From IntegratorXX", "Radial Size", std::size_t(150));
+    mm.change_input("Grid From IntegratorXX", "Angular Size", std::size_t(194));
 
     SECTION("He") {
-        path += "/he_grid.txt";
-        mm.change_input("Grid From File", "Path to Grid File", path);
         auto rho  = test_scf::he_density<float_type>();
         auto aos  = test_scf::he_aos();
         auto func = chemist::qm_operator::xc_functional::SVWN3;
@@ -45,15 +47,13 @@ TEST_CASE("LibXCPotential") {
         auto vxc = mod.run_as<pt>(braket);
         typename simde::type::tensor::matrix_il_type il{{-0.668319}};
         simde::type::tensor corr(il);
-        REQUIRE(approximately_equal(vxc, corr, 1e-5));
+        REQUIRE(approximately_equal(vxc, corr, 1e-3));
 #else
         REQUIRE_THROWS_AS(mod.run_as<pt>(braket), std::runtime_error);
 #endif
     }
 
     SECTION("H2") {
-        path += "/h2_grid.txt";
-        mm.change_input("Grid From File", "Path to Grid File", path);
         auto rho  = test_scf::h2_density<float_type>();
         auto aos  = test_scf::h2_aos();
         auto func = chemist::qm_operator::xc_functional::SVWN3;
@@ -64,7 +64,7 @@ TEST_CASE("LibXCPotential") {
         auto vxc = mod.run_as<pt>(braket);
         simde::type::tensor corr{{-0.453301, -0.296985},
                                  {-0.296985, -0.453301}};
-        REQUIRE(approximately_equal(vxc, corr, 1e-5));
+        REQUIRE(approximately_equal(vxc, corr, 1e-3));
 #else
         REQUIRE_THROWS_AS(mod.run_as<pt>(braket), std::runtime_error);
 #endif

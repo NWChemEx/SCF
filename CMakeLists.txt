@@ -26,28 +26,49 @@ project(scf VERSION "${scf_version}" LANGUAGES CXX)
 include(disable_in_source_builds)
 include(set_default_nwx_options)
 option(BUILD_LIBXC             "Build libxc-backed XC functionals?"     ON)
+option(BUILD_GAUXC             "Build GauXC-backed XC/SN-LinK functionals? (temporary toggle)" OFF)
 
 # Documentation target (no-op unless BUILD_DOCS is on)
 include(nwx_cxx_api_docs)
 nwx_cxx_api_docs("cxx/include" "cxx/src")
 
 ### Dependencies ###
-# simde is the only PUBLIC dep; gauxc/eigen/gau2grid/libxc are implementation
-# details of the XC and eigensolver internals (PRIVATE).
-set(scf_private_deps gauxc eigen gau2grid)
+# simde is the only PUBLIC dep; gauxc/eigen/gau2grid/libxc/integratorxx are
+# implementation details of the XC and eigensolver internals (PRIVATE).
+set(scf_private_deps eigen gau2grid integratorxx)
 if(BUILD_LIBXC)
     list(APPEND scf_private_deps libxc)
+endif()
+if(BUILD_GAUXC)
+    list(APPEND scf_private_deps gauxc)
 endif()
 
 include(get_dependencies)
 get_dependencies(simde ${scf_private_deps})
 
 ### Library ###
-include(nwx_library)
-nwx_library(${PROJECT_NAME} "cxx/include" "cxx/src"
-    simde PRIVATE ${scf_private_deps})
+# With BUILD_GAUXC off, the xc/gauxc/ source subtree unconditionally
+# #includes <gauxc/...> headers at file scope (unlike libxc.cpp's intra-file
+# #ifdef guard), so it must be excluded from the build entirely rather than
+# merely left unlinked.
+if(BUILD_GAUXC)
+    include(nwx_library)
+    nwx_library(${PROJECT_NAME} "cxx/include" "cxx/src"
+        simde PRIVATE ${scf_private_deps})
+else()
+    file(GLOB_RECURSE _scf_source_files CONFIGURE_DEPENDS "cxx/src/*.cpp")
+    list(FILTER _scf_source_files EXCLUDE REGEX ".*/export_.*\\.cpp$")
+    list(FILTER _scf_source_files EXCLUDE REGEX ".*/xc/gauxc/.*\\.cpp$")
+    include(nwx_library)
+    nwx_library(${PROJECT_NAME} "cxx/include" "cxx/src"
+        simde PRIVATE ${scf_private_deps} SOURCES ${_scf_source_files})
+    unset(_scf_source_files)
+endif()
 if(BUILD_LIBXC)
     target_compile_definitions(${PROJECT_NAME} PRIVATE BUILD_LIBXC)
+endif()
+if(BUILD_GAUXC)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE BUILD_GAUXC)
 endif()
 
 ### Python bindings (no-op unless BUILD_PYBIND11_BINDINGS is on) ###
@@ -64,12 +85,23 @@ if(BUILD_TESTING)
     # be linked into the test executable in addition to scf itself.
     set(scf_test_libs
         ${PROJECT_NAME}
-        ${NWX_DEP_TARGET_gauxc}
         ${NWX_DEP_TARGET_eigen}
         ${NWX_DEP_TARGET_gau2grid}
+        ${NWX_DEP_TARGET_integratorxx}
     )
     if(BUILD_LIBXC)
         list(APPEND scf_test_libs ${NWX_DEP_TARGET_libxc})
+    endif()
+    if(BUILD_GAUXC)
+        list(APPEND scf_test_libs ${NWX_DEP_TARGET_gauxc})
+    endif()
+
+    # tests/cxx/unit_tests/xc/gauxc/*.cpp unconditionally #includes
+    # <gauxc/...> headers, so it must be excluded from the glob (not merely
+    # left unlinked) when BUILD_GAUXC is OFF.
+    set(_scf_test_exclude_args)
+    if(NOT BUILD_GAUXC)
+        set(_scf_test_exclude_args EXCLUDE_REGEX ".*/xc/gauxc/.*\\.cpp$")
     endif()
 
     include(catch2_tests_from_dir)
@@ -78,9 +110,13 @@ if(BUILD_TESTING)
         "tests/cxx/unit_tests"
         ${scf_test_libs}
         PRIVATE_INCLUDES "cxx/src" "cxx/src/${PROJECT_NAME}"
+        ${_scf_test_exclude_args}
     )
     if(BUILD_LIBXC)
         target_compile_definitions(test_unit_${PROJECT_NAME} PRIVATE BUILD_LIBXC)
+    endif()
+    if(BUILD_GAUXC)
+        target_compile_definitions(test_unit_${PROJECT_NAME} PRIVATE BUILD_GAUXC)
     endif()
 
     # The C++ unit tests can also be run under MPI with 2 ranks. Left wired but
@@ -105,6 +141,11 @@ if(BUILD_TESTING)
         if(BUILD_LIBXC)
             target_compile_definitions(
                 test_integration_${PROJECT_NAME} PRIVATE BUILD_LIBXC
+            )
+        endif()
+        if(BUILD_GAUXC)
+            target_compile_definitions(
+                test_integration_${PROJECT_NAME} PRIVATE BUILD_GAUXC
             )
         endif()
         nwx_python_test(

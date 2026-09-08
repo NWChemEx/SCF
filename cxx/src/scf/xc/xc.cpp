@@ -14,22 +14,29 @@
  * limitations under the License.
  */
 
+#ifdef BUILD_GAUXC
 #include "gauxc/gauxc.hpp"
+#endif
 #include "libxc/libxc.hpp"
 #include "xc.hpp"
 
 namespace scf::xc {
 void load_modules(pluginplay::ModuleManager& mm) {
+#ifdef BUILD_GAUXC
     gauxc::load_modules(mm);
+#endif
     libxc::load_modules(mm);
     mm.add_module<AOsOnGrid>("AOs on a grid");
     mm.add_module<Gau2Grid>("Gau2Grid");
     mm.add_module<GridFromFile>("Grid From File");
+    mm.add_module<GridFromIntegratorXX>("Grid From IntegratorXX");
     mm.add_module<Density2Grid>("Density2Grid");
 }
 
 void set_defaults(pluginplay::ModuleManager& mm) {
+#ifdef BUILD_GAUXC
     gauxc::set_defaults(mm);
+#endif
     libxc::set_defaults(mm);
     mm.change_submod("Density2Grid", "AOs on a grid", "AOs on a grid");
 }
