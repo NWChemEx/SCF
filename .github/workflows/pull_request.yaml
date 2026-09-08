@@ -29,6 +29,18 @@ jobs:
     with:
       doc_target: "scf_cxx_api"
 
+  # allow_macos_failure: the "Install Extra Pip Packages" step (pip install
+  # nwchemex, needed by run_python_tests) has no macOS arm64 wheel for
+  # nwchemex-scf, so pip source-builds the *published* sdist instead. That
+  # release predates chemist replacing GridPointView::point() with
+  # get_x()/get_y()/get_z(), so it no longer compiles against chemist master
+  # ("no member named 'point' in 'chemist::GridPointView<const
+  # chemist::GridPoint>'" in xc/aos_on_grid.cpp and xc/gau2grid.cpp). This has
+  # nothing to do with the source under test -- this branch already migrated to
+  # the new API, and master's nightly fails the same way compiling its own
+  # tree. Linux is unaffected because it installs a manylinux wheel rather than
+  # building. Merging this branch publishes an sdist that compiles, so drop
+  # this input once that release is on PyPI.
   test_cmake_build:
     uses: NWChemEx/.github/.github/workflows/test_nwx_cmake_build.yaml@master
     with:
@@ -36,6 +48,7 @@ jobs:
       cmake_opts: "-DINTEGRATION_TESTING=ON"
       python_version: "3.12"
       extra_pip_packages: "nwchemex"
+      allow_macos_failure: "true"
 
   # allow_macos_failure: test_pip_build's macOS gcc-14 leg has a separate,
   # pre-existing, unrelated failure -- meson can't detect Homebrew gcc-14's
