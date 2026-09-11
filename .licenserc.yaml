@@ -24,6 +24,6 @@ header:
     - src/scf/common/
     - src/scf/scf/
     - LICENSE
-    - build
+    - build*
 
   comment: never
