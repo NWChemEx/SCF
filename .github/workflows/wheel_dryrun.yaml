@@ -98,8 +98,11 @@ jobs:
       # this proves nothing about the real release. build_sdist is the one
       # deliberate exception: an sdist is platform-independent and already
       # covered by the Linux release leg.
+      # TEMPORARY: pinned to the branch carrying the cibuildwheel
+      # SKBUILD_CMAKE_DEFINE quoting fix. Revert to @master once
+      # NWChemEx/.github#<PR> merges, and before this branch is merged.
       - name: Build PyPI Distribution
-        uses: NWChemEx/.github/.github/actions/build_pypi_dist@master
+        uses: NWChemEx/.github/.github/actions/build_pypi_dist@macos_wheel_fixes
         with:
           cibw_build: ${{ matrix.cibw_build }}
           build_sdist: "false"
