@@ -161,7 +161,19 @@ MODULE_CTOR(GridFromIntegratorXX) {
 }
 
 MODULE_RUN(GridFromIntegratorXX) {
-    const auto& [molecule] = pt::unwrap_inputs(inputs);
+    // Rebound to an ordinary reference because the dispatch lambda below
+    // captures it. Capturing a structured binding is C++20 (P1091); GCC
+    // accepts it, but AppleClang -- which is what builds the macOS release
+    // wheel, since cibuildwheel uses /usr/bin/clang++ -- still rejects it:
+    //
+    //   error: reference to local binding 'molecule' declared in enclosing
+    //   function 'scf::xc::GridFromIntegratorXX::run_'
+    //
+    // The dev matrix cannot catch this. It builds macOS with Homebrew
+    // clang-18 and gcc-14, both of which implement P1091; AppleClang is
+    // exercised only by the wheel build.
+    const auto& [molecule_input] = pt::unwrap_inputs(inputs);
+    const auto& molecule         = molecule_input;
 
     const auto& float_type = inputs.at("Float Type").value<std::string>();
 

@@ -1,0 +1,118 @@
+# Copyright 2026 NWChemEx-Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Manually exercises the PyPI wheel build without publishing anything.
+#
+# merge.yaml's build_pypi_dist job only runs on push-to-master, so the wheel
+# build cannot be tested from a pull request -- which is how SCF's macOS leg
+# went from the CI migration (PR #64) to now without ever executing once. It
+# also cannot be tested cheaply: deploy_to_pypi has `needs: build_pypi_dist`,
+# so a failing macOS leg skips the publish job entirely and blocks the *Linux*
+# release too.
+#
+# This workflow is that missing escape hatch. It runs exactly the same
+# build_pypi_dist action with exactly the same inputs as merge.yaml, but has
+# no tag-commit dependency and no deploy_to_pypi job, so nothing reaches PyPI
+# and no version tag is cut. The wheel comes back as an artifact to install
+# and smoke-test by hand.
+#
+#   gh workflow run wheel_dryrun.yaml --ref <branch>
+#
+# (workflow_dispatch works from a non-default branch as long as this file
+# exists on that branch.)
+name: Wheel Build Dry Run
+
+on:
+  # workflow_dispatch alone is not enough to bootstrap this: GitHub only
+  # exposes a dispatchable workflow once the file exists on the *default*
+  # branch, so `gh workflow run wheel_dryrun.yaml --ref <branch>` answers
+  # "not found on the default branch" until this lands on master. The push
+  # trigger is what makes it usable from the branch that is developing it.
+  # Narrow it (or drop it) once this is on master and dispatch works.
+  push:
+    branches:
+      - get_macos_on_pypi
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "Which release leg(s) to build"
+        required: true
+        default: "macos"
+        type: choice
+        options:
+          - macos
+          - linux
+          - both
+
+jobs:
+  # The matrix has to be computed in its own job: the `matrix` context is not
+  # available in a job-level `if:`, so filtering legs there would silently
+  # evaluate to the empty string and skip everything. Same shape as
+  # merge.yaml's platform_matrix -> build_pypi_dist handoff.
+  select_legs:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.pick.outputs.matrix }}
+    steps:
+      - name: Pick Release Legs
+        id: pick
+        shell: bash
+        run: |
+          # Mirrors platform_matrix.yaml's release_matrix. Hardcoded rather
+          # than pulled from that reusable workflow so a single leg can be
+          # selected; keep in sync if release_matrix changes.
+          macos='{"os": "macos-14", "cibw_build": "cp312-macosx_arm64"}'
+          linux='{"os": "ubuntu-latest", "cibw_build": "cp312-manylinux_x86_64"}'
+          # A push event carries no inputs; default that to macOS,
+          # which is the leg this workflow exists to exercise.
+          case "${{ inputs.platform || 'macos' }}" in
+            macos) matrix="[${macos}]" ;;
+            linux) matrix="[${linux}]" ;;
+            both)  matrix="[${macos}, ${linux}]" ;;
+            *) echo "unknown platform: ${{ inputs.platform }}" >&2; exit 1 ;;
+          esac
+          echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
+          echo "Building: ${matrix}"
+
+  build_wheel:
+    needs: select_legs
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.select_legs.outputs.matrix) }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      # Inputs must stay identical to merge.yaml's build_pypi_dist job, or
+      # this proves nothing about the real release. build_sdist is the one
+      # deliberate exception: an sdist is platform-independent and already
+      # covered by the Linux release leg.
+      # TEMPORARY: pinned to the branch carrying the cibuildwheel
+      # SKBUILD_CMAKE_DEFINE quoting fix. Revert to @master once
+      # NWChemEx/.github#<PR> merges, and before this branch is merged.
+      - name: Build PyPI Distribution
+        uses: NWChemEx/.github/.github/actions/build_pypi_dist@macos_wheel_fixes
+        with:
+          cibw_build: ${{ matrix.cibw_build }}
+          build_sdist: "false"
+          needs_mpi: "true"
+          needs_boost: "true"
+          needs_blas: "true"
+          needs_openmp: "true"
+
+      - name: Upload Distribution Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dryrun-dist-${{ matrix.os }}
+          path: dist/
