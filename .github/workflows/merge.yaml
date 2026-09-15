@@ -35,31 +35,12 @@ jobs:
   platform_matrix:
     uses: NWChemEx/.github/.github/workflows/platform_matrix.yaml@master
 
-  # SCF has a known, tracked, macOS-only segfault (see
-  # scf-macos-pybind11-segfault.md) -- skip publishing a macOS wheel until
-  # it's fixed, rather than ship a broken one. Filters platform_matrix's
-  # release_matrix down to ubuntu-latest only; drop this job and go back to
-  # consuming platform_matrix.outputs.release_matrix directly once macOS is
-  # re-enabled.
-  filter_release_matrix:
-    needs: platform_matrix
-    runs-on: ubuntu-latest
-    outputs:
-      release_matrix: ${{ steps.filter.outputs.release_matrix }}
-    steps:
-      - id: filter
-        shell: bash
-        run: |
-          filtered=$(echo '${{ needs.platform_matrix.outputs.release_matrix }}' \
-            | jq -c '[.[] | select(.os != "macos-14")]')
-          echo "release_matrix=$filtered" >> "$GITHUB_OUTPUT"
-
   build_pypi_dist:
-    needs: [tag-commit, filter_release_matrix]
+    needs: [tag-commit, platform_matrix]
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(needs.filter_release_matrix.outputs.release_matrix) }}
+        include: ${{ fromJSON(needs.platform_matrix.outputs.release_matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Build PyPI Distribution
