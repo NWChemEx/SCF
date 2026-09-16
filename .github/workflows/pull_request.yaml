@@ -45,7 +45,7 @@ jobs:
     uses: NWChemEx/.github/.github/workflows/test_nwx_cmake_build.yaml@master
     with:
       run_python_tests: "true"
-      cmake_opts: "-DINTEGRATION_TESTING=ON"
+      cmake_opts: "-DINTEGRATION_TESTING=ON -DNWX_ECOSYSTEM_FROM_SOURCE=ON"
       python_version: "3.12"
       extra_pip_packages: "nwchemex"
       allow_macos_failure: "true"
