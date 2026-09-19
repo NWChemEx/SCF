@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GauXC Quadrature Batches &mdash; SCF 1.0.0 documentation</title>
+  <title>Grid From IntegratorXX &mdash; SCF 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="GauXC XC Energy" href="GauXC_XC_Energy.html" />
-    <link rel="prev" title="GauXC Molecule Converter" href="GauXC_Molecule_Converter.html" /> 
+    <link rel="next" title="LibXC Energy" href="LibXC_Energy.html" />
+    <link rel="prev" title="Grid From File" href="Grid_From_File.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -66,26 +66,30 @@
 <li class="toctree-l2"><a class="reference internal" href="Electronic_energy.html">Electronic energy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Fock_matrix_builder.html">Fock matrix builder</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Gau2Grid.html">Gau2Grid</a></li>
-<li class="toctree-l2"><a class="reference internal" href="GauXC_Basis_Converter.html">GauXC Basis Converter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="GauXC_Driver.html">GauXC Driver</a></li>
-<li class="toctree-l2"><a class="reference internal" href="GauXC_Molecule_Converter.html">GauXC Molecule Converter</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">GauXC Quadrature Batches</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#please-cite">Please Cite</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#property-types">Property Types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-inputs">Module Inputs</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#quick-reference">Quick Reference</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#detailed-descriptions">Detailed Descriptions</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-results">Module Results</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="GauXC_XC_Energy.html">GauXC XC Energy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="GauXC_XC_Potential.html">GauXC XC Potential</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Generalized_eigensolve.html">Generalized eigensolve</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Generalized_eigensolve_via_Eigen.html">Generalized eigensolve via Eigen</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Grid_From_File.html">Grid From File</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Grid From IntegratorXX</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gridfromintegratorxx">GridFromIntegratorXX</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#please-cite">Please Cite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#property-types">Property Types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-inputs">Module Inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#angular-size">Angular Size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#float-type">Float Type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#max-batch-size">Max Batch Size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#molecule">Molecule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#partition-scheme">Partition Scheme</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pruning-scheme">Pruning Scheme</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#radial-quadrature-type">Radial Quadrature Type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#radial-size">Radial Size</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-results">Module Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="LibXC_Energy.html">LibXC Energy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LibXC_Potential.html">LibXC Potential</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Loop.html">Loop</a></li>
@@ -96,7 +100,6 @@
 <li class="toctree-l2"><a class="reference internal" href="SAD_guess.html">SAD guess</a></li>
 <li class="toctree-l2"><a class="reference internal" href="SCF_Driver.html">SCF Driver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="SCF_integral_driver.html">SCF integral driver</a></li>
-<li class="toctree-l2"><a class="reference internal" href="snLinK.html">snLinK</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://nwchemex.github.io/SCF/scf_cxx_api/index.html">C++ API</a></li>
@@ -117,9 +120,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Modules API</a></li>
-      <li class="breadcrumb-item active">GauXC Quadrature Batches</li>
+      <li class="breadcrumb-item active">Grid From IntegratorXX</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/module_api/GauXC_Quadrature_Batches.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/module_api/Grid_From_IntegratorXX.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -127,28 +130,54 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="gauxc-quadrature-batches">
-<h1>GauXC Quadrature Batches<a class="headerlink" href="#gauxc-quadrature-batches" title="Link to this heading"></a></h1>
-<p>No description provided</p>
+  <section id="grid-from-integratorxx">
+<h1>Grid From IntegratorXX<a class="headerlink" href="#grid-from-integratorxx" title="Link to this heading"></a></h1>
+<section id="gridfromintegratorxx">
+<h2>GridFromIntegratorXX<a class="headerlink" href="#gridfromintegratorxx" title="Link to this heading"></a></h2>
+<p>Generates a molecular integration grid directly from the molecule using
+IntegratorXX: a per-element radial x angular product quadrature (optionally
+pruned), recentered on each atom and combined with fuzzy-cell partition
+weights. Unlike GridFromFile, this module actually consumes the “Molecule”
+property-type input.</p>
+<p>The “Float Type” input selects the concrete floating-point type used to
+generate the grid (points and weights alike) before it is type-erased into
+the returned chemist::Grid, by name as registered with WTF (see
+wtf::enums::from_string) – e.g. “float”, “double”, “udouble”, “idouble”.
+“udouble” and “idouble” additionally require Sigma support (ENABLE_SIGMA) to
+be compiled in: without it, tensorwrapper’s sigma-backed types are never
+registered with WTF, so wtf::enums::from_string throws for those names
+exactly as it would for any other unrecognized Float Type. “adouble”,
+“tadouble”, and “tmdouble” are NOT currently supported – sigma::Affine
+(and, transitively, ThresholdedAffine/TaylorModel, which wrap
+Affine/Interval) doesn’t implement cos, which two of IntegratorXX’s four
+radial quadratures call – and always throw regardless of ENABLE_SIGMA, so
+as not to require those (currently-uncompilable) template instantiations at
+all.</p>
+<p>“Partition Scheme” (Becke/SSF/LKO fuzzy-cell weighting) is applied only for
+Float Types that satisfy std::totally_ordered (“double”, “float”, “udouble”,
+and “idouble”). For “idouble” this order is sigma::Interval’s median-based
+comparison, a pragmatic ordering for sorting rather than a rigorous
+enclosure relation – see sigma::Interval’s relational operators for
+details.</p>
 <section id="please-cite">
-<h2>Please Cite<a class="headerlink" href="#please-cite" title="Link to this heading"></a></h2>
+<h3>Please Cite<a class="headerlink" href="#please-cite" title="Link to this heading"></a></h3>
 <p>No citations</p>
 </section>
 <section id="property-types">
-<h2>Property Types<a class="headerlink" href="#property-types" title="Link to this heading"></a></h2>
+<h3>Property Types<a class="headerlink" href="#property-types" title="Link to this heading"></a></h3>
 <p>The following is a list of property types that this module satisfies.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">scf::xc::gauxc::XCQuadratureBatches</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simde::MolecularGrid</span></code></p></li>
 </ul>
 </section>
 <section id="module-inputs">
-<h2>Module Inputs<a class="headerlink" href="#module-inputs" title="Link to this heading"></a></h2>
+<h3>Module Inputs<a class="headerlink" href="#module-inputs" title="Link to this heading"></a></h3>
 <p>This section details the full list of inputs that the module accepts. Inputs
 that are not listed as optional must have their value set before the module can
 be run. Inputs can be set manually by calling the module’s <code class="docutils literal notranslate"><span class="pre">change_input</span></code>
 function or by passing arguments to a property type.</p>
 <section id="quick-reference">
-<h3>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading"></a></h3>
+<h4>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading"></a></h4>
 <p>The following table provides a quick summary of the inputs available to this
 module. The columns are:</p>
 <ul class="simple">
@@ -164,31 +193,43 @@ module. The columns are:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>AO Basis</p></td>
+<tr class="row-even"><td><p>Angular Size</p></td>
+<td><p>194</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>Float Type</p></td>
+<td><p>double</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p>Max Batch Size</p></td>
+<td><p>512</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>Molecule</p></td>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-odd"><td><p>Grid Type</p></td>
-<td><p>UltraFine</p></td>
-<td><p>N/A</p></td>
-</tr>
-<tr class="row-even"><td><p>On GPU</p></td>
-<td><p>0</p></td>
+<tr class="row-even"><td><p>Partition Scheme</p></td>
+<td><p>Becke</p></td>
 <td><p>N/A</p></td>
 </tr>
 <tr class="row-odd"><td><p>Pruning Scheme</p></td>
-<td><p>&lt;N5GauXC13PruningSchemeE 0x1699b7a8&gt;</p></td>
+<td><p>Unpruned</p></td>
 <td><p>N/A</p></td>
 </tr>
 <tr class="row-even"><td><p>Radial Quadrature Type</p></td>
-<td><p>&lt;N5GauXC10RadialQuadE 0x1699b958&gt;</p></td>
+<td><p>MuraKnowles</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>Radial Size</p></td>
+<td><p>150</p></td>
 <td><p>N/A</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="detailed-descriptions">
-<h3>Detailed Descriptions<a class="headerlink" href="#detailed-descriptions" title="Link to this heading"></a></h3>
+<h4>Detailed Descriptions<a class="headerlink" href="#detailed-descriptions" title="Link to this heading"></a></h4>
 <p>The following subsections provide detailed descriptions of each input recognized
 by this module. The subsection headings are the name of the input. Within each
 subsection we list:</p>
@@ -199,25 +240,28 @@ subsection we list:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">Opaque?</span></code> : Does the value of the input influence memoization?.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Domain</span> <span class="pre">Restrictions</span></code> : Criteria a value must obey to be deemed valid.</p></li>
 </ul>
-<section id="ao-basis">
-<h4>AO Basis<a class="headerlink" href="#ao-basis" title="Link to this heading"></a></h4>
+</section>
+</section>
+</section>
+<section id="angular-size">
+<h2>Angular Size<a class="headerlink" href="#angular-size" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Description : N/A</p></li>
-<li><p>Default Value : N/A</p></li>
+<li><p>Default Value : 194</p></li>
 <li><p>Optional? : False</p></li>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == chemist::basis_set::AOBasisSet&lt;chemist::basis_set::AtomicBasisSet&lt;chemist::basis_set::Shell&lt;chemist::basis_set::ContractedGaussian&lt;chemist::basis_set::Primitive&lt;double&gt;&gt;&gt;&gt;&gt;</p></li>
+<li><p>Type == unsigned long</p></li>
 </ul>
 </li>
 </ul>
 </section>
-<section id="grid-type">
-<h4>Grid Type<a class="headerlink" href="#grid-type" title="Link to this heading"></a></h4>
+<section id="float-type">
+<h2>Float Type<a class="headerlink" href="#float-type" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Description : N/A</p></li>
-<li><p>Default Value : UltraFine</p></li>
+<li><p>Default Value : double</p></li>
 <li><p>Optional? : False</p></li>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
@@ -227,52 +271,91 @@ subsection we list:</p>
 </li>
 </ul>
 </section>
-<section id="on-gpu">
-<h4>On GPU<a class="headerlink" href="#on-gpu" title="Link to this heading"></a></h4>
+<section id="max-batch-size">
+<h2>Max Batch Size<a class="headerlink" href="#max-batch-size" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Description : N/A</p></li>
-<li><p>Default Value : 0</p></li>
+<li><p>Default Value : 512</p></li>
 <li><p>Optional? : False</p></li>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == bool</p></li>
+<li><p>Type == unsigned long</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="molecule">
+<h2>Molecule<a class="headerlink" href="#molecule" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Description : N/A</p></li>
+<li><p>Default Value : N/A</p></li>
+<li><p>Optional? : False</p></li>
+<li><p>Opaque? : True</p></li>
+<li><p>Domain Restrictions :</p>
+<ul>
+<li><p>Type == chemist::Molecule</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="partition-scheme">
+<h2>Partition Scheme<a class="headerlink" href="#partition-scheme" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Description : N/A</p></li>
+<li><p>Default Value : Becke</p></li>
+<li><p>Optional? : False</p></li>
+<li><p>Opaque? : True</p></li>
+<li><p>Domain Restrictions :</p>
+<ul>
+<li><p>Type == std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt;&gt;</p></li>
 </ul>
 </li>
 </ul>
 </section>
 <section id="pruning-scheme">
-<h4>Pruning Scheme<a class="headerlink" href="#pruning-scheme" title="Link to this heading"></a></h4>
+<h2>Pruning Scheme<a class="headerlink" href="#pruning-scheme" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Description : N/A</p></li>
-<li><p>Default Value : &lt;N5GauXC13PruningSchemeE 0x1699b7a8&gt;</p></li>
+<li><p>Default Value : Unpruned</p></li>
 <li><p>Optional? : False</p></li>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == GauXC::PruningScheme</p></li>
+<li><p>Type == std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt;&gt;</p></li>
 </ul>
 </li>
 </ul>
 </section>
 <section id="radial-quadrature-type">
-<h4>Radial Quadrature Type<a class="headerlink" href="#radial-quadrature-type" title="Link to this heading"></a></h4>
+<h2>Radial Quadrature Type<a class="headerlink" href="#radial-quadrature-type" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Description : N/A</p></li>
-<li><p>Default Value : &lt;N5GauXC10RadialQuadE 0x1699b958&gt;</p></li>
+<li><p>Default Value : MuraKnowles</p></li>
 <li><p>Optional? : False</p></li>
 <li><p>Opaque? : True</p></li>
 <li><p>Domain Restrictions :</p>
 <ul>
-<li><p>Type == GauXC::RadialQuad</p></li>
+<li><p>Type == std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt;&gt;</p></li>
 </ul>
 </li>
 </ul>
 </section>
-</section>
-</section>
+<section id="radial-size">
+<h2>Radial Size<a class="headerlink" href="#radial-size" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Description : N/A</p></li>
+<li><p>Default Value : 150</p></li>
+<li><p>Optional? : False</p></li>
+<li><p>Opaque? : True</p></li>
+<li><p>Domain Restrictions :</p>
+<ul>
+<li><p>Type == unsigned long</p></li>
+</ul>
+</li>
+</ul>
 <section id="module-results">
-<h2>Module Results<a class="headerlink" href="#module-results" title="Link to this heading"></a></h2>
+<h3>Module Results<a class="headerlink" href="#module-results" title="Link to this heading"></a></h3>
 <p>This section tabulates the full list of results that the module returns. The
 columns respectively are:</p>
 <ul class="simple">
@@ -294,40 +377,17 @@ the Module class’s advanced API.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Quadrature Batches</p></td>
-<td><p>GauXC::LoadBalancer</p></td>
+<tr class="row-even"><td><p>Grid</p></td>
+<td><p>chemist::Grid</p></td>
 <td><p>N/A</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
-<p>This section details the full list of submodules that the module uses. For each
-submodule we have listed:</p>
-<ul class="simple">
-<li><p>Key : The key used to refer to this particular callback.</p></li>
-<li><p>Property Type : The property type that the submodule must satisfy.</p></li>
-<li><p>Description : How the module will use the submodule.</p></li>
-</ul>
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Key</p></th>
-<th class="head"><p>Property Type</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>GauXC Basis Converter</p></td>
-<td><p>simde::Convert&lt;GauXC::BasisSet&lt;double&gt;, chemist::basis_set::AOBasisSet&lt;chemist::basis_set::AtomicBasisSet&lt;chemist::basis_set::Shell&lt;chemist::basis_set::ContractedGaussian&lt;chemist::basis_set::Primitive&lt;double&gt;&gt;&gt;&gt;&gt;&gt;</p></td>
-<td><p>Converts NWX Basis -&gt; GauXC Basis</p></td>
-</tr>
-<tr class="row-odd"><td><p>GauXC Molecule Converter</p></td>
-<td><p>simde::Convert&lt;GauXC::Molecule, chemist::basis_set::AOBasisSet&lt;chemist::basis_set::AtomicBasisSet&lt;chemist::basis_set::Shell&lt;chemist::basis_set::ContractedGaussian&lt;chemist::basis_set::Primitive&lt;double&gt;&gt;&gt;&gt;&gt;&gt;</p></td>
-<td><p>Converts NWX Basis -&gt; GauXC Molecule</p></td>
-</tr>
-</tbody>
-</table>
+<h3>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h3>
+<p>The module defines no submodules.</p>
+</section>
 </section>
 </section>
 
@@ -335,8 +395,8 @@ submodule we have listed:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="GauXC_Molecule_Converter.html" class="btn btn-neutral float-left" title="GauXC Molecule Converter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="GauXC_XC_Energy.html" class="btn btn-neutral float-right" title="GauXC XC Energy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Grid_From_File.html" class="btn btn-neutral float-left" title="Grid From File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="LibXC_Energy.html" class="btn btn-neutral float-right" title="LibXC Energy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

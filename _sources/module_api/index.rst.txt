@@ -22,15 +22,10 @@ Modules API
    Electronic_energy
    Fock_matrix_builder
    Gau2Grid
-   GauXC_Basis_Converter
-   GauXC_Driver
-   GauXC_Molecule_Converter
-   GauXC_Quadrature_Batches
-   GauXC_XC_Energy
-   GauXC_XC_Potential
    Generalized_eigensolve
    Generalized_eigensolve_via_Eigen
    Grid_From_File
+   Grid_From_IntegratorXX
    LibXC_Energy
    LibXC_Potential
    Loop
@@ -41,4 +36,3 @@ Modules API
    SAD_guess
    SCF_Driver
    SCF_integral_driver
-   snLinK

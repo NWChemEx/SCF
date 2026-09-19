@@ -87,7 +87,7 @@ Molecule
 - Opaque? : True
 - Domain Restrictions :
 
-  - Type == chemist::MoleculeView<chemist::Molecule const>
+  - Type == chemist::Molecule
 
 Path to Grid File
 -----------------
