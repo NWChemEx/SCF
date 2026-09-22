@@ -18,7 +18,8 @@
 
 using types =
   std::tuple<float, double, tensorwrapper::types::idouble,
-             tensorwrapper::types::adouble, tensorwrapper::types::tadouble>;
+             tensorwrapper::types::adouble, tensorwrapper::types::tadouble,
+             tensorwrapper::types::tmdouble>;
 using namespace test_eigen_solver;
 using namespace tensorwrapper::generate;
 
