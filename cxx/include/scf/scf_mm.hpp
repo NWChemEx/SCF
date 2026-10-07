@@ -23,4 +23,21 @@ namespace scf {
  */
 void load_modules(pluginplay::ModuleManager& mm);
 
+/** @brief Connects SCF's modules to the modules other plugins provide.
+ *
+ *  Several SCF modules need a submodule that SCF itself does not provide (the
+ *  Hamiltonian, the AO integrals, the overlap matrix, and the SAD density).
+ *  This function sets those submodules to the default implementations from
+ *  the NUX, Integrals, and ChemCache plugins.
+ *
+ *  Each submodule is only set if the module providing it has been loaded into
+ *  @p mm, so this function must be called after those plugins' load_modules.
+ *  Submodules whose provider is missing are left unset, and SCF does not
+ *  depend on any of those plugins.
+ *
+ *  @param[in,out] mm The ModuleManager to set the submodules in. Must already
+ *                    contain SCF's modules (see load_modules).
+ */
+void set_defaults(pluginplay::ModuleManager& mm);
+
 } // namespace scf
