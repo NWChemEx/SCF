@@ -49,4 +49,27 @@ void load_modules(pluginplay::ModuleManager& mm) {
     xc::set_defaults(mm);
 }
 
+void set_defaults(pluginplay::ModuleManager& mm) {
+    // Sets submod of module to provider, but only if provider is loaded
+    auto set_if_loaded = [&mm](const std::string& module,
+                               const std::string& submod,
+                               const std::string& provider) {
+        if(mm.count(provider)) mm.change_submod(module, submod, provider);
+    };
+
+    // From NUX
+    set_if_loaded("SCF Driver", "Hamiltonian",
+                  "Born-Oppenheimer approximation");
+
+    // From Integrals
+    set_if_loaded("SCF integral driver", "Fundamental matrices",
+                  "AO integral driver");
+    set_if_loaded("Diagonalization Fock update", "Overlap matrix builder",
+                  "Overlap");
+    set_if_loaded("Loop", "Overlap matrix builder", "Overlap");
+
+    // From ChemCache
+    set_if_loaded("SAD guess", "SAD Density", "sto-3g SAD density");
+}
+
 } // namespace scf

@@ -35,6 +35,13 @@ requires = [
     # against it ("ld: unknown options: --version") on current macOS/Xcode.
     "numpy<2 ; sys_platform == 'linux'",
     "numpy ; sys_platform != 'linux'",
+    # Ecosystem packages this build resolves from installed wheels rather
+    # than fetching from git master, so the wheel links against exactly the
+    # binaries users get at runtime and ships only its own files. Mirror
+    # [project].dependencies; leave the floors unbounded so the newest
+    # release is always resolved.
+    "nwchemex-nwxcmake>=0.1.0",
+    "nwchemex-simde>=0.0.77",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -54,16 +61,26 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# friendzone is needed by build/_deps/nwchemex-src/python/nwchemex/load_modules.py
-# (see tests/python/conftest.py) -- unlike nwchemex itself, friendzone has no
-# C++/CMake counterpart for scf to fetch, and (unlike nwchemex) it doesn't
-# depend on scf, so it's safe to pull in normally here.
-dev = ["pytest", "pre-commit", "nwchemex-friendzone[molssi]>=1.0.23"]
+# The integration tests run SCF's modules with the plugins they are wired to
+# (see scf::set_defaults). None of these depends on scf, so installing them
+# never pulls in a published copy of the package under test.
+dev = [
+    "pytest",
+    "pre-commit",
+    "nwchemex-integrals",
+    "nwchemex-chemcache",
+    "nwchemex-nux",
+]
 
 [tool.scikit-build]
 metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
 # All installed content comes from the CMake install; no pure-Python packages.
 wheel.packages = []
+# Ship only this project's own install rules ("scf") plus third-party
+# dependencies this build had to fetch itself ("Unspecified", CMake's default
+# component). Ecosystem dependencies are resolved from their own wheels, and
+# their files belong to those wheels.
+install.components = ["scf", "Unspecified"]
 build-dir = "build"
 
 [tool.setuptools_scm]
