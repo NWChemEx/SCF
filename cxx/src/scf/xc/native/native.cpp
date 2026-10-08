@@ -33,7 +33,7 @@ namespace {
  */
 template<typename T>
 constexpr bool is_supported_v =
-  std::is_same_v<T, double> ||
+  std::is_same_v<T, float> || std::is_same_v<T, double> ||
   std::is_same_v<T, tensorwrapper::types::udouble> ||
   std::is_same_v<T, tensorwrapper::types::idouble>;
 
