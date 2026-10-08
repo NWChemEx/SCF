@@ -36,3 +36,5 @@ Modules API
    SAD_guess
    SCF_Driver
    SCF_integral_driver
+   SVWN3_Energy
+   SVWN3_Potential
