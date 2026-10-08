@@ -42,6 +42,10 @@ void load_modules(pluginplay::ModuleManager& mm);
  *
  *  @throw std::runtime_error if @p rho_on_grid's floating-point type is not
  *                            supported. Strong throw guarantee.
+ *  @throw std::domain_error if any element of @p rho_on_grid could be zero or
+ *                           negative, but is not exactly zero. Exactly zero
+ *                           densities give the zero-density limit (zero).
+ *                           Strong throw guarantee.
  */
 simde::type::tensor svwn3_energy_density(
   const simde::type::tensor& rho_on_grid);
@@ -56,6 +60,10 @@ simde::type::tensor svwn3_energy_density(
  *
  *  @throw std::runtime_error if @p rho_on_grid's floating-point type is not
  *                            supported. Strong throw guarantee.
+ *  @throw std::domain_error if any element of @p rho_on_grid could be zero or
+ *                           negative, but is not exactly zero. Exactly zero
+ *                           densities give the zero-density limit (zero).
+ *                           Strong throw guarantee.
  */
 simde::type::tensor svwn3_potential(const simde::type::tensor& rho_on_grid);
 
