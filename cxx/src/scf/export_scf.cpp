@@ -34,6 +34,7 @@ EXPORT_PLUGIN(scf, m) {
         return scf::initialize(argc, argv.data());
     });
     m.def("finalize", []() { scf::finalize(); });
+    m.def("set_defaults", &set_defaults);
 }
 
 } // namespace scf
