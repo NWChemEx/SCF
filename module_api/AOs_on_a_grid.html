@@ -128,6 +128,12 @@
 <h1>AOs on a grid<a class="headerlink" href="#aos-on-a-grid" title="Link to this heading"></a></h1>
 <section id="ao-collocationmatrix">
 <h2>AO CollocationMatrix<a class="headerlink" href="#ao-collocationmatrix" title="Link to this heading"></a></h2>
+<p>Evaluates each AO of the basis set at each point of the grid. Element (m, i)
+of the result is the value of AO m at grid point i.</p>
+<p>The AOs are normalized following the convention of the integral libraries
+(e.g., libint and gau2grid): each primitive and the contraction as a whole are
+normalized, but the per-component Cartesian factor (e.g., sqrt(3) for d_xy) is
+not applied. Spherical AOs are fully normalized.</p>
 <section id="please-cite">
 <h3>Please Cite<a class="headerlink" href="#please-cite" title="Link to this heading"></a></h3>
 <p>No citations</p>

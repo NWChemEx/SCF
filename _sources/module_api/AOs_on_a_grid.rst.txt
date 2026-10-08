@@ -8,7 +8,15 @@ AOs on a grid
 
 
 AO CollocationMatrix
------------------
+--------------------
+
+Evaluates each AO of the basis set at each point of the grid. Element (m, i)
+of the result is the value of AO m at grid point i.
+
+The AOs are normalized following the convention of the integral libraries
+(e.g., libint and gau2grid): each primitive and the contraction as a whole are
+normalized, but the per-component Cartesian factor (e.g., sqrt(3) for d_xy) is
+not applied. Spherical AOs are fully normalized.
 
 
 ***********
