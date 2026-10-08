@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import numpy as np
-from nwchemex import load_modules
+import scf
 from pluginplay import ModuleManager
 from simde import GeneralizedEigenSolve
 from tensorwrapper import Tensor
@@ -22,7 +22,7 @@ from tensorwrapper import Tensor
 class GeneralizedEigenSolverTester:
     def __init__(self):
         self.mm = ModuleManager()
-        load_modules(self.mm)
+        scf.load_modules(self.mm)
         self.solver = self.mm.at("Generalized eigensolve via Eigen")
 
     def solve_gen_eigenproblem(self, A, B, verify=True):

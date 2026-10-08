@@ -49,20 +49,7 @@ pluginplay::ModuleManager load_modules() {
     integrals::set_defaults(mm);
     nux::load_modules(mm);
     chemcache::load_modules(mm);
-
-    mm.change_submod("SCF Driver", "Hamiltonian",
-                     "Born-Oppenheimer approximation");
-
-    const auto ao_driver_key = "SCF integral driver";
-    mm.change_submod(ao_driver_key, "Fundamental matrices",
-                     "AO integral driver");
-
-    mm.change_submod("Diagonalization Fock update", "Overlap matrix builder",
-                     "Overlap");
-
-    mm.change_submod("Loop", "Overlap matrix builder", "Overlap");
-
-    mm.change_submod("SAD guess", "SAD Density", "sto-3g SAD density");
+    scf::set_defaults(mm);
 
     if constexpr(std::is_same_v<FloatType, tensorwrapper::types::udouble>) {
         configure_uq(mm, "uncertain");
