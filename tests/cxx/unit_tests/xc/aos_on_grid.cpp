@@ -68,7 +68,7 @@ ao_basis_type one_shell_basis(chemist::ShellType purity, unsigned l,
 
 TEST_CASE("AOsOnGrid") {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("AOs on a grid");
 
     auto path = test_scf::get_test_directory_path();

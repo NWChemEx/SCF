@@ -23,8 +23,8 @@ namespace scf::xc::libxc {
 DECLARE_MODULE(LibXCEnergy);
 DECLARE_MODULE(LibXCPotential);
 
-void set_defaults(pluginplay::ModuleManager& mm);
-void load_modules(pluginplay::ModuleManager& mm);
+void set_defaults(pluginplay::ModuleMap& modules);
+void load_modules(pluginplay::ModuleMap& modules);
 
 /** @brief Wraps the process of going from NWChemEx's XC specification to
  *         LibXC's.

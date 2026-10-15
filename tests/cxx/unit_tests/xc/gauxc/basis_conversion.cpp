@@ -22,7 +22,7 @@ using pt = scf::xc::gauxc::gauxc_basis_conversion_t;
 
 TEST_CASE("BasisConversion") {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("GauXC Basis Converter");
 
     using nuclei_type = simde::type::nuclei;

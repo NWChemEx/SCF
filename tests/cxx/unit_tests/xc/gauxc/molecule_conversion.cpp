@@ -22,7 +22,7 @@ using pt = scf::xc::gauxc::basis_to_gauxc_molecule_conversion_t;
 
 TEST_CASE("MoleculeConversion") {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("GauXC Molecule Converter");
 
     using nuclei_type = simde::type::nuclei;

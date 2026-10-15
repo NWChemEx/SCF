@@ -24,7 +24,7 @@ using pt = simde::MolecularGrid;
 
 TEST_CASE("GridFromFile") {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("Grid From File");
 
     int process_rank;

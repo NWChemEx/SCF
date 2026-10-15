@@ -29,8 +29,8 @@ namespace scf::xc::native {
 DECLARE_MODULE(SVWN3Energy);
 DECLARE_MODULE(SVWN3Potential);
 
-void set_defaults(pluginplay::ModuleManager& mm);
-void load_modules(pluginplay::ModuleManager& mm);
+void set_defaults(pluginplay::ModuleMap& modules);
+void load_modules(pluginplay::ModuleMap& modules);
 
 /** @brief Computes the SVWN3 energy density, rho * (eps_x + eps_c).
  *

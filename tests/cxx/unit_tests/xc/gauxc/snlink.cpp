@@ -21,7 +21,7 @@ using tensorwrapper::operations::approximately_equal;
 
 TEST_CASE("snLinK") {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("snLinK");
 
     SECTION("h2") {

@@ -33,7 +33,7 @@ TEST_CASE("XCEnergy") {
     using float_type = double;
 
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("GauXC XC Energy");
 
     auto func = chemist::qm_operator::xc_functional::PBE0;

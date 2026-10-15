@@ -26,7 +26,7 @@ using tensorwrapper::operations::approximately_equal;
 
 TEST_CASE("GauXCDriver") {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("GauXC Driver");
 
     auto func = chemist::qm_operator::xc_functional::PBE0;

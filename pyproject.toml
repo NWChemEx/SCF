@@ -62,8 +62,8 @@ dependencies = [
 
 [project.optional-dependencies]
 # The integration tests run SCF's modules with the plugins they are wired to
-# (see scf::set_defaults). None of these depends on scf, so installing them
-# never pulls in a published copy of the package under test.
+# (see the preferred providers in scf_mm.cpp). None of these depends on scf, so
+# installing them never pulls in a published copy of the package under test.
 dev = [
     "pytest",
     "pre-commit",

@@ -26,7 +26,7 @@ TEST_CASE("LibXCEnergy") {
     using float_type = double;
 
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("LibXC Energy");
 
     auto rho    = test_scf::h2_density<float_type>();

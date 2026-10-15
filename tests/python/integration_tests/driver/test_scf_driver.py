@@ -53,10 +53,11 @@ class TestSCFDriver(unittest.TestCase):
     def setUp(self):
         # Setup Module Manager
         self.mm = pp.ModuleManager(pz.runtime.RuntimeView())
-        for plugin in (scf, integrals, chemcache, nux):
-            plugin.load_modules(self.mm)
-        integrals.set_defaults(self.mm)
-        scf.set_defaults(self.mm)
+        self.mm.load_plugin(scf.SCF())
+        self.mm.load_plugin(integrals.Integrals())
+        self.mm.load_plugin(chemcache.ChemCache())
+        self.mm.load_plugin(nux.NUX())
+        self.mm.wire_defaults()
 
         # Property Types
         self.mol = simde.MoleculeFromString()

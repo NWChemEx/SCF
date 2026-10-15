@@ -27,7 +27,7 @@ using tensorwrapper::operations::approximately_equal;
 
 TEST_CASE("Gau2Grid") {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("Gau2Grid");
 
     using float_type     = double;

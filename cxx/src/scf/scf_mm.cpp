@@ -26,50 +26,47 @@
 
 namespace scf {
 
-void load_modules(pluginplay::ModuleManager& mm) {
-    driver::load_modules(mm);
-    eigen_solver::load_modules(mm);
-    fock_operator::load_modules(mm);
-    guess::load_modules(mm);
-    matrix_builder::load_modules(mm);
-    update::load_modules(mm);
-    xc::load_modules(mm);
+PLUGIN_CTOR(SCF) {
+    set_name("scf");
 
-    mm.add_module<CoulombsLaw>("Coulomb's Law");
+    // The defaults refer to modules from more than one subdirectory, so all
+    // modules are added before any defaults are set
+    driver::load_modules(modules());
+    eigen_solver::load_modules(modules());
+    fock_operator::load_modules(modules());
+    guess::load_modules(modules());
+    matrix_builder::load_modules(modules());
+    update::load_modules(modules());
+    xc::load_modules(modules());
 
-    // mm.add_module<SCFDriver>("Driver");
+    add_module<CoulombsLaw>("Coulomb's Law");
+
 #ifdef BUILD_TAMM_SCF
-    mm.add_module<TAMMEnergy>("SCF Energy via TAMM");
+    add_module<TAMMEnergy>("SCF Energy via TAMM");
 #endif
 
-    driver::set_defaults(mm);
-    guess::set_defaults(mm);
-    matrix_builder::set_defaults(mm);
-    update::set_defaults(mm);
-    xc::set_defaults(mm);
-}
+    driver::set_defaults(modules());
+    eigen_solver::set_defaults(modules());
+    guess::set_defaults(modules());
+    matrix_builder::set_defaults(modules());
+    update::set_defaults(modules());
+    xc::set_defaults(modules());
 
-void set_defaults(pluginplay::ModuleManager& mm) {
-    // Sets submod of module to provider, but only if provider is loaded
-    auto set_if_loaded = [&mm](const std::string& module,
-                               const std::string& submod,
-                               const std::string& provider) {
-        if(mm.count(provider)) mm.change_submod(module, submod, provider);
-    };
+    // Submodules SCF does not provide come from these plugins, if loaded
+    set_preferred_providers("nux", "integrals", "chemcache");
 
-    // From NUX
-    set_if_loaded("SCF Driver", "Hamiltonian",
-                  "Born-Oppenheimer approximation");
+    default_submod_from("nux", "SCF Driver", "Hamiltonian",
+                        "Born-Oppenheimer approximation");
 
-    // From Integrals
-    set_if_loaded("SCF integral driver", "Fundamental matrices",
-                  "AO integral driver");
-    set_if_loaded("Diagonalization Fock update", "Overlap matrix builder",
-                  "Overlap");
-    set_if_loaded("Loop", "Overlap matrix builder", "Overlap");
+    default_submod_from("integrals", "SCF integral driver",
+                        "Fundamental matrices", "AO integral driver");
+    default_submod_from("integrals", "Diagonalization Fock update",
+                        "Overlap matrix builder", "Overlap");
+    default_submod_from("integrals", "Loop", "Overlap matrix builder",
+                        "Overlap");
 
-    // From ChemCache
-    set_if_loaded("SAD guess", "SAD Density", "sto-3g SAD density");
+    default_submod_from("chemcache", "SAD guess", "SAD Density",
+                        "sto-3g SAD density");
 }
 
 } // namespace scf

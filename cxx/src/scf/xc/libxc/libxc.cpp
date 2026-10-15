@@ -40,19 +40,20 @@ const auto* get_const_pointer(const tensorwrapper::buffer::BufferBase& buffer) {
 }
 } // namespace
 
-void load_modules(pluginplay::ModuleManager& mm) {
-    mm.add_module<LibXCEnergy>("LibXC Energy");
-    mm.add_module<LibXCPotential>("LibXC Potential");
+void load_modules(pluginplay::ModuleMap& modules) {
+    modules.add_module<LibXCEnergy>("LibXC Energy");
+    modules.add_module<LibXCPotential>("LibXC Potential");
 }
 
-void set_defaults(pluginplay::ModuleManager& mm) {
-    mm.change_submod("LibXC Energy", "Integration grid",
-                     "Grid From IntegratorXX");
-    mm.change_submod("LibXC Potential", "Integration grid",
-                     "Grid From IntegratorXX");
-    mm.change_submod("LibXC Energy", "Density on a grid", "Density2Grid");
-    mm.change_submod("LibXC Potential", "Density on a grid", "Density2Grid");
-    mm.change_submod("LibXC Potential", "AOs on a grid", "AOs on a Grid");
+void set_defaults(pluginplay::ModuleMap& modules) {
+    modules.change_submod("LibXC Energy", "Integration grid",
+                          "Grid From IntegratorXX");
+    modules.change_submod("LibXC Potential", "Integration grid",
+                          "Grid From IntegratorXX");
+    modules.change_submod("LibXC Energy", "Density on a grid", "Density2Grid");
+    modules.change_submod("LibXC Potential", "Density on a grid",
+                          "Density2Grid");
+    modules.change_submod("LibXC Potential", "AOs on a grid", "AOs on a Grid");
 }
 
 std::pair<int, int> to_libxc_codes(chemist::qm_operator::xc_functional func) {

@@ -26,7 +26,7 @@ TEST_CASE("LibXCPotential") {
     using tensorwrapper::operations::approximately_equal;
 
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     mm.change_submod("LibXC Potential", "Integration grid", "Grid From File");
     auto& mod = mm.at("LibXC Potential");
 

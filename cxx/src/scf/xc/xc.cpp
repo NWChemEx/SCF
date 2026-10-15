@@ -22,26 +22,26 @@
 #include "xc.hpp"
 
 namespace scf::xc {
-void load_modules(pluginplay::ModuleManager& mm) {
+void load_modules(pluginplay::ModuleMap& modules) {
 #ifdef BUILD_GAUXC
-    gauxc::load_modules(mm);
+    gauxc::load_modules(modules);
 #endif
-    libxc::load_modules(mm);
-    native::load_modules(mm);
-    mm.add_module<AOsOnGrid>("AOs on a grid");
-    mm.add_module<Gau2Grid>("Gau2Grid");
-    mm.add_module<GridFromFile>("Grid From File");
-    mm.add_module<GridFromIntegratorXX>("Grid From IntegratorXX");
-    mm.add_module<Density2Grid>("Density2Grid");
+    libxc::load_modules(modules);
+    native::load_modules(modules);
+    modules.add_module<AOsOnGrid>("AOs on a grid");
+    modules.add_module<Gau2Grid>("Gau2Grid");
+    modules.add_module<GridFromFile>("Grid From File");
+    modules.add_module<GridFromIntegratorXX>("Grid From IntegratorXX");
+    modules.add_module<Density2Grid>("Density2Grid");
 }
 
-void set_defaults(pluginplay::ModuleManager& mm) {
+void set_defaults(pluginplay::ModuleMap& modules) {
 #ifdef BUILD_GAUXC
-    gauxc::set_defaults(mm);
+    gauxc::set_defaults(modules);
 #endif
-    libxc::set_defaults(mm);
-    native::set_defaults(mm);
-    mm.change_submod("Density2Grid", "AOs on a grid", "AOs on a grid");
+    libxc::set_defaults(modules);
+    native::set_defaults(modules);
+    modules.change_submod("Density2Grid", "AOs on a grid", "AOs on a grid");
 }
 
 } // namespace scf::xc

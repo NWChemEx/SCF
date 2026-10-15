@@ -25,7 +25,7 @@ DECLARE_MODULE(Restricted);
 template<typename DensityType, typename ElectronType>
 DECLARE_MODULE(RKohnSham);
 
-inline void load_modules(pluginplay::ModuleManager& mm) {
+inline void load_modules(pluginplay::ModuleMap& modules) {
     using simde::type::decomposable_e_density;
     using simde::type::e_density;
     using simde::type::electron;
@@ -38,14 +38,14 @@ inline void load_modules(pluginplay::ModuleManager& mm) {
     using e_ks_e    = RKohnSham<e_density, electron>;
     using d_ks_many = RKohnSham<decomposable_e_density, many_electrons>;
     using d_ks_e    = RKohnSham<decomposable_e_density, electron>;
-    mm.add_module<e_many>("AO Restricted Fock Op");
-    mm.add_module<d_many>("Restricted Fock Op");
-    mm.add_module<e_e>("AO Restricted One-Electron Fock Op");
-    mm.add_module<d_e>("Restricted One-Electron Fock Op");
-    mm.add_module<e_ks_many>("AO Restricted Kohn-Sham Op");
-    mm.add_module<d_ks_many>("Restricted Kohn-Sham Op");
-    mm.add_module<e_ks_e>("AO Restricted One-Electron Kohn-Sham Op");
-    mm.add_module<d_ks_e>("Restricted One-Electron Kohn-Sham Op");
+    modules.add_module<e_many>("AO Restricted Fock Op");
+    modules.add_module<d_many>("Restricted Fock Op");
+    modules.add_module<e_e>("AO Restricted One-Electron Fock Op");
+    modules.add_module<d_e>("Restricted One-Electron Fock Op");
+    modules.add_module<e_ks_many>("AO Restricted Kohn-Sham Op");
+    modules.add_module<d_ks_many>("Restricted Kohn-Sham Op");
+    modules.add_module<e_ks_e>("AO Restricted One-Electron Kohn-Sham Op");
+    modules.add_module<d_ks_e>("Restricted One-Electron Kohn-Sham Op");
 }
 
 #define EXTERN_RESTRICTED(density)                                           \

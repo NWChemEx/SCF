@@ -88,19 +88,20 @@ simde::type::tensor visit(KernelType&& k, const simde::type::tensor& t) {
 
 } // namespace
 
-void load_modules(pluginplay::ModuleManager& mm) {
-    mm.add_module<SVWN3Energy>("SVWN3 Energy");
-    mm.add_module<SVWN3Potential>("SVWN3 Potential");
+void load_modules(pluginplay::ModuleMap& modules) {
+    modules.add_module<SVWN3Energy>("SVWN3 Energy");
+    modules.add_module<SVWN3Potential>("SVWN3 Potential");
 }
 
-void set_defaults(pluginplay::ModuleManager& mm) {
-    mm.change_submod("SVWN3 Energy", "Integration grid",
-                     "Grid From IntegratorXX");
-    mm.change_submod("SVWN3 Potential", "Integration grid",
-                     "Grid From IntegratorXX");
-    mm.change_submod("SVWN3 Energy", "Density on a grid", "Density2Grid");
-    mm.change_submod("SVWN3 Potential", "Density on a grid", "Density2Grid");
-    mm.change_submod("SVWN3 Potential", "AOs on a grid", "AOs on a grid");
+void set_defaults(pluginplay::ModuleMap& modules) {
+    modules.change_submod("SVWN3 Energy", "Integration grid",
+                          "Grid From IntegratorXX");
+    modules.change_submod("SVWN3 Potential", "Integration grid",
+                          "Grid From IntegratorXX");
+    modules.change_submod("SVWN3 Energy", "Density on a grid", "Density2Grid");
+    modules.change_submod("SVWN3 Potential", "Density on a grid",
+                          "Density2Grid");
+    modules.change_submod("SVWN3 Potential", "AOs on a grid", "AOs on a grid");
 }
 
 simde::type::tensor svwn3_energy_density(

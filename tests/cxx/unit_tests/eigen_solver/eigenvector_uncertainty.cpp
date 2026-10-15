@@ -38,7 +38,7 @@ TEMPLATE_LIST_TEST_CASE("attach_eigenvector_uncertainty", "", uq_types) {
     auto radius = [](const TestType& x) { return uq_upper(x) - uq_center(x); };
 
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod        = mm.at("Eigen Solve via Jacobi");
     auto noise_level = 1e-6;
     using pt         = simde::EigenSolve;

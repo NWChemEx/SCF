@@ -21,7 +21,7 @@ using namespace test_eigen_solver;
 
 TEMPLATE_LIST_TEST_CASE("EigenSolveDriver", "", types) {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("Eigen Solve");
     using pt  = simde::EigenSolve;
 
