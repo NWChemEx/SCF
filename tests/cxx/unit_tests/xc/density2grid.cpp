@@ -26,7 +26,7 @@ using tensorwrapper::operations::approximately_equal;
 
 TEST_CASE("Density2Grid") {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("Density2Grid");
 
     auto path = test_scf::get_test_directory_path();

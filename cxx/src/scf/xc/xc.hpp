@@ -25,7 +25,7 @@ DECLARE_MODULE(Gau2Grid);
 DECLARE_MODULE(GridFromFile);
 DECLARE_MODULE(GridFromIntegratorXX);
 
-void set_defaults(pluginplay::ModuleManager& mm);
-void load_modules(pluginplay::ModuleManager& mm);
+void set_defaults(pluginplay::ModuleMap& modules);
+void load_modules(pluginplay::ModuleMap& modules);
 
 } // namespace scf::xc

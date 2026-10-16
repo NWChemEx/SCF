@@ -23,7 +23,7 @@ using namespace test_eigen_solver;
 TEMPLATE_LIST_TEST_CASE("EigenGeneralized H2 dimer", "", types) {
     using pt = simde::GeneralizedEigenSolve;
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
 
     auto rtol = std::is_same_v<TestType, float> ? 5e-4 : 1e-5;
     auto A    = h2_dimer_fock_as<TestType>();

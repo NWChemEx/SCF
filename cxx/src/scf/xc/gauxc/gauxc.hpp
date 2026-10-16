@@ -35,7 +35,7 @@ DECLARE_MODULE(MoleculeConversion);
 // Modules to generate XC Quadrature Batches
 DECLARE_MODULE(QuadratureBatches);
 
-void set_defaults(pluginplay::ModuleManager& mm);
-void load_modules(pluginplay::ModuleManager& mm);
+void set_defaults(pluginplay::ModuleMap& modules);
+void load_modules(pluginplay::ModuleMap& modules);
 
 } // namespace scf::xc::gauxc

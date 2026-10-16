@@ -24,7 +24,7 @@ using namespace tensorwrapper::generate;
 
 TEMPLATE_LIST_TEST_CASE("JacobiNormal", "", types) {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
 
     auto& mod = mm.at("Eigen Solve via Jacobi");
     auto rtol = std::is_same_v<TestType, float> ? 5e-4 : 1e-5;
@@ -68,7 +68,7 @@ TEMPLATE_LIST_TEST_CASE("JacobiNormal", "", types) {
 using types2 = std::tuple<tensorwrapper::types::idouble>;
 TEMPLATE_LIST_TEST_CASE("JacobiNormal with noise", "", types2) {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
 
     auto& mod        = mm.at("Eigen Solve via Jacobi");
     auto noise_level = 1e-6;

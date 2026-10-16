@@ -21,7 +21,7 @@ using pt = simde::aos_rho_e_aos<simde::type::cmos>;
 TEMPLATE_LIST_TEST_CASE("Density Matrix Builder", "", test_scf::float_types) {
     using float_type = TestType;
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("Density matrix builder");
     auto aos  = test_scf::h2_aos();
     auto cmos = test_scf::h2_cmos<float_type>();

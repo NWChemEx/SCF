@@ -18,26 +18,18 @@
 #include <pluginplay/pluginplay.hpp>
 
 namespace scf {
-/** @brief Loads the modules contained in the SCF module collection into the
- *         provided ModuleManager instance.
- */
-void load_modules(pluginplay::ModuleManager& mm);
-
-/** @brief Connects SCF's modules to the modules other plugins provide.
+/** @brief The SCF plugin.
+ *
+ *  Load it into a ModuleManager with `mm.load_plugin<scf::SCF>()`
+ *  (`mm.load_plugin(scf.SCF())` from Python). The plugin's name is "scf".
  *
  *  Several SCF modules need a submodule that SCF itself does not provide (the
  *  Hamiltonian, the AO integrals, the overlap matrix, and the SAD density).
- *  This function sets those submodules to the default implementations from
- *  the NUX, Integrals, and ChemCache plugins.
- *
- *  Each submodule is only set if the module providing it has been loaded into
- *  @p mm, so this function must be called after those plugins' load_modules.
- *  Submodules whose provider is missing are left unset, and SCF does not
- *  depend on any of those plugins.
- *
- *  @param[in,out] mm The ModuleManager to set the submodules in. Must already
- *                    contain SCF's modules (see load_modules).
+ *  The plugin records defaults for those submodules from the NUX, Integrals,
+ *  and ChemCache plugins, which ModuleManager::wire_defaults sets once the
+ *  plugins are loaded. Submodules whose provider is not loaded are left unset,
+ *  and SCF does not depend on any of those plugins.
  */
-void set_defaults(pluginplay::ModuleManager& mm);
+DECLARE_PLUGIN(SCF);
 
 } // namespace scf

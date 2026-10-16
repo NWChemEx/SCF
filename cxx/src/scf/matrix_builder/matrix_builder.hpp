@@ -25,43 +25,46 @@ DECLARE_MODULE(DeterminantDriver);
 DECLARE_MODULE(ElectronicEnergy);
 DECLARE_MODULE(Fock);
 
-inline void load_modules(pluginplay::ModuleManager& mm) {
-    mm.add_module<SCFIntegralsDriver>("SCF integral driver");
-    mm.add_module<DensityMatrix>("Density matrix builder");
-    mm.add_module<DeterminantDriver>("Determinant driver");
-    mm.add_module<ElectronicEnergy>("Electronic energy");
-    mm.add_module<Fock>("Fock matrix builder");
+inline void load_modules(pluginplay::ModuleMap& modules) {
+    modules.add_module<SCFIntegralsDriver>("SCF integral driver");
+    modules.add_module<DensityMatrix>("Density matrix builder");
+    modules.add_module<DeterminantDriver>("Determinant driver");
+    modules.add_module<ElectronicEnergy>("Electronic energy");
+    modules.add_module<Fock>("Fock matrix builder");
 }
 
-inline void set_defaults(pluginplay::ModuleManager& mm) {
+inline void set_defaults(pluginplay::ModuleMap& modules) {
     const auto ao_driver = "SCF integral driver";
-    // mm.change_submod(ao_driver, "Fock matrix", "Fock Matrix Builder");
-    mm.change_submod(ao_driver, "Density matrix", "Density matrix builder");
+    // modules.change_submod(ao_driver, "Fock matrix", "Fock Matrix Builder");
+    modules.change_submod(ao_driver, "Density matrix",
+                          "Density matrix builder");
 // GauXC and LibXC's "XC Potential"/"XC Energy" modules satisfy the same
 // property types (see scf::xc::gauxc::xc_potential.cpp/xc_energy.cpp and
 // scf::xc::libxc::libxc_potential.cpp/libxc_energy.cpp), so either is a
 // valid default; GauXC is preferred when both are available. Neither module
-// exists in the ModuleManager when its BUILD_* option is off, and
-// mm.change_submod throws if pointed at a key that isn't registered, so
+// exists in the plugin when its BUILD_* option is off, and
+// ModuleMap::change_submod throws if pointed at a key that isn't registered, so
 // this must mirror the same guards scf::xc::set_defaults uses (see xc.cpp)
 // rather than unconditionally defaulting to GauXC.
 #ifdef BUILD_GAUXC
-    mm.change_submod(ao_driver, "XC Potential", "GauXC XC Potential");
+    modules.change_submod(ao_driver, "XC Potential", "GauXC XC Potential");
 #elif defined(BUILD_LIBXC)
-    mm.change_submod(ao_driver, "XC Potential", "LibXC Potential");
+    modules.change_submod(ao_driver, "XC Potential", "LibXC Potential");
 #endif
 
-    mm.change_submod("Fock Matrix Builder", "Two center evaluator", ao_driver);
+    modules.change_submod("Fock Matrix Builder", "Two center evaluator",
+                          ao_driver);
 
     const auto det_driver = "Determinant driver";
-    mm.change_submod(det_driver, "Two center evaluator", ao_driver);
-    mm.change_submod(det_driver, "Fock matrix", "Fock matrix builder");
+    modules.change_submod(det_driver, "Two center evaluator", ao_driver);
+    modules.change_submod(det_driver, "Fock matrix", "Fock matrix builder");
 
-    mm.change_submod("Electronic energy", "determinant driver", det_driver);
+    modules.change_submod("Electronic energy", "determinant driver",
+                          det_driver);
 #ifdef BUILD_GAUXC
-    mm.change_submod("Electronic energy", "XC Energy", "GauXC XC Energy");
+    modules.change_submod("Electronic energy", "XC Energy", "GauXC XC Energy");
 #elif defined(BUILD_LIBXC)
-    mm.change_submod("Electronic energy", "XC Energy", "LibXC Energy");
+    modules.change_submod("Electronic energy", "XC Energy", "LibXC Energy");
 #endif
 }
 

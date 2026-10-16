@@ -20,7 +20,7 @@
 
 TEMPLATE_LIST_TEST_CASE("Restricted", "", test_scf::float_types) {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     using float_type   = double;
     using density_type = simde::type::decomposable_e_density;
     using pt           = simde::FockOperator<density_type>;

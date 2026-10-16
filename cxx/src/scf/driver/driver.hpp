@@ -22,25 +22,25 @@ namespace scf::driver {
 DECLARE_MODULE(SCFDriver);
 DECLARE_MODULE(SCFLoop);
 
-inline void load_modules(pluginplay::ModuleManager& mm) {
-    mm.add_module<SCFDriver>("SCF Driver");
-    mm.add_module<SCFLoop>("Loop");
+inline void load_modules(pluginplay::ModuleMap& modules) {
+    modules.add_module<SCFDriver>("SCF Driver");
+    modules.add_module<SCFLoop>("Loop");
 }
 
-inline void set_defaults(pluginplay::ModuleManager& mm) {
-    mm.change_submod("Loop", "Electronic energy", "Electronic energy");
-    mm.change_submod("Loop", "Density matrix", "Density matrix builder");
-    mm.change_submod("Loop", "Diagonalizer",
-                     "Generalized eigensolve via Eigen");
-    mm.change_submod("Loop", "Fock matrix builder", "Fock matrix builder");
-    mm.change_submod("Loop", "One-electron Fock operator",
-                     "Restricted One-Electron Fock op");
-    mm.change_submod("Loop", "Fock operator", "Restricted Fock Op");
-    mm.change_submod("Loop", "Charge-charge", "Coulomb's Law");
-    mm.change_submod("Loop", "Fock matrix builder", "Fock matrix builder");
+inline void set_defaults(pluginplay::ModuleMap& modules) {
+    modules.change_submod("Loop", "Electronic energy", "Electronic energy");
+    modules.change_submod("Loop", "Density matrix", "Density matrix builder");
+    modules.change_submod("Loop", "Diagonalizer",
+                          "Generalized eigensolve via Eigen");
+    modules.change_submod("Loop", "Fock matrix builder", "Fock matrix builder");
+    modules.change_submod("Loop", "One-electron Fock operator",
+                          "Restricted One-Electron Fock op");
+    modules.change_submod("Loop", "Fock operator", "Restricted Fock Op");
+    modules.change_submod("Loop", "Charge-charge", "Coulomb's Law");
+    modules.change_submod("Loop", "Fock matrix builder", "Fock matrix builder");
 
-    mm.change_submod("SCF Driver", "Guess", "Core guess");
-    mm.change_submod("SCF Driver", "Optimizer", "Loop");
+    modules.change_submod("SCF Driver", "Guess", "Core guess");
+    modules.change_submod("SCF Driver", "Optimizer", "Loop");
 }
 
 } // namespace scf::driver

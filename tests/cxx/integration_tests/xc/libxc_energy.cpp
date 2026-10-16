@@ -29,7 +29,7 @@ TEST_CASE("LibXCEnergy") {
     using tensorwrapper::operations::approximately_equal;
 
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     mm.change_submod("LibXC Energy", "Integration grid",
                      "Grid From IntegratorXX");
     auto& mod = mm.at("LibXC Energy");
@@ -112,7 +112,7 @@ simde::type::tensor to_float_type(const simde::type::tensor& t) {
 /// Makes a ModuleManager whose IntegratorXX grid matches the LibXC tests
 pluginplay::ModuleManager make_svwn3_mm(const std::string& float_type) {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     const auto grid_key = "Grid From IntegratorXX";
     mm.change_input(grid_key, "Radial Size", std::size_t(150));
     mm.change_input(grid_key, "Angular Size", std::size_t(194));

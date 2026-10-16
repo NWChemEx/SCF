@@ -22,7 +22,7 @@ using namespace tensorwrapper::generate;
 
 TEMPLATE_LIST_TEST_CASE("EigenNormal", "", types) {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
 
     auto& mod = mm.at("Eigen Solve via Eigen");
     auto rtol = std::is_same_v<TestType, float> ? 1e-3 : 1e-5;

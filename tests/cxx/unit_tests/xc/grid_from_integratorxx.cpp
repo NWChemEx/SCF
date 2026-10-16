@@ -31,7 +31,7 @@ constexpr std::size_t angular_size = 6;
 
 pluginplay::ModuleManager make_mm() {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("Grid From IntegratorXX");
     mod.change_input("Radial Size", radial_size);
     mod.change_input("Angular Size", angular_size);

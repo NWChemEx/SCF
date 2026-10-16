@@ -44,12 +44,11 @@ template<typename FloatType>
 pluginplay::ModuleManager load_modules() {
     auto rv = std::make_shared<parallelzone::runtime::RuntimeView>();
     pluginplay::ModuleManager mm(rv);
-    scf::load_modules(mm);
-    integrals::load_modules(mm);
-    integrals::set_defaults(mm);
-    nux::load_modules(mm);
-    chemcache::load_modules(mm);
-    scf::set_defaults(mm);
+    mm.load_plugin<scf::SCF>();
+    mm.load_plugin<integrals::Integrals>();
+    mm.load_plugin<nux::NUX>();
+    mm.load_plugin<chemcache::ChemCache>();
+    mm.wire_defaults();
 
     if constexpr(std::is_same_v<FloatType, tensorwrapper::types::udouble>) {
         configure_uq(mm, "uncertain");

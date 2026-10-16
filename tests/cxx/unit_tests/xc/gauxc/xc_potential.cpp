@@ -25,7 +25,7 @@ using tensorwrapper::operations::approximately_equal;
 
 TEST_CASE("XCPotential") {
     pluginplay::ModuleManager mm;
-    scf::load_modules(mm);
+    mm.load_plugin<scf::SCF>();
     auto& mod = mm.at("GauXC XC Potential");
 
     simde::type::electron e;

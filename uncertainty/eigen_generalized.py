@@ -22,7 +22,7 @@ from tensorwrapper import Tensor
 class GeneralizedEigenSolverTester:
     def __init__(self):
         self.mm = ModuleManager()
-        scf.load_modules(self.mm)
+        self.mm.load_plugin(scf.SCF())
         self.solver = self.mm.at("Generalized eigensolve via Eigen")
 
     def solve_gen_eigenproblem(self, A, B, verify=True):

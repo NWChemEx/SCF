@@ -25,20 +25,20 @@ DECLARE_MODULE(EigenGeneralized);
 DECLARE_MODULE(EigenNormal);
 DECLARE_MODULE(JacobiNormal);
 
-inline void set_defaults(pluginplay::ModuleManager& mm) {
-    mm.change_submod("Eigen Solve", "none", "Eigen Solve via Eigen");
-    mm.change_submod("Eigen Solve", "uncertain", "Eigen Solve via Jacobi");
-    mm.change_submod("Eigen Solve", "interval", "Eigen Solve via Jacobi");
-    mm.change_submod("Generalized eigensolve", "Eigen Solve", "Eigen Solve");
+inline void set_defaults(pluginplay::ModuleMap& modules) {
+    modules.change_submod("Eigen Solve", "none", "Eigen Solve via Eigen");
+    modules.change_submod("Eigen Solve", "uncertain", "Eigen Solve via Jacobi");
+    modules.change_submod("Eigen Solve", "interval", "Eigen Solve via Jacobi");
+    modules.change_submod("Generalized eigensolve", "Eigen Solve",
+                          "Eigen Solve");
 }
 
-inline void load_modules(pluginplay::ModuleManager& mm) {
-    mm.add_module<EigenSolveDriver>("Eigen Solve");
-    mm.add_module<EigenNormal>("Eigen Solve via Eigen");
-    mm.add_module<JacobiNormal>("Eigen Solve via Jacobi");
-    mm.add_module<EigenGeneralized>("Generalized eigensolve via Eigen");
-    mm.add_module<GeneralizedEigenSolver>("Generalized eigensolve");
-    set_defaults(mm);
+inline void load_modules(pluginplay::ModuleMap& modules) {
+    modules.add_module<EigenSolveDriver>("Eigen Solve");
+    modules.add_module<EigenNormal>("Eigen Solve via Eigen");
+    modules.add_module<JacobiNormal>("Eigen Solve via Jacobi");
+    modules.add_module<EigenGeneralized>("Generalized eigensolve via Eigen");
+    modules.add_module<GeneralizedEigenSolver>("Generalized eigensolve");
 }
 
 } // namespace scf::eigen_solver
