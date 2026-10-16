@@ -108,7 +108,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> DensityType, <span class="keyword">typename</span> ElectronType&gt;</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>DECLARE_MODULE(RKohnSham);</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keyword">inline</span> <span class="keywordtype">void</span> load_modules(pluginplay::ModuleManager&amp; mm) {</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keyword">inline</span> <span class="keywordtype">void</span> load_modules(pluginplay::ModuleMap&amp; modules) {</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keyword">using </span>simde::type::decomposable_e_density;</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <span class="keyword">using </span>simde::type::e_density;</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <span class="keyword">using </span>simde::type::electron;</div>
@@ -121,14 +121,14 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    <span class="keyword">using </span>e_ks_e    = RKohnSham&lt;e_density, electron&gt;;</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="keyword">using </span>d_ks_many = RKohnSham&lt;decomposable_e_density, many_electrons&gt;;</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <span class="keyword">using </span>d_ks_e    = RKohnSham&lt;decomposable_e_density, electron&gt;;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    mm.add_module&lt;e_many&gt;(<span class="stringliteral">&quot;AO Restricted Fock Op&quot;</span>);</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    mm.add_module&lt;d_many&gt;(<span class="stringliteral">&quot;Restricted Fock Op&quot;</span>);</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    mm.add_module&lt;e_e&gt;(<span class="stringliteral">&quot;AO Restricted One-Electron Fock Op&quot;</span>);</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    mm.add_module&lt;d_e&gt;(<span class="stringliteral">&quot;Restricted One-Electron Fock Op&quot;</span>);</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    mm.add_module&lt;e_ks_many&gt;(<span class="stringliteral">&quot;AO Restricted Kohn-Sham Op&quot;</span>);</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    mm.add_module&lt;d_ks_many&gt;(<span class="stringliteral">&quot;Restricted Kohn-Sham Op&quot;</span>);</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    mm.add_module&lt;e_ks_e&gt;(<span class="stringliteral">&quot;AO Restricted One-Electron Kohn-Sham Op&quot;</span>);</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    mm.add_module&lt;d_ks_e&gt;(<span class="stringliteral">&quot;Restricted One-Electron Kohn-Sham Op&quot;</span>);</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    modules.add_module&lt;e_many&gt;(<span class="stringliteral">&quot;AO Restricted Fock Op&quot;</span>);</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    modules.add_module&lt;d_many&gt;(<span class="stringliteral">&quot;Restricted Fock Op&quot;</span>);</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    modules.add_module&lt;e_e&gt;(<span class="stringliteral">&quot;AO Restricted One-Electron Fock Op&quot;</span>);</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    modules.add_module&lt;d_e&gt;(<span class="stringliteral">&quot;Restricted One-Electron Fock Op&quot;</span>);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    modules.add_module&lt;e_ks_many&gt;(<span class="stringliteral">&quot;AO Restricted Kohn-Sham Op&quot;</span>);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    modules.add_module&lt;d_ks_many&gt;(<span class="stringliteral">&quot;Restricted Kohn-Sham Op&quot;</span>);</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    modules.add_module&lt;e_ks_e&gt;(<span class="stringliteral">&quot;AO Restricted One-Electron Kohn-Sham Op&quot;</span>);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>    modules.add_module&lt;d_ks_e&gt;(<span class="stringliteral">&quot;Restricted One-Electron Kohn-Sham Op&quot;</span>);</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>}</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#define EXTERN_RESTRICTED(density)                                           \</span></div>
