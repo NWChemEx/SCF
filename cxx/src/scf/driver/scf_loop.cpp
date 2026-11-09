@@ -14,27 +14,11 @@
  * limitations under the License.
  */
 
-#include "../eigen_solver/eigenvector_uncertainty.hpp"
-#include "../eigen_solver/inflate_uncertainty.hpp"
 #include "driver.hpp"
 #include <scf/driver/commutator.hpp>
 
 namespace scf::driver {
 namespace {
-
-struct IsUQTypeKernel {
-    template<typename FloatType>
-    auto operator()(std::span<FloatType> out) {
-        using clean_t = std::decay_t<FloatType>;
-        return tensorwrapper::types::is_uq_type_v<clean_t>;
-    }
-};
-
-auto check_if_uqtype(const tensorwrapper::buffer::BufferBase& buffer) {
-    IsUQTypeKernel kernel;
-    const auto& contiguous = tensorwrapper::buffer::make_contiguous(buffer);
-    return tensorwrapper::buffer::visit_contiguous_buffer(kernel, contiguous);
-}
 
 // Comparison between convergence metrics based on floating point type
 struct Kernel {
@@ -115,6 +99,8 @@ using v_nn_pt         = simde::charge_charge_interaction;
 using fock_matrix_pt  = simde::aos_f_e_aos;
 using diagonalizer_pt = simde::GeneralizedEigenSolve;
 using s_pt            = simde::aos_s_e_aos;
+using mo_uq_pt        = scf::property_types::MOUncertainty;
+using conv_uq_pt      = scf::property_types::ConvergenceUncertainty;
 using simde::type::electronic_hamiltonian;
 
 template<typename WfType>
@@ -152,6 +138,11 @@ MODULE_CTOR(SCFLoop) {
     add_submodule<fock_pt>("One-electron Fock operator");
     add_submodule<fock_pt>("Fock operator");
     add_submodule<v_nn_pt>("Charge-charge");
+    add_submodule<mo_uq_pt>("MO uncertainty")
+      .set_description("Attaches uncertainty to the converged orbitals");
+    add_submodule<conv_uq_pt>("Convergence uncertainty")
+      .set_description("Attaches the uncertainty from incomplete convergence "
+                       "to the converged energy");
 }
 
 MODULE_RUN(SCFLoop) {
@@ -172,6 +163,8 @@ MODULE_RUN(SCFLoop) {
     auto& V_nn_mod         = submods.at("Charge-charge");
     auto& F_mod            = submods.at("Fock matrix builder");
     auto& S_mod            = submods.at("Overlap matrix builder");
+    auto& mo_uq_mod        = submods.at("MO uncertainty");
+    auto& conv_uq_mod      = submods.at("Convergence uncertainty");
 
     // Unwrap Braket and trial wavefunction
     // TODO: Assert bra == ket == psi0
@@ -220,9 +213,9 @@ MODULE_RUN(SCFLoop) {
     tensor_t e_old;
     tensor_t F_old;
 
-    // Converged-iteration residuals, captured for post-convergence UQ
-    // inflation: de is the final change in energy, dp the final change in the
-    // density matrix. They drive the extra energy/MO uncertainty below.
+    // Converged-iteration residuals, captured for the uncertainty attached
+    // after convergence: de is the final change in energy, dp the final change
+    // in the density matrix.
     tensor_t de;
     tensor_t dp;
 
@@ -323,30 +316,15 @@ MODULE_RUN(SCFLoop) {
     }
     if(iter == max_iter) throw std::runtime_error("SCF failed to converge");
 
-    // One-shot: attach first-order MO-coefficient uncertainty to the converged
-    // orbitals. The SCF iterates on the centers, so the eigenvector spread is
-    // NOT fed back through the density (which would compound it); it is applied
-    // once, here, to the converged Fock and only reported. See
-    // eigen_solver/eigenvector_uncertainty.hpp.
-    if(check_if_uqtype(F_old.buffer())) {
-        const auto&& [evalues, evectors] =
-          diagonalizer_mod.run_as<diagonalizer_pt>(F_old, S);
-        auto corrected_vectors = evectors;
-        eigen_solver::attach_eigenvector_uncertainty(corrected_vectors, F_old,
-                                                     evalues);
-
-        // Inflate each MO coefficient by an independent uncertainty of radius
-        // |dP_mn|, using the converged density change dp as the per-element dP.
-        // The density P = sum_i C_mi C_ni then picks up a first-order change of
-        // order |C| * dP ~ dP per element, so each density-matrix element's
-        // uncertainty lands at ~dP (its converged residual). No-op unless a UQ
-        // type is active. See inflate_uncertainty.hpp for why this is dP and
-        // not sqrt(dP).
-        eigen_solver::inflate_uncertainty_from(corrected_vectors, dp);
-
-        cmos_t cmos(evalues, aos, corrected_vectors);
-        psi_old = wf_type(psi_old.orbital_indices(), cmos);
-    }
+    // Attach uncertainty to the converged orbitals. This is done once, here.
+    // The orbitals are not fed back through the density, where their
+    // uncertainty would compound. The uncertainty models need the eigenpairs of
+    // the converged Fock matrix, so it is diagonalized once more.
+    const auto&& [evalues, evectors] =
+      diagonalizer_mod.run_as<diagonalizer_pt>(F_old, S);
+    const auto& C = mo_uq_mod.run_as<mo_uq_pt>(F_old, S, evalues, evectors, dp);
+    cmos_t cmos(evalues, aos, C);
+    psi_old = wf_type(psi_old.orbital_indices(), cmos);
 
     tensor_t e_total;
 
@@ -355,13 +333,8 @@ MODULE_RUN(SCFLoop) {
 
     e_total("") = e_old("") + e_nuclear("");
 
-    // Add an extra independent uncertainty to the converged total energy equal
-    // to the magnitude of the final energy change |center(de)| -- the
-    // incomplete-convergence error (bounded by the energy tolerance), NOT de's
-    // propagated uncertainty radius (which is ~the energy's own uncertainty and
-    // would roughly double it). No-op unless a UQ float type is active.
-    eigen_solver::inflate_uncertainty(e_total,
-                                      eigen_solver::uq_center_magnitude(de));
+    // Attach the uncertainty from incomplete convergence to the energy
+    e_total = conv_uq_mod.run_as<conv_uq_pt>(e_total, de);
 
     auto rv = results();
     return pt<wf_type>::wrap_results(rv, e_total, psi_old);

@@ -20,6 +20,7 @@
 #include "guess/guess.hpp"
 #include "matrix_builder/matrix_builder.hpp"
 #include "scf_modules.hpp"
+#include "uncertainty/uncertainty.hpp"
 #include "update/update.hpp"
 #include "xc/xc.hpp"
 #include <scf/scf_mm.hpp>
@@ -36,6 +37,7 @@ PLUGIN_CTOR(SCF) {
     fock_operator::load_modules(modules());
     guess::load_modules(modules());
     matrix_builder::load_modules(modules());
+    uncertainty::load_modules(modules());
     update::load_modules(modules());
     xc::load_modules(modules());
 
@@ -67,6 +69,13 @@ PLUGIN_CTOR(SCF) {
 
     default_submod_from("chemcache", "SAD guess", "SAD Density",
                         "sto-3g SAD density");
+
+    default_submod_from("integrals", "QCUP SCF", "ERIs",
+                        "UQ Atom Symm Blocked Driver");
+    default_submod_from("integrals", "QCUP SCF", "ERI Error Model",
+                        "Analytic Error");
+    default_submod_from("integrals", "QCUP SCF", "Benchmark ERIs",
+                        "Analytic Benchmark ERI4");
 }
 
 } // namespace scf

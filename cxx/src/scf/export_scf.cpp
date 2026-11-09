@@ -34,6 +34,10 @@ EXPORT_PLUGIN(scf, SCF, m) {
         return scf::initialize(argc, argv.data());
     });
     m.def("finalize", []() { scf::finalize(); });
+
+    using namespace scf::property_types;
+    EXPORT_PROPERTY_TYPE(MOUncertainty, m);
+    EXPORT_PROPERTY_TYPE(ConvergenceUncertainty, m);
 }
 
 } // namespace scf

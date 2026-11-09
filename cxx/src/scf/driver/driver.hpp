@@ -15,16 +15,19 @@
  */
 
 #pragma once
+#include <scf/property_types.hpp>
 #include <simde/simde.hpp>
 
 namespace scf::driver {
 
 DECLARE_MODULE(SCFDriver);
 DECLARE_MODULE(SCFLoop);
+DECLARE_DRIVER(QCUPSCF);
 
 inline void load_modules(pluginplay::ModuleMap& modules) {
     modules.add_module<SCFDriver>("SCF Driver");
     modules.add_module<SCFLoop>("Loop");
+    modules.add_module<QCUPSCF>("QCUP SCF");
 }
 
 inline void set_defaults(pluginplay::ModuleMap& modules) {
@@ -38,6 +41,9 @@ inline void set_defaults(pluginplay::ModuleMap& modules) {
     modules.change_submod("Loop", "Fock operator", "Restricted Fock Op");
     modules.change_submod("Loop", "Charge-charge", "Coulomb's Law");
     modules.change_submod("Loop", "Fock matrix builder", "Fock matrix builder");
+    modules.change_submod("Loop", "MO uncertainty", "No MO uncertainty");
+    modules.change_submod("Loop", "Convergence uncertainty",
+                          "No convergence uncertainty");
 
     modules.change_submod("SCF Driver", "Guess", "Core guess");
     modules.change_submod("SCF Driver", "Optimizer", "Loop");
