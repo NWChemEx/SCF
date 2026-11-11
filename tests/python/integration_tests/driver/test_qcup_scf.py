@@ -25,6 +25,7 @@ import scf
 import simde
 
 
+@unittest.skipUnless(scf.sigma_enabled, "QCUP SCF requires Sigma")
 class TestQCUPSCF(unittest.TestCase):
     def test_qcup_scf(self):
         self.mm.change_input("QCUP SCF", "UQ Type", "thresholded affine")

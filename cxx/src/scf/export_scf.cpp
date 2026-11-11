@@ -35,6 +35,14 @@ EXPORT_PLUGIN(scf, SCF, m) {
     });
     m.def("finalize", []() { scf::finalize(); });
 
+    // Whether SCF was built with Sigma, i.e., whether the uncertain floating
+    // point types (and so QCUP SCF) are available
+#ifdef ENABLE_SIGMA
+    m.attr("sigma_enabled") = true;
+#else
+    m.attr("sigma_enabled") = false;
+#endif
+
     using namespace scf::property_types;
     EXPORT_PROPERTY_TYPE(MOUncertainty, m);
     EXPORT_PROPERTY_TYPE(ConvergenceUncertainty, m);
