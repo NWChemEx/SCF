@@ -25,3 +25,5 @@ the design) of SCF.
    :maxdepth: 2
 
    qcup_scf
+   xc_uq
+   xc_inputs_uq
