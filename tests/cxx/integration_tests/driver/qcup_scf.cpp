@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
+#include <tuple>
+#include <vector>
 
 #ifdef ENABLE_SIGMA
 
@@ -38,6 +40,36 @@ std::pair<double, double> center_and_radius(const tensor_t& e) {
     return {double(uq_center(x)), double(uq_upper(x) - uq_center(x))};
 }
 
+/// The centers and radii of the elements of the tensor @p t of FloatType
+template<typename FloatType>
+auto centers_and_radii(const tensor_t& t) {
+    using tensorwrapper::buffer::get_raw_data;
+    using tensorwrapper::buffer::make_contiguous;
+    using tensorwrapper::types::uq_center;
+    using tensorwrapper::types::uq_upper;
+    std::vector<double> centers, radii;
+    for(const auto& x : get_raw_data<FloatType>(make_contiguous(t.buffer()))) {
+        centers.push_back(double(uq_center(x)));
+        radii.push_back(double(uq_upper(x) - uq_center(x)));
+    }
+    return std::pair{centers, radii};
+}
+
+/// Water, so that both screening and incomplete convergence matter
+simde::type::molecule make_water() {
+    using atom_t      = simde::type::atom;
+    const auto a2b    = 1.8897259886; // Angstroms to bohrs
+    const auto H_mass = 1822.877;     // Hydrogen mass in atomic units
+    const auto O_mass = 29166.037;    // Oxygen mass in atomic units
+    atom_t H0("H", 1ul, H_mass, -1.958940 * a2b, -0.032063 * a2b,
+              0.725554 * a2b);
+    atom_t H1("H", 1ul, H_mass, -0.607485 * a2b, 0.010955 * a2b,
+              0.056172 * a2b);
+    atom_t O0("O", 8ul, O_mass, -1.538963 * a2b, 0.004548 * a2b,
+              -0.117331 * a2b);
+    return simde::type::molecule{H0, H1, O0};
+}
+
 /// True if any of the inactive settings of @p mod mentions @p what
 bool reports(const pluginplay::Module& mod, const std::string& what) {
     const auto inactive = mod.inactive_settings();
@@ -54,20 +86,8 @@ TEST_CASE("QCUP SCF") {
 
     auto mm = test_scf::load_modules<double>();
 
-    // Water, so that both screening and incomplete convergence matter
-    using atom_t      = simde::type::atom;
-    using molecule_t  = simde::type::molecule;
-    const auto a2b    = 1.8897259886; // Angstroms to bohrs
-    const auto H_mass = 1822.877;     // Hydrogen mass in atomic units
-    const auto O_mass = 29166.037;    // Oxygen mass in atomic units
-    atom_t H0("H", 1ul, H_mass, -1.958940 * a2b, -0.032063 * a2b,
-              0.725554 * a2b);
-    atom_t H1("H", 1ul, H_mass, -0.607485 * a2b, 0.010955 * a2b,
-              0.056172 * a2b);
-    atom_t O0("O", 8ul, O_mass, -1.538963 * a2b, 0.004548 * a2b,
-              -0.117331 * a2b);
-    molecule_t water{H0, H1, O0};
-    auto aos = mm.run_as<simde::MolecularBasisSet>("STO-3G", water);
+    const auto water = make_water();
+    auto aos         = mm.run_as<simde::MolecularBasisSet>("STO-3G", water);
     simde::type::chemical_system h2o(water);
 
     // Correct energy, without screening, is validated against Psi4
@@ -163,6 +183,63 @@ TEST_CASE("QCUP SCF") {
         const auto [c_no, r_no] = center_and_radius<idouble>(e_no);
         REQUIRE(c == c_no);
         REQUIRE(r > r_no);
+    }
+}
+
+// "SCF Driver" only returns the energy, which does not depend on the MO
+// coefficients "Loop" returns. So "Loop" is run directly, wired by hand as
+// "QCUP SCF" wires it, to check that the MO uncertainty reaches the orbitals.
+TEST_CASE("Loop with MO uncertainty") {
+    using idouble = tensorwrapper::types::idouble;
+    using wf_type = simde::type::rscf_wf;
+    using ham_pt =
+      simde::Convert<simde::type::hamiltonian, simde::type::chemical_system>;
+    using guess_pt = simde::InitialGuess<wf_type>;
+    using braket_t =
+      chemist::braket::BraKet<wf_type, simde::type::hamiltonian, wf_type>;
+    using egy_pt  = simde::EvaluateBraKet<braket_t>;
+    using loop_pt = simde::Optimize<egy_pt, wf_type>;
+
+    auto mm = test_scf::load_modules<double>();
+
+    // Intervals, with the error of the screened ERIs from the analytic model
+    mm.change_input("UQ Initializer", "UQ Type", std::string("interval"));
+    mm.change_submod("Loop", "Diagonalizer", "Generalized eigensolve");
+    mm.change_submod("Diagonalization Fock update", "Diagonalizer",
+                     "Generalized eigensolve");
+    for(const auto* key : {"Four center J builder", "Four center K builder"})
+        mm.change_submod(key, "Four-center ERI", "UQ Atom Symm Blocked Driver");
+    mm.change_submod("UQ Atom Symm Blocked Driver", "ERI Error",
+                     "Analytic Error");
+    mm.change_submod("Analytic Error", "ERI4s", "Analytic Benchmark ERI4");
+    mm.change_input("ERI4", "Threshold", 1.0E-6);
+
+    mm.copy_module("Loop", "Loop with MO uncertainty");
+    mm.change_submod("Loop with MO uncertainty", "MO uncertainty",
+                     "First-order MO uncertainty");
+
+    const auto water = make_water();
+    simde::type::chemical_system h2o(water);
+    simde::type::aos aos(mm.run_as<simde::MolecularBasisSet>("STO-3G", water));
+    const auto H    = mm.run_as<ham_pt>("Born-Oppenheimer approximation", h2o);
+    const auto psi0 = mm.run_as<guess_pt>("Core guess", H, aos);
+    braket_t H_00(psi0, H, psi0);
+
+    const auto psi =
+      std::get<1>(mm.run_as<loop_pt>("Loop with MO uncertainty", H_00, psi0));
+    const auto psi_no = std::get<1>(mm.run_as<loop_pt>("Loop", H_00, psi0));
+
+    const auto [c, r] = centers_and_radii<idouble>(psi.orbitals().transform());
+    const auto [c_no, r_no] =
+      centers_and_radii<idouble>(psi_no.orbitals().transform());
+
+    // The orbitals diagonalize the center of the Fock matrix, so the couplings,
+    // and thus the correction, are centered at zero. The centers are unchanged
+    // and every radius grows.
+    REQUIRE(c.size() == c_no.size());
+    for(std::size_t i = 0; i < c.size(); ++i) {
+        REQUIRE_THAT(c[i], WithinAbs(c_no[i], 1.0E-10));
+        REQUIRE(r[i] > r_no[i]);
     }
 }
 
