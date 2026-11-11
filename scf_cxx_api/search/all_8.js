@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['restrictedvisitor_0',['RestrictedVisitor',['../classscf_1_1fock__operator_1_1RestrictedVisitor.html',1,'scf::fock_operator']]],
-  ['rkohnshamvisitor_1',['RKohnShamVisitor',['../classscf_1_1fock__operator_1_1RKohnShamVisitor.html',1,'scf::fock_operator']]]
+  ['q_0',['Q',['../svwn3_8hpp.html#a6a74ab6d349ebe2e430fb2a64df4daa4',1,'scf::xc::native::svwn3::detail_']]]
 ];

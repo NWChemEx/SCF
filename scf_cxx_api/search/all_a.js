@@ -1,9 +1,7 @@
 var searchData=
 [
-  ['value_5ftype_5fimpl_0',['value_type_impl',['../structscf_1_1eigen__solver_1_1detail_1_1value__type__impl.html',1,'scf::eigen_solver::detail']]],
-  ['value_5ftype_5fimpl_3c_20t_2c_20true_20_3e_1',['value_type_impl&lt; T, true &gt;',['../structscf_1_1eigen__solver_1_1detail_1_1value__type__impl_3_01T_00_01true_01_4.html',1,'scf::eigen_solver::detail']]],
-  ['vwn3_5feps_2',['vwn3_eps',['../svwn3_8hpp.html#ac6bff5e79e30aa4f62f60daaf3a7b542',1,'scf::xc::native::svwn3']]],
-  ['vwn3_5fv_3',['vwn3_v',['../svwn3_8hpp.html#a9720377155c8bc4c0e5ff3585a11f9b3',1,'scf::xc::native::svwn3']]],
-  ['vwn_5fdeps_5fdx_4',['vwn_deps_dx',['../svwn3_8hpp.html#a56d870031b1ec881798286a21e637238',1,'scf::xc::native::svwn3::detail_']]],
-  ['vwn_5feps_5',['vwn_eps',['../svwn3_8hpp.html#a9433ed2838653cb5b5e188d0877ebaf8',1,'scf::xc::native::svwn3::detail_']]]
+  ['scf_3a_3aproperty_5ftypes_0',['property_types',['../namespacescf_1_1property__types.html',1,'scf']]],
+  ['slater_5feps_1',['slater_eps',['../svwn3_8hpp.html#a5d9ce2030c925b9d0d9afe0ada7e8db9',1,'scf::xc::native::svwn3']]],
+  ['slater_5fv_2',['slater_v',['../svwn3_8hpp.html#a3d4d3f511ccfc3409991f0988628ddaa',1,'scf::xc::native::svwn3']]],
+  ['svwn3_2ehpp_3',['svwn3.hpp',['../svwn3_8hpp.html',1,'']]]
 ];

@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['eigenvectoruncertaintykernel_0',['EigenvectorUncertaintyKernel',['../structscf_1_1eigen__solver_1_1detail_1_1EigenvectorUncertaintyKernel.html',1,'scf::eigen_solver::detail']]],
-  ['energy_5fdensity_1',['energy_density',['../svwn3_8hpp.html#a1c7c2a6034d779e96f1fa6a70d9d2ebf',1,'scf::xc::native::svwn3']]],
-  ['energydispatcher_2',['EnergyDispatcher',['../classscf_1_1matrix__builder_1_1EnergyDispatcher.html',1,'scf::matrix_builder']]]
+  ['declare_5fproperty_5ftype_0',['declare_property_type',['../namespacescf_1_1property__types.html#a865c6caa7b2341d46117d55fcb5b9167',1,'scf::property_types::DECLARE_PROPERTY_TYPE(MOUncertainty)'],['../namespacescf_1_1property__types.html#adc0151a38149c1ad548f3392d297cda6',1,'scf::property_types::DECLARE_PROPERTY_TYPE(ConvergenceUncertainty)']]]
 ];

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['f2_0',['f2',['../svwn3_8hpp.html#a9396c1d14aad7d98caefba5cb9f20eec',1,'scf::xc::native::svwn3::detail_']]],
-  ['fockoperatorcommon_1',['FockOperatorCommon',['../classscf_1_1fock__operator_1_1FockOperatorCommon.html',1,'scf::fock_operator']]],
-  ['fp_5ftraits_3c_20sigma_3a_3ainterval_3c_20t_20_3e_2c_20void_20_3e_2',['fp_traits&lt; sigma::Interval&lt; T &gt;, void &gt;',['../structIntegratorXX_1_1fp__traits_3_01sigma_1_1Interval_3_01T_01_4_00_01void_01_4.html',1,'IntegratorXX']]]
+  ['eigenvectoruncertaintykernel_0',['EigenvectorUncertaintyKernel',['../structscf_1_1eigen__solver_1_1detail_1_1EigenvectorUncertaintyKernel.html',1,'scf::eigen_solver::detail']]],
+  ['energy_5fdensity_1',['energy_density',['../svwn3_8hpp.html#a1c7c2a6034d779e96f1fa6a70d9d2ebf',1,'scf::xc::native::svwn3']]],
+  ['energydispatcher_2',['EnergyDispatcher',['../classscf_1_1matrix__builder_1_1EnergyDispatcher.html',1,'scf::matrix_builder']]]
 ];

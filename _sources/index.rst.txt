@@ -21,6 +21,7 @@ SCF
    :caption: Contents
 
    background/index
+   design/index
 
 .. toctree::
    :maxdepth: 2
