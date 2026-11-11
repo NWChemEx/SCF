@@ -32,8 +32,5 @@ jobs:
       python_version: "3.12"
       extra_pip_packages: "nwchemex-integrals nwchemex-chemcache nwchemex-nux"
 
-  # allow_macos_failure: see pull_request.yaml's comment on the same input.
   test_pip_build:
     uses: NWChemEx/.github/.github/workflows/test_nwx_pip_build.yaml@master
-    with:
-      allow_macos_failure: "true"

@@ -55,6 +55,10 @@ public:
         set_name("integrals");
         add_module<StubProvider<simde::aos_op_base_aos>>("AO integral driver");
         add_module<StubProvider<simde::aos_s_e_aos>>("Overlap");
+        add_module<StubProvider<simde::ERI4>>("UQ Atom Symm Blocked Driver");
+        add_module<StubProvider<simde::Uncertainty<simde::ERI4>>>(
+          "Analytic Error");
+        add_module<StubProvider<simde::ERI4>>("Analytic Benchmark ERI4");
     }
 };
 
@@ -74,7 +78,10 @@ const std::vector<std::array<std::string, 4>> wiring{
   {"Diagonalization Fock update", "Overlap matrix builder", "integrals",
    "Overlap"},
   {"Loop", "Overlap matrix builder", "integrals", "Overlap"},
-  {"SAD guess", "SAD Density", "chemcache", "sto-3g SAD density"}};
+  {"SAD guess", "SAD Density", "chemcache", "sto-3g SAD density"},
+  {"QCUP SCF", "ERIs", "integrals", "UQ Atom Symm Blocked Driver"},
+  {"QCUP SCF", "ERI Error Model", "integrals", "Analytic Error"},
+  {"QCUP SCF", "Benchmark ERIs", "integrals", "Analytic Benchmark ERI4"}};
 
 } // namespace
 
@@ -94,6 +101,18 @@ TEST_CASE("SCF plugin") {
         REQUIRE(modules.has_submod("Generalized eigensolve", "Eigen Solve"));
         REQUIRE(modules.has_submod("Density2Grid", "AOs on a grid"));
         REQUIRE(modules.has_submod("Loop", "Charge-charge"));
+    }
+
+    SECTION("Ordinary SCF attaches no uncertainty") {
+        const auto& loop = *modules.at("Loop");
+        REQUIRE(loop.submods().at("MO uncertainty").value() ==
+                *modules.at("No MO uncertainty"));
+        REQUIRE(loop.submods().at("Convergence uncertainty").value() ==
+                *modules.at("No convergence uncertainty"));
+    }
+
+    SECTION("QCUP SCF is a driver") {
+        REQUIRE(modules.at("QCUP SCF")->is_driver());
     }
 
     pluginplay::ModuleManager mm;

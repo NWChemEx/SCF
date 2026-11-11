@@ -105,6 +105,11 @@ struct EigenvectorUncertaintyKernel {
                     }
                 }
             }
+        } else if constexpr(!std::is_const_v<FloatType>) {
+            // Plain floating-point types carry no uncertainty, so out = C.
+            // out was allocated, not copied, so it must still be filled.
+            auto C = tensorwrapper::buffer::get_raw_data<clean_t>(m_C);
+            for(std::size_t k = 0; k < m_n * m_n; ++k) { out[k] = C[k]; }
         }
     }
 };

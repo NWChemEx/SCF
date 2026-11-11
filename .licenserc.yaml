@@ -24,6 +24,8 @@ header:
     - src/scf/common/
     - src/scf/scf/
     - LICENSE
-    - build*
+    - build/**
+    - '**/venv/**'
+    - '**/.venv/**'
 
   comment: never

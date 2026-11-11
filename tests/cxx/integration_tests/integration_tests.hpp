@@ -26,13 +26,9 @@ namespace test_scf {
 namespace {
 [[maybe_unused]] void configure_uq(pluginplay::ModuleManager& mm,
                                    const std::string& uq_type) {
-    mm.change_input("Evaluate 2-Index BraKet", "UQ Type", uq_type);
-    mm.change_input("Evaluate 4-Index BraKet", "UQ Type", uq_type);
-    mm.change_input("Overlap", "UQ Type", uq_type);
-    mm.change_input("ERI4", "UQ Type", uq_type);
-    mm.change_input("Kinetic", "UQ Type", uq_type);
-    mm.change_input("Nuclear", "UQ Type", uq_type);
-    mm.change_input("sto-3g atomic density matrix", "With UQ?", true);
+    // The integrals, ERIs included, and the SAD density are made uncertain
+    mm.change_input("UQ Initializer", "UQ Type", uq_type);
+    mm.change_submod("ERI4", "UQ Initializer", "UQ Initializer");
     mm.change_submod("Loop", "Diagonalizer", "Generalized eigensolve");
     mm.change_submod("Diagonalization Fock update", "Diagonalizer",
                      "Generalized eigensolve");
