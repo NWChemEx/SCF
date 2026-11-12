@@ -62,11 +62,17 @@ In SCF the collocation matrix is computed by the ``AOs on a grid`` module,
 which satisfies ``simde::AOCollocationMatrix``. It evaluates every AO at every
 grid point. The density is computed by the ``Density2Grid`` module, which
 satisfies ``simde::EDensityCollocationMatrix``. Its inputs are the grid and the
-density (a ``simde::type::e_density``, which holds :math:`\mathbf{P}` and the
-AO basis set). Its result is a tensor with one element per grid point. It gets
-the collocation matrix from its ``"AOs on a grid"`` submodule, forms
+density (a ``simde::type::e_density`` and the AO basis set). The matrix the
+``e_density`` holds is not :math:`\mathbf{P}`: it is the restricted density
+matrix, :math:`\mathbf{D}`, formed from products of the occupied orbitals
+without a spin factor. Assuming restricted orbitals, ``Density2Grid`` forms
+:math:`\mathbf{P} = 2\mathbf{D}`, gets the collocation matrix from its
+``"AOs on a grid"`` submodule, forms
 :math:`\mathbf{X} = \mathbf{P}\boldsymbol{\Phi}`, and takes the column-wise dot
-product of :math:`\boldsymbol{\Phi}` and :math:`\mathbf{X}`.
+product of :math:`\boldsymbol{\Phi}` and :math:`\mathbf{X}`. Its result is a
+tensor with one element per grid point. Error models that work with the
+density matrix must likewise double the stored matrix, and its uncertainty,
+before using it as :math:`\mathbf{P}`.
 
 The XC modules use both: the density as the argument of the functional, and
 the collocation matrix to assemble the AO matrix of the potential.
@@ -144,9 +150,10 @@ Considerations
 #. Only sources of uncertainty know the uncertain type
 
    - As in :ref:`qcup_scf_design`, the uncertain type comes from a
-     ``UQ Initializer`` submodule rather than an input of its own. The error
-     models return plain deviations, so only the modules that attach them
-     need the ``UQ Initializer``.
+     ``UQ Initializer`` submodule rather than an input of its own. As in
+     :ref:`xc_uq_design`, the error models create the uncertainty, so they
+     are the modules that call ``UQ Initializer``; the wrappers only receive
+     results that are already uncertain.
 
 #. Ordinary DFT is unaffected
 
@@ -166,10 +173,10 @@ Grid Input UQ Implementation
 SCF will add two modules, ``UQ Density2Grid`` and ``UQ AOs on a grid``, that
 follow the pattern of ``UQ XC Energy`` and ``UQ XC Potential`` in
 :ref:`xc_uq_design`. Each satisfies the same property type as the module it
-wraps, runs that module through an evaluator submodule, runs one error-model
-submodule per source of uncertainty, and attaches the deviations to the
-result. They are ordinary modules, not PluginPlay drivers because they only
-manage their inputs and their submodules.
+wraps, runs that module through an evaluator submodule, passes the result to
+one error-model submodule per source of uncertainty, and returns the uncertain
+result the error models produce. They are ordinary modules, not PluginPlay
+drivers because they only manage their inputs and their submodules.
 
 The error models satisfy the ``XCUncertain<U>`` property type of
 :ref:`xc_uq_design`, with ``U`` the property type of the evaluator, *i.e.*,
@@ -177,7 +184,9 @@ The error models satisfy the ``XCUncertain<U>`` property type of
 ``XCUncertain<simde::AOCollocationMatrix>``. Their inputs are the inputs of
 ``U`` followed by the result of the evaluator, so the evaluator is not run a
 second time. Their results are the result of the evaluator with uncertainties
-applied.
+applied, *i.e.*, each error model calls ``UQ Initializer``, keeps the
+evaluator's result as the mean, and attaches its deviations. The density error
+models also pin the lower bound at zero.
 
 **********************
 Further Considerations

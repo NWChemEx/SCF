@@ -231,17 +231,25 @@ the quantity that is being evaluated by quadrature, *e.g.*, for the XC
 potential it is
 ``simde::aos_xc_e_aos``. In addition to taking the inputs ``T`` needs,
 ``Quadrature<T>`` will also take the grid. SCF's XC energy and potential modules
-will be updated accordingly so that they call modules satisfying
-``Quadrature<T>``.
+will be updated accordingly: each keeps its ``"Integration grid"`` submodule,
+builds the grid with it, and passes the grid and its own inputs to a submodule
+satisfying ``Quadrature<T>``, *e.g.*, ``SVWN3 Potential Quadrature`` for
+``SVWN3 Potential``, which evaluates the quadrature on that grid.
 
 The ``UQ XC Potential`` module satisfies the same property type as an XC
-potential module (i.e., ``simde::aos_xc_e_aos``). The initial implementation
-will focus on attaching the uncertainty caused by using an incomplete grid. The
-current control flow is as follows:
+potential module (i.e., ``simde::aos_xc_e_aos``). Like the XC potential
+modules, it builds the grid with its own ``"Integration grid"`` submodule, so
+that the quadrature and the error model see the same grid. The initial
+implementation will focus on attaching the uncertainty caused by using an
+incomplete grid. The current control flow is as follows:
 
-- Unwrap inputs and pass them to the wrapped XC potential module.
-- Call a submodule to estimate the uncertainty from the incompleteness error
-  and attach the uncertainty.
+- Unwrap the inputs and build the grid with the ``"Integration grid"``
+  submodule.
+- Pass the inputs and the grid to the ``"XC Potential"`` submodule, which
+  satisfies ``Quadrature<T>``.
+- Pass the inputs, the grid, and the result of the quadrature to a submodule
+  that estimates the uncertainty from the incompleteness error and attaches
+  the uncertainty.
 - Call submodules for other sources of uncertainty, if any (eventually
   screening). Module's design dictates whether the uncertainty is attached to
   the results of the wrapped XC potential module or to the uncertainty from the
@@ -278,9 +286,12 @@ To summarize, the submodules of the ``UQ XC Potential`` module are:
    * - Hook name
      - Default key
      - Purpose
+   * - ``Integration grid``
+     - ``Grid From IntegratorXX``
+     - Builds the grid passed to both the quadrature and the error model.
    * - ``XC Potential``
-     - ``SVWN3 Potential``
-     - The module that evaluates the quadrature.
+     - ``SVWN3 Potential Quadrature``
+     - The module that evaluates the quadrature. Satisfies ``Quadrature<T>``.
    * - ``Incompleteness Error Model``
      - ``Reference Grid Error``
      - The error model that estimates the uncertainty from the incompleteness
@@ -304,9 +315,13 @@ Reference Grid
 Evaluate the quadrature a second time on a finer grid, giving
 :math:`E^{Quad}_{\mathrm{ref}}` (or :math:`V^{Quad}_{\mathrm{ref}}`), and use
 the difference, :math:`d = E^{Quad}_{\mathrm{ref}} - E^{Quad}`, as an estimate
-of :math:`-\delta E^{Quad}`. Since the direction of the error is known, the
-deviation on the side of the reference value is :math:`|d|`, and the deviation
-on the other side can be zero or a fraction of :math:`|d|`. This mirrors the
+of :math:`-\delta E^{Quad}`. The sign of :math:`d` is taken as an estimate of
+the direction of the error, so the deviation on the side of the reference
+value is :math:`|d|`, and the deviation on the other side can be zero or a
+fraction of :math:`|d|`. This is a heuristic: refinement need not converge
+monotonically, so the finer grid can lie on the wrong side of the exact
+integral, and a one-sided deviation then excludes it. Making both deviations
+:math:`|d|` avoids this at the cost of a wider interval. This mirrors the
 ``Analytic Error`` ERI error model and its benchmark ERIs. It is an estimate,
 not a bound, and costs one evaluation on the finer grid, including the density
 and AOs on that grid.
@@ -318,8 +333,11 @@ property type. It has a submodule, ``Reference XC Module``, which satisfies
 should be able to determine a finer grid from it. This requires that the grid
 has identifiers for its radial and angular quadratures. The module then passes
 the inputs and the finer grid to the ``Reference XC Module`` submodule and
-returns the difference. This requires that the ``Reference Grid Error`` module
-also have a submodule for generating grids.
+uses the difference to construct the deviations. Finally, it converts the
+original result to the UQ type with its ``UQ Initializer`` submodule, keeping
+the original result as the mean, attaches the deviations, and returns that
+uncertain result, not the difference. This requires that the
+``Reference Grid Error`` module also have a submodule for generating grids.
 
 Grid Extrapolation
 ------------------
@@ -378,7 +396,7 @@ Summary
    * - Reference grid
      - estimate
      - 1 evaluation on a finer grid
-     - direction of the error is known
+     - direction of the error is estimated (heuristic)
    * - Grid extrapolation
      - estimate
      - several evaluations
