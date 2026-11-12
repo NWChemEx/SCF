@@ -1,0 +1,306 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Uncertainty in the XC Inputs on a Grid &mdash; SCF 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Module API" href="../module_api/index.html" />
+    <link rel="prev" title="Uncertainty in the XC Energy and Potential" href="xc_uq.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../background/index.html">Background</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Design Topics</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="qcup_scf.html">Designing QCUP-SCF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xc_uq.html">Uncertainty in the XC Energy and Potential</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Uncertainty in the XC Inputs on a Grid</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-are-the-density-and-aos-on-a-grid">What are the Density and AOs on a Grid?</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#why-inputs-lose-precision">Why Inputs Lose Precision</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statement-of-need">Statement of Need</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#considerations">Considerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grid-input-uq-implementation">Grid Input UQ Implementation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#further-considerations">Further Considerations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">APIs:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../module_api/index.html">Module API</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://nwchemex.github.io/SCF/scf_cxx_api/index.html">C++ API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SCF</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Design Topics</a></li>
+      <li class="breadcrumb-item active">Uncertainty in the XC Inputs on a Grid</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/design/xc_inputs_uq.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="uncertainty-in-the-xc-inputs-on-a-grid">
+<span id="xc-inputs-uq-design"></span><h1>Uncertainty in the XC Inputs on a Grid<a class="headerlink" href="#uncertainty-in-the-xc-inputs-on-a-grid" title="Link to this heading"></a></h1>
+<p>This page describes how SCF estimates the uncertainty in the quantities the
+XC modules evaluate at the grid points: today the density, <span class="math notranslate nohighlight">\(\rho_i\)</span>, and
+the values of the atomic orbitals (AOs), <span class="math notranslate nohighlight">\(\phi_{\mu i}\)</span>; for GGAs and
+beyond also, <em>e.g.</em>, the gradient of the density. An error model estimates the
+uncertainty of each value, and the value is returned with that uncertainty
+attached, as a UQ type. How that uncertainty reaches the XC energy and
+potential, and how the error of the grid itself is handled, is described in
+<a class="reference internal" href="xc_uq.html#xc-uq-design"><span class="std std-ref">Uncertainty in the XC Energy and Potential</span></a>.</p>
+<p>In the notation of <a class="reference internal" href="xc_uq.html#xc-uq-design"><span class="std std-ref">Uncertainty in the XC Energy and Potential</span></a>, this page covers the input errors,
+<span class="math notranslate nohighlight">\(\delta E^{Inputs}\)</span> and <span class="math notranslate nohighlight">\(\delta V^{Inputs}\)</span>: the uncertainty of the
+values <em>at</em> the grid points. The error of the grid, <em>i.e.</em>, the screening of
+the quadrature and its incompleteness, is attached to the XC energy and
+potential instead.</p>
+<p>As in <a class="reference internal" href="xc_uq.html#xc-uq-design"><span class="std std-ref">Uncertainty in the XC Energy and Potential</span></a>, the UQ type is assumed to be an asymmetric interval
+(see <a class="reference internal" href="xc_uq.html#xc-uq-asymmetric-intervals"><span class="std std-ref">Assumption: Asymmetric Intervals</span></a>): it stores a lower bound, an upper
+bound, and a mean, which need not be the midpoint. For the density at a grid
+point, the mean is <span class="math notranslate nohighlight">\(\rho_i\)</span> and the bounds are
+<span class="math notranslate nohighlight">\(\rho_i - \delta\rho_i^-\)</span> and <span class="math notranslate nohighlight">\(\rho_i + \delta\rho_i^+\)</span>.</p>
+<section id="what-are-the-density-and-aos-on-a-grid">
+<h2>What are the Density and AOs on a Grid?<a class="headerlink" href="#what-are-the-density-and-aos-on-a-grid" title="Link to this heading"></a></h2>
+<p>Let <span class="math notranslate nohighlight">\(\vec{r}_i\)</span> be the <span class="math notranslate nohighlight">\(i\)</span>-th of <span class="math notranslate nohighlight">\(N_g\)</span> grid points,
+<span class="math notranslate nohighlight">\(\phi_\mu\)</span> the <span class="math notranslate nohighlight">\(\mu\)</span>-th of <span class="math notranslate nohighlight">\(N_b\)</span> AOs, and
+<span class="math notranslate nohighlight">\(P_{\mu\nu}\)</span> the total (<em>i.e.</em>, summed over spin) AO density matrix. The
+density at <span class="math notranslate nohighlight">\(\vec{r}_i\)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[\rho_i \equiv \rho\left(\vec{r}_i\right) =
+   \sum_{\mu\nu}^{N_b} \phi_{\mu i} P_{\mu\nu} \phi_{\nu i}
+   = \boldsymbol{\phi}_i^T \mathbf{P} \boldsymbol{\phi}_i\]</div>
+<p>where <span class="math notranslate nohighlight">\(\phi_{\mu i} = \phi_\mu\left(\vec{r}_i\right)\)</span> is an element of
+the AO collocation matrix, <span class="math notranslate nohighlight">\(\boldsymbol{\Phi}\)</span>, and
+<span class="math notranslate nohighlight">\(\boldsymbol{\phi}_i\)</span> is its <span class="math notranslate nohighlight">\(i\)</span>-th column.</p>
+<p>In SCF the collocation matrix is computed by the <code class="docutils literal notranslate"><span class="pre">AOs</span> <span class="pre">on</span> <span class="pre">a</span> <span class="pre">grid</span></code> module,
+which satisfies <code class="docutils literal notranslate"><span class="pre">simde::AOCollocationMatrix</span></code>. It evaluates every AO at every
+grid point. The density is computed by the <code class="docutils literal notranslate"><span class="pre">Density2Grid</span></code> module, which
+satisfies <code class="docutils literal notranslate"><span class="pre">simde::EDensityCollocationMatrix</span></code>. Its inputs are the grid and the
+density (a <code class="docutils literal notranslate"><span class="pre">simde::type::e_density</span></code> and the AO basis set). The matrix the
+<code class="docutils literal notranslate"><span class="pre">e_density</span></code> holds is not <span class="math notranslate nohighlight">\(\mathbf{P}\)</span>: it is the restricted density
+matrix, <span class="math notranslate nohighlight">\(\mathbf{D}\)</span>, formed from products of the occupied orbitals
+without a spin factor. Assuming restricted orbitals, <code class="docutils literal notranslate"><span class="pre">Density2Grid</span></code> forms
+<span class="math notranslate nohighlight">\(\mathbf{P} = 2\mathbf{D}\)</span>, gets the collocation matrix from its
+<code class="docutils literal notranslate"><span class="pre">&quot;AOs</span> <span class="pre">on</span> <span class="pre">a</span> <span class="pre">grid&quot;</span></code> submodule, forms
+<span class="math notranslate nohighlight">\(\mathbf{X} = \mathbf{P}\boldsymbol{\Phi}\)</span>, and takes the column-wise dot
+product of <span class="math notranslate nohighlight">\(\boldsymbol{\Phi}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{X}\)</span>. Its result is a
+tensor with one element per grid point. Error models that work with the
+density matrix must likewise double the stored matrix, and its uncertainty,
+before using it as <span class="math notranslate nohighlight">\(\mathbf{P}\)</span>.</p>
+<p>The XC modules use both: the density as the argument of the functional, and
+the collocation matrix to assemble the AO matrix of the potential.</p>
+<section id="why-inputs-lose-precision">
+<h3>Why Inputs Lose Precision<a class="headerlink" href="#why-inputs-lose-precision" title="Link to this heading"></a></h3>
+<p>The value of <span class="math notranslate nohighlight">\(\rho_i\)</span> is uncertain for four reasons. The first two
+introduce error when <span class="math notranslate nohighlight">\(\rho_i\)</span> is evaluated. The third is uncertainty
+inherited from <span class="math notranslate nohighlight">\(\mathbf{P}\)</span>.</p>
+<ol class="arabic simple">
+<li><p><strong>Floating-point error.</strong> <span class="math notranslate nohighlight">\(\rho_i\)</span> is a sum of
+<span class="math notranslate nohighlight">\(N_b^2\)</span> terms of both signs, since off-diagonal elements of
+<span class="math notranslate nohighlight">\(\mathbf{P}\)</span> can be negative. Where the terms nearly cancel, the sum
+is much smaller than its largest terms and if care is not taken the small
+terms will be lost in the rounding error.</p></li>
+<li><p><strong>Screening.</strong> Production evaluators skip AOs whose value at a point is
+below a threshold, and skip blocks of <span class="math notranslate nohighlight">\(\mathbf{P}\)</span> that are small.
+This means that even if the <span class="math notranslate nohighlight">\(i\)</span>-th grid point is retained,
+<span class="math notranslate nohighlight">\(\rho_i\)</span> may contain an error due to dropping contributions from
+the collocation matrix and/or <span class="math notranslate nohighlight">\(\mathbf{P}\)</span>.</p></li>
+<li><p><strong>Uncertainty already in the AO quantities.</strong> The AOs and the AO density
+matrix may already carry uncertainty. This uncertainty propagates to the
+collocation matrix and the <span class="math notranslate nohighlight">\(\rho_i\)</span> computed from it.</p></li>
+<li><p><strong>Uncertain grid points.</strong> Grid points may be uncertain, e.g., due to the
+floating point arithmetic used to compute their weights and locations.</p></li>
+</ol>
+</section>
+</section>
+<section id="statement-of-need">
+<h2>Statement of Need<a class="headerlink" href="#statement-of-need" title="Link to this heading"></a></h2>
+<p>In <a class="reference internal" href="xc_uq.html#xc-uq-design"><span class="std std-ref">Uncertainty in the XC Energy and Potential</span></a> the uncertainty in the XC energy and potential due to
+their inputs follows from evaluating them with UQ types. That requires the
+inputs to carry their uncertainty, <em>i.e.</em>, an error model for each input.
+None exists today. Sources of error were listed above.</p>
+</section>
+<section id="considerations">
+<h2>Considerations<a class="headerlink" href="#considerations" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Same inputs as the modules they replace</p>
+<ul class="simple">
+<li><p>The modules that attach the uncertainty must be drop-in replacements for
+<code class="docutils literal notranslate"><span class="pre">Density2Grid</span></code> and <code class="docutils literal notranslate"><span class="pre">AOs</span> <span class="pre">on</span> <span class="pre">a</span> <span class="pre">grid</span></code>, so that the XC modules do not
+change. They therefore satisfy <code class="docutils literal notranslate"><span class="pre">simde::EDensityCollocationMatrix</span></code> and
+<code class="docutils literal notranslate"><span class="pre">simde::AOCollocationMatrix</span></code>.</p></li>
+</ul>
+</li>
+<li><p>The evaluator is a choice</p>
+<ul class="simple">
+<li><p>The algorithm that evaluates the quantity (<code class="docutils literal notranslate"><span class="pre">Density2Grid</span></code> today, a
+screened or GPU evaluator later) is chosen independently of the algorithm
+that estimates its uncertainty.</p></li>
+</ul>
+</li>
+<li><p>The error model is a choice</p>
+<ul class="simple">
+<li><p>Rigorous bounds, cheap bounds, and estimates all have uses. As in
+<a class="reference internal" href="xc_uq.html#xc-uq-design"><span class="std std-ref">Uncertainty in the XC Energy and Potential</span></a>, each source of uncertainty has its own error model,
+which is a submodule of the module that attaches the uncertainty, and
+the user chooses one by binding that submodule.</p></li>
+</ul>
+</li>
+<li><p>Uncertainty at the grid points only</p>
+<ul class="simple">
+<li><p>The error models estimate the uncertainty of the values at the grid
+points, not their variation between grid points, nor the effect of
+dropping grid points. Both belong to the error of the grid (see
+<a class="reference internal" href="xc_uq.html#xc-uq-design"><span class="std std-ref">Uncertainty in the XC Energy and Potential</span></a>).</p></li>
+</ul>
+</li>
+<li><p>Sound physical constraints</p>
+<ul class="simple">
+<li><p>The density is non-negative. Any uncertain density returned must keep its
+lower bound at or above zero, by intersecting with
+<span class="math notranslate nohighlight">\([0, \infty)\)</span>, which can only remove values that can not be the
+true one. With an asymmetric interval this leaves the mean unchanged.</p></li>
+</ul>
+</li>
+<li><p>Only sources of uncertainty know the uncertain type</p>
+<ul class="simple">
+<li><p>As in <a class="reference internal" href="qcup_scf.html#qcup-scf-design"><span class="std std-ref">Designing QCUP-SCF</span></a>, the uncertain type comes from a
+<code class="docutils literal notranslate"><span class="pre">UQ</span> <span class="pre">Initializer</span></code> submodule rather than an input of its own. As in
+<a class="reference internal" href="xc_uq.html#xc-uq-design"><span class="std std-ref">Uncertainty in the XC Energy and Potential</span></a>, the error models create the uncertainty, so they
+are the modules that call <code class="docutils literal notranslate"><span class="pre">UQ</span> <span class="pre">Initializer</span></code>; the wrappers only receive
+results that are already uncertain.</p></li>
+</ul>
+</li>
+<li><p>Ordinary DFT is unaffected</p>
+<ul class="simple">
+<li><p>Nothing changes unless the user binds the new modules.</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="grid-input-uq-implementation">
+<h2>Grid Input UQ Implementation<a class="headerlink" href="#grid-input-uq-implementation" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The initial implementation of QCUP-DFT will assume that the AOs and the AO
+density matrix have no uncertainty. Thus the modules in this section are
+not actually implemented yet, but the design is here to show how they are
+envisioned to work.</p>
+</div>
+<p>SCF will add two modules, <code class="docutils literal notranslate"><span class="pre">UQ</span> <span class="pre">Density2Grid</span></code> and <code class="docutils literal notranslate"><span class="pre">UQ</span> <span class="pre">AOs</span> <span class="pre">on</span> <span class="pre">a</span> <span class="pre">grid</span></code>, that
+follow the pattern of <code class="docutils literal notranslate"><span class="pre">UQ</span> <span class="pre">XC</span> <span class="pre">Energy</span></code> and <code class="docutils literal notranslate"><span class="pre">UQ</span> <span class="pre">XC</span> <span class="pre">Potential</span></code> in
+<a class="reference internal" href="xc_uq.html#xc-uq-design"><span class="std std-ref">Uncertainty in the XC Energy and Potential</span></a>. Each satisfies the same property type as the module it
+wraps, runs that module through an evaluator submodule, passes the result to
+one error-model submodule per source of uncertainty, and returns the uncertain
+result the error models produce. They are ordinary modules, not PluginPlay
+drivers because they only manage their inputs and their submodules.</p>
+<p>The error models satisfy the <code class="docutils literal notranslate"><span class="pre">XCUncertain&lt;U&gt;</span></code> property type of
+<a class="reference internal" href="xc_uq.html#xc-uq-design"><span class="std std-ref">Uncertainty in the XC Energy and Potential</span></a>, with <code class="docutils literal notranslate"><span class="pre">U</span></code> the property type of the evaluator, <em>i.e.</em>,
+<code class="docutils literal notranslate"><span class="pre">XCUncertain&lt;simde::EDensityCollocationMatrix&gt;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">XCUncertain&lt;simde::AOCollocationMatrix&gt;</span></code>. Their inputs are the inputs of
+<code class="docutils literal notranslate"><span class="pre">U</span></code> followed by the result of the evaluator, so the evaluator is not run a
+second time. Their results are the result of the evaluator with uncertainties
+applied, <em>i.e.</em>, each error model calls <code class="docutils literal notranslate"><span class="pre">UQ</span> <span class="pre">Initializer</span></code>, keeps the
+evaluator’s result as the mean, and attaches its deviations. The density error
+models also pin the lower bound at zero.</p>
+</section>
+<section id="further-considerations">
+<h2>Further Considerations<a class="headerlink" href="#further-considerations" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>GGAs and beyond.</strong> GGAs also need
+<span class="math notranslate nohighlight">\(\nabla\rho_i = 2\sum_{\mu\nu}\nabla\phi_{\mu i}P_{\mu\nu}\phi_{\nu i}\)</span>
+on the grid, and the gradient of the collocation matrix. The same
+strategies apply, with the gradient of the collocation matrix in place of
+one factor of it. Meta-GGAs add the kinetic-energy density, which is
+non-negative like the density and needs its lower bound pinned the same way.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="xc_uq.html" class="btn btn-neutral float-left" title="Uncertainty in the XC Energy and Potential" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../module_api/index.html" class="btn btn-neutral float-right" title="Module API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, NWChemEx Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
