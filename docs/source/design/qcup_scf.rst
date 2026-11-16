@@ -202,7 +202,7 @@ the Fock matrix holds an uncertain type:
   (``inflate_uncertainty``).
 
 These become two new property types. They are declared in SCF, in
-``scf/property_types.hpp``, until their APIs have settled, and may move to
+``scf/property_types/``, until their APIs have settled, and may move to
 SimDE later:
 
 .. list-table::

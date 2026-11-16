@@ -16,7 +16,7 @@
 
 #include "libxc/libxc.hpp"
 #include "xc.hpp"
-#include <scf/property_types.hpp>
+#include <scf/property_types/quadrature.hpp>
 #include <simde/simde.hpp>
 
 namespace scf::xc {
