@@ -16,57 +16,41 @@
 
 #include "../../../test_scf.hpp"
 
-using grid_pt = simde::MolecularGrid;
-using ao_pt   = simde::AOCollocationMatrix;
-using rho_pt  = simde::EDensityCollocationMatrix;
-using pt      = simde::aos_xc_e_aos;
+using rho_pt = simde::EDensityCollocationMatrix;
+using pt     = scf::property_types::xc_potential_quadrature;
 
-TEST_CASE("LibXCPotential") {
+TEST_CASE("LibXCPotentialQuadrature") {
     using float_type = double;
     using tensorwrapper::operations::approximately_equal;
 
     pluginplay::ModuleManager mm;
     mm.load_plugin<scf::SCF>();
-    mm.change_submod("LibXC Potential", "Integration grid", "Grid From File");
-    auto& mod = mm.at("LibXC Potential");
+    auto& mod = mm.at("LibXC Potential Quadrature");
 
     auto rho  = test_scf::h2_density<float_type>();
     auto aos  = test_scf::h2_aos();
     auto func = chemist::qm_operator::xc_functional::SVWN3;
 
     // For this test only the weights matter (we hardcode the density array)
-    using grid_point = chemist::GridPoint;
-    std::vector<grid_point> grid_points;
-    grid_points.push_back(grid_point(15.80337241, 0.0, 0.0, 0.0));
-    grid_points.push_back(grid_point(0.03961399, 0.0, 0.0, 0.0));
-    grid_points.push_back(grid_point(15.80337241, 0.0, 0.0, -1.3984));
-    grid_points.push_back(grid_point(0.03961399, 0.0, 0.0, -1.3984));
-    chemist::Grid grid(grid_points.begin(), grid_points.end());
-
-    auto grid_mod = pluginplay::make_lambda<grid_pt>([&](auto&& mol) {
-        REQUIRE(mol.size() == 2);
-        return grid;
-    });
+    auto grid = test_scf::h2_xc_grid();
 
     auto rho_mod =
       pluginplay::make_lambda<rho_pt>([&](auto&& grid_in, auto&& P) {
           REQUIRE(grid_in == grid);
           REQUIRE(P == rho);
-          return simde::type::tensor(
-            {0.01313525, 0.32141338, 0.01313525, 0.3214133});
+          return test_scf::h2_rho_on_xc_grid();
       });
 
-    mod.change_submod("Integration grid", grid_mod);
     mod.change_submod("Density on a grid", rho_mod);
 
     simde::type::xc_e_type xc_op(func, simde::type::electron{}, rho);
     chemist::braket::BraKet braket(aos, xc_op, aos);
 
 #ifdef BUILD_LIBXC
-    auto vxc = mod.run_as<pt>(braket);
+    auto vxc = mod.run_as<pt>(braket, grid);
     simde::type::tensor corr{{-1.83222, -0.402489}, {-0.402489, -0.0886007}};
     REQUIRE(approximately_equal(vxc, corr, 1e-5));
 #else
-    REQUIRE_THROWS_AS(mod.run_as<pt>(braket), std::runtime_error);
+    REQUIRE_THROWS_AS(mod.run_as<pt>(braket, grid), std::runtime_error);
 #endif
 }

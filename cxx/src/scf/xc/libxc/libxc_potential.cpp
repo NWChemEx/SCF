@@ -15,31 +15,34 @@
  */
 
 #include "libxc.hpp"
+#include <scf/property_types.hpp>
 #include <simde/simde.hpp>
 
 namespace scf::xc::libxc {
 namespace {
 const auto desc = R"(
-Exchange-Correlation Potential via LibXC
-========================================
+Exchange-Correlation Potential Quadrature via LibXC
+===================================================
+
+Evaluates the AO matrix of the exchange-correlation potential by quadrature on
+the provided grid, using LibXC to evaluate the LDA functional. Only
+double-precision densities are supported.
 )";
 }
 
-using pt            = simde::aos_xc_e_aos;
-using grid_pt       = simde::MolecularGrid;
+using pt            = scf::property_types::xc_potential_quadrature;
 using ao_on_grid_pt = simde::AOCollocationMatrix;
 using rho2grid_pt   = simde::EDensityCollocationMatrix;
 
-MODULE_CTOR(LibXCPotential) {
+MODULE_CTOR(LibXCPotentialQuadrature) {
     satisfies_property_type<pt>();
     description(desc);
-    add_submodule<grid_pt>("Integration grid");
     add_submodule<ao_on_grid_pt>("AOs on a grid");
     add_submodule<rho2grid_pt>("Density on a grid");
 }
 
-MODULE_RUN(LibXCPotential) {
-    const auto& [braket] = pt::unwrap_inputs(inputs);
+MODULE_RUN(LibXCPotentialQuadrature) {
+    const auto& [braket, grid] = pt::unwrap_inputs(inputs);
 
     const auto& bra_aos = braket.bra();
     const auto& xc_op   = braket.op();
@@ -51,10 +54,6 @@ MODULE_RUN(LibXCPotential) {
     const auto func = xc_op.get_functional_name();
     const auto& P   = xc_op.get_rhs_particle();
     const auto& aos = bra_aos.ao_basis_set();
-
-    // Get grid
-    auto& grid_mod   = submods.at("Integration grid");
-    const auto& grid = grid_mod.run_as<grid_pt>(libxc::aos2molecule(aos));
 
     // Get AOs on the grid
     auto& aos_on_grid_mod   = submods.at("AOs on a grid");

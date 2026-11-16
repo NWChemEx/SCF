@@ -42,3 +42,18 @@ class TestConvergenceUncertainty(unittest.TestCase):
         self.assertIn("Energy change", pt.inputs())
         self.assertEqual(len(pt.results()), 1)
         self.assertIn("Energy", pt.results())
+
+
+class TestQuadrature(unittest.TestCase):
+    def check_fields(self, pt):
+        self.assertEqual(len(pt.inputs()), 2)
+        self.assertIn("BraKet", pt.inputs())
+        self.assertIn("Grid", pt.inputs())
+        self.assertEqual(len(pt.results()), 1)
+        self.assertIn("tensor representation", pt.results())
+
+    def test_xc_energy_quadrature(self):
+        self.check_fields(scf.xc_energy_quadrature())
+
+    def test_xc_potential_quadrature(self):
+        self.check_fields(scf.xc_potential_quadrature())

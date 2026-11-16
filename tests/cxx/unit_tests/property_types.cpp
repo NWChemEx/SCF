@@ -48,3 +48,15 @@ TEST_CASE("ConvergenceUncertainty") {
     test_property_type<ConvergenceUncertainty>({"Energy", "Energy change"},
                                                {"Energy"});
 }
+
+TEST_CASE("Quadrature") {
+    SECTION("xc_energy_quadrature") {
+        test_property_type<xc_energy_quadrature>({"BraKet", "Grid"},
+                                                 {"tensor representation"});
+    }
+
+    SECTION("xc_potential_quadrature") {
+        test_property_type<xc_potential_quadrature>({"BraKet", "Grid"},
+                                                    {"tensor representation"});
+    }
+}

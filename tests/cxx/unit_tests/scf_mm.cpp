@@ -100,6 +100,19 @@ TEST_CASE("SCF plugin") {
         REQUIRE(modules.has_submod("SCF Driver", "Optimizer"));
         REQUIRE(modules.has_submod("Generalized eigensolve", "Eigen Solve"));
         REQUIRE(modules.has_submod("Density2Grid", "AOs on a grid"));
+        for(std::string backend : {"SVWN3", "LibXC"}) {
+            const auto e_key = backend + " Energy";
+            const auto v_key = backend + " Potential";
+            REQUIRE(modules.has_submod(e_key, "Integration grid"));
+            REQUIRE(modules.has_submod(e_key, "Quadrature"));
+            REQUIRE(modules.has_submod(v_key, "Integration grid"));
+            REQUIRE(modules.has_submod(v_key, "Quadrature"));
+            REQUIRE(
+              modules.has_submod(e_key + " Quadrature", "Density on a grid"));
+            REQUIRE(
+              modules.has_submod(v_key + " Quadrature", "Density on a grid"));
+            REQUIRE(modules.has_submod(v_key + " Quadrature", "AOs on a grid"));
+        }
         REQUIRE(modules.has_submod("Loop", "Charge-charge"));
     }
 

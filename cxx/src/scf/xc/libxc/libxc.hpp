@@ -20,8 +20,8 @@
 
 namespace scf::xc::libxc {
 
-DECLARE_MODULE(LibXCEnergy);
-DECLARE_MODULE(LibXCPotential);
+DECLARE_MODULE(LibXCEnergyQuadrature);
+DECLARE_MODULE(LibXCPotentialQuadrature);
 
 void set_defaults(pluginplay::ModuleMap& modules);
 void load_modules(pluginplay::ModuleMap& modules);

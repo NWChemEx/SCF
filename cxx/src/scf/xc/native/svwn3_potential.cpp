@@ -16,41 +16,40 @@
 
 #include "../libxc/libxc.hpp"
 #include "native.hpp"
+#include <scf/property_types.hpp>
 #include <simde/simde.hpp>
 
 namespace scf::xc::native {
 namespace {
 
 const auto desc = R"(
-SVWN3 Exchange-Correlation Potential
-====================================
+SVWN3 Exchange-Correlation Potential Quadrature
+===============================================
 
-Computes the AO matrix of the SVWN3 (Slater exchange plus VWN3 correlation)
-exchange-correlation potential by numerical integration. The functional is
-implemented natively, so this module works with any of the floating-point types
-supported by the grid, AOs-on-a-grid, and density-on-a-grid submodules
-(including the UQ types). For a spin-unpolarized density SVWN3 is identical to
-LibXC's XC_LDA_X plus XC_LDA_C_VWN_3. Unlike LibXC, no density threshold is
-applied.
+Evaluates the AO matrix of the SVWN3 (Slater exchange plus VWN3 correlation)
+exchange-correlation potential by quadrature on the provided grid. The
+functional is implemented natively, so this module works with any of the
+floating-point types supported by the grid, AOs-on-a-grid, and
+density-on-a-grid submodules (including the UQ types). For a spin-unpolarized
+density SVWN3 is identical to LibXC's XC_LDA_X plus XC_LDA_C_VWN_3. Unlike
+LibXC, no density threshold is applied.
 )";
 
 } // namespace
 
-using pt            = simde::aos_xc_e_aos;
-using grid_pt       = simde::MolecularGrid;
+using pt            = scf::property_types::xc_potential_quadrature;
 using ao_on_grid_pt = simde::AOCollocationMatrix;
 using rho2grid_pt   = simde::EDensityCollocationMatrix;
 
-MODULE_CTOR(SVWN3Potential) {
+MODULE_CTOR(SVWN3PotentialQuadrature) {
     satisfies_property_type<pt>();
     description(desc);
-    add_submodule<grid_pt>("Integration grid");
     add_submodule<ao_on_grid_pt>("AOs on a grid");
     add_submodule<rho2grid_pt>("Density on a grid");
 }
 
-MODULE_RUN(SVWN3Potential) {
-    const auto& [braket] = pt::unwrap_inputs(inputs);
+MODULE_RUN(SVWN3PotentialQuadrature) {
+    const auto& [braket, grid] = pt::unwrap_inputs(inputs);
 
     const auto& bra_aos = braket.bra();
     const auto& xc_op   = braket.op();
@@ -65,10 +64,6 @@ MODULE_RUN(SVWN3Potential) {
 
     const auto& P   = xc_op.get_rhs_particle();
     const auto& aos = bra_aos.ao_basis_set();
-
-    // Get grid
-    auto& grid_mod   = submods.at("Integration grid");
-    const auto& grid = grid_mod.run_as<grid_pt>(libxc::aos2molecule(aos));
 
     // Get AOs on the grid
     auto& aos_on_grid_mod   = submods.at("AOs on a grid");

@@ -287,6 +287,28 @@ inline auto he_xc(chemist::qm_operator::xc_functional func) {
     return simde::type::XC_e_type(func, es, rho);
 }
 
+/** @brief A 4-point grid for testing XC quadratures on H2.
+ *
+ *  Only the weights of the grid matter for the tests that use it; the density
+ *  on the grid is hard-coded (see h2_rho_on_xc_grid). These are the points and
+ *  weights of the first batch of a modified Psi4numpy example with 6 angular
+ *  and 2 radial points per atom.
+ */
+inline auto h2_xc_grid() {
+    using grid_point = chemist::GridPoint;
+    std::vector<grid_point> grid_points;
+    grid_points.push_back(grid_point(15.80337241, 0.0, 0.0, 0.0));
+    grid_points.push_back(grid_point(0.03961399, 0.0, 0.0, 0.0));
+    grid_points.push_back(grid_point(15.80337241, 0.0, 0.0, -1.3984));
+    grid_points.push_back(grid_point(0.03961399, 0.0, 0.0, -1.3984));
+    return chemist::Grid(grid_points.begin(), grid_points.end());
+}
+
+/// The density of h2_density on the points of h2_xc_grid
+inline auto h2_rho_on_xc_grid() {
+    return simde::type::tensor({0.01313525, 0.32141338, 0.01313525, 0.3214133});
+}
+
 inline std::filesystem::path get_test_directory_path() {
     auto path = std::filesystem::current_path().parent_path();
     // Spack testing hack

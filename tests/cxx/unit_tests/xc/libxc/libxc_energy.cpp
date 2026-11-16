@@ -16,21 +16,18 @@
 
 #include "../../../test_scf.hpp"
 
-using grid_pt = simde::MolecularGrid;
-using rho_pt  = simde::EDensityCollocationMatrix;
-using wf_type = simde::type::rscf_wf;
-using pt      = simde::eval_braket<wf_type, simde::type::XC_e_type, wf_type>;
+using rho_pt = simde::EDensityCollocationMatrix;
+using pt     = scf::property_types::xc_energy_quadrature;
 using tensorwrapper::operations::approximately_equal;
 
-TEST_CASE("LibXCEnergy") {
+TEST_CASE("LibXCEnergyQuadrature") {
     using float_type = double;
 
     pluginplay::ModuleManager mm;
     mm.load_plugin<scf::SCF>();
-    auto& mod = mm.at("LibXC Energy");
+    auto& mod = mm.at("LibXC Energy Quadrature");
 
     auto rho    = test_scf::h2_density<float_type>();
-    auto aos    = test_scf::h2_aos();
     auto psi    = test_scf::h2_wave_function<float_type>();
     auto func   = chemist::qm_operator::xc_functional::SVWN3;
     auto xc_hat = test_scf::h2_xc<float_type>(func);
@@ -43,37 +40,22 @@ TEST_CASE("LibXCEnergy") {
     // (which differ from Psi4 by about 1e-3) reproduces the correct value here
     //  to 1e-6, i.e., this test is consistent with the libxc_lda_energy_density
     // test.
-
-    // For this test only the weights matter (we hardcode the density array)
-    using grid_point = chemist::GridPoint;
-    std::vector<grid_point> grid_points;
-    grid_points.push_back(grid_point(15.80337241, 0.0, 0.0, 0.0));
-    grid_points.push_back(grid_point(0.03961399, 0.0, 0.0, 0.0));
-    grid_points.push_back(grid_point(15.80337241, 0.0, 0.0, -1.3984));
-    grid_points.push_back(grid_point(0.03961399, 0.0, 0.0, -1.3984));
-    chemist::Grid grid(grid_points.begin(), grid_points.end());
-
-    auto grid_mod = pluginplay::make_lambda<grid_pt>([&](auto&& mol) {
-        REQUIRE(mol.size() == 2);
-        return grid;
-    });
+    auto grid = test_scf::h2_xc_grid();
 
     auto rho_mod =
       pluginplay::make_lambda<rho_pt>([&](auto&& grid_in, auto&& P) {
           REQUIRE(grid_in == grid);
           REQUIRE(P == rho);
-          return simde::type::tensor(
-            {0.01313525, 0.32141338, 0.01313525, 0.3214133});
+          return test_scf::h2_rho_on_xc_grid();
       });
 
-    mod.change_submod("Integration grid", grid_mod);
     mod.change_submod("Density on a grid", rho_mod);
 
 #ifdef BUILD_LIBXC
-    auto exc = mod.run_as<pt>(braket);
+    auto exc = mod.run_as<pt>(braket, grid);
     simde::type::tensor corr(-0.1031596741234082);
     REQUIRE(approximately_equal(exc, corr, 1e-6));
 #else
-    REQUIRE_THROWS_AS(mod.run_as<pt>(braket), std::runtime_error);
+    REQUIRE_THROWS_AS(mod.run_as<pt>(braket, grid), std::runtime_error);
 #endif
 }

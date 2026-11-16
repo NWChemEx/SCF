@@ -26,8 +26,8 @@
 
 namespace scf::xc::native {
 
-DECLARE_MODULE(SVWN3Energy);
-DECLARE_MODULE(SVWN3Potential);
+DECLARE_MODULE(SVWN3EnergyQuadrature);
+DECLARE_MODULE(SVWN3PotentialQuadrature);
 
 void set_defaults(pluginplay::ModuleMap& modules);
 void load_modules(pluginplay::ModuleMap& modules);

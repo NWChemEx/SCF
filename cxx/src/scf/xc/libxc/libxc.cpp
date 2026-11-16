@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include "../xc.hpp"
 #include "libxc.hpp"
 #ifdef BUILD_LIBXC
 #include "xc.h"
@@ -41,19 +42,25 @@ const auto* get_const_pointer(const tensorwrapper::buffer::BufferBase& buffer) {
 } // namespace
 
 void load_modules(pluginplay::ModuleMap& modules) {
-    modules.add_module<LibXCEnergy>("LibXC Energy");
-    modules.add_module<LibXCPotential>("LibXC Potential");
+    modules.add_module<XCEnergyViaQuadrature>("LibXC Energy");
+    modules.add_module<XCPotentialViaQuadrature>("LibXC Potential");
+    modules.add_module<LibXCEnergyQuadrature>("LibXC Energy Quadrature");
+    modules.add_module<LibXCPotentialQuadrature>("LibXC Potential Quadrature");
 }
 
 void set_defaults(pluginplay::ModuleMap& modules) {
-    modules.change_submod("LibXC Energy", "Integration grid",
-                          "Grid From IntegratorXX");
-    modules.change_submod("LibXC Potential", "Integration grid",
-                          "Grid From IntegratorXX");
-    modules.change_submod("LibXC Energy", "Density on a grid", "Density2Grid");
-    modules.change_submod("LibXC Potential", "Density on a grid",
-                          "Density2Grid");
-    modules.change_submod("LibXC Potential", "AOs on a grid", "AOs on a Grid");
+    const auto e_key    = "LibXC Energy";
+    const auto v_key    = "LibXC Potential";
+    const auto e_q_key  = "LibXC Energy Quadrature";
+    const auto v_q_key  = "LibXC Potential Quadrature";
+    const auto grid_key = "Grid From IntegratorXX";
+    modules.change_submod(e_key, "Integration grid", grid_key);
+    modules.change_submod(v_key, "Integration grid", grid_key);
+    modules.change_submod(e_key, "Quadrature", e_q_key);
+    modules.change_submod(v_key, "Quadrature", v_q_key);
+    modules.change_submod(e_q_key, "Density on a grid", "Density2Grid");
+    modules.change_submod(v_q_key, "Density on a grid", "Density2Grid");
+    modules.change_submod(v_q_key, "AOs on a grid", "AOs on a grid");
 }
 
 std::pair<int, int> to_libxc_codes(chemist::qm_operator::xc_functional func) {

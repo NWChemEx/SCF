@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include "../xc.hpp"
 #include "native.hpp"
 #include "svwn3.hpp"
 #include <span>
@@ -89,19 +90,25 @@ simde::type::tensor visit(KernelType&& k, const simde::type::tensor& t) {
 } // namespace
 
 void load_modules(pluginplay::ModuleMap& modules) {
-    modules.add_module<SVWN3Energy>("SVWN3 Energy");
-    modules.add_module<SVWN3Potential>("SVWN3 Potential");
+    modules.add_module<XCEnergyViaQuadrature>("SVWN3 Energy");
+    modules.add_module<XCPotentialViaQuadrature>("SVWN3 Potential");
+    modules.add_module<SVWN3EnergyQuadrature>("SVWN3 Energy Quadrature");
+    modules.add_module<SVWN3PotentialQuadrature>("SVWN3 Potential Quadrature");
 }
 
 void set_defaults(pluginplay::ModuleMap& modules) {
-    modules.change_submod("SVWN3 Energy", "Integration grid",
-                          "Grid From IntegratorXX");
-    modules.change_submod("SVWN3 Potential", "Integration grid",
-                          "Grid From IntegratorXX");
-    modules.change_submod("SVWN3 Energy", "Density on a grid", "Density2Grid");
-    modules.change_submod("SVWN3 Potential", "Density on a grid",
-                          "Density2Grid");
-    modules.change_submod("SVWN3 Potential", "AOs on a grid", "AOs on a grid");
+    const auto e_key    = "SVWN3 Energy";
+    const auto v_key    = "SVWN3 Potential";
+    const auto e_q_key  = "SVWN3 Energy Quadrature";
+    const auto v_q_key  = "SVWN3 Potential Quadrature";
+    const auto grid_key = "Grid From IntegratorXX";
+    modules.change_submod(e_key, "Integration grid", grid_key);
+    modules.change_submod(v_key, "Integration grid", grid_key);
+    modules.change_submod(e_key, "Quadrature", e_q_key);
+    modules.change_submod(v_key, "Quadrature", v_q_key);
+    modules.change_submod(e_q_key, "Density on a grid", "Density2Grid");
+    modules.change_submod(v_q_key, "Density on a grid", "Density2Grid");
+    modules.change_submod(v_q_key, "AOs on a grid", "AOs on a grid");
 }
 
 simde::type::tensor svwn3_energy_density(
