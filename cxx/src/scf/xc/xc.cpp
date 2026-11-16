@@ -33,6 +33,8 @@ void load_modules(pluginplay::ModuleMap& modules) {
     modules.add_module<GridFromFile>("Grid From File");
     modules.add_module<GridFromIntegratorXX>("Grid From IntegratorXX");
     modules.add_module<Density2Grid>("Density2Grid");
+    modules.add_module<UQXCEnergy>("UQ XC Energy");
+    modules.add_module<UQXCPotential>("UQ XC Potential");
 }
 
 void set_defaults(pluginplay::ModuleMap& modules) {
@@ -42,6 +44,16 @@ void set_defaults(pluginplay::ModuleMap& modules) {
     libxc::set_defaults(modules);
     native::set_defaults(modules);
     modules.change_submod("Density2Grid", "AOs on a grid", "AOs on a grid");
+
+    // The UQ XC modules default to the native SVWN3 quadratures, since they
+    // support the UQ types. "Incompleteness Error Model" has no default yet.
+    const auto grid_key = "Grid From IntegratorXX";
+    modules.change_submod("UQ XC Energy", "Integration grid", grid_key);
+    modules.change_submod("UQ XC Potential", "Integration grid", grid_key);
+    modules.change_submod("UQ XC Energy", "XC Energy",
+                          "SVWN3 Energy Quadrature");
+    modules.change_submod("UQ XC Potential", "XC Potential",
+                          "SVWN3 Potential Quadrature");
 }
 
 } // namespace scf::xc

@@ -131,4 +131,44 @@ using xc_energy_quadrature =
 /// Property type for evaluating the AO matrix of the XC potential by quadrature
 using xc_potential_quadrature = Quadrature<simde::aos_xc_e_aos>;
 
+/** @brief Attaches uncertainty to the result of another property type.
+ *
+ *  Modules satisfying this property type are error models for the XC energy
+ *  and potential, *e.g.*, for the error from the incompleteness of the grid.
+ *  They are given the inputs of @p BasePT and the results of calling a module
+ *  satisfying @p BasePT with those inputs. The results are those of
+ *  @p BasePT, but with uncertainty attached: each value is a UQ type whose
+ *  nominal value is the corresponding value of the given results. The module
+ *  satisfying this property type gets the UQ type from its own
+ *  ``UQ Initializer`` submodule.
+ *
+ *  This property type is a stop gap. It should eventually replace
+ *  SimDE's ``Uncertainty`` property type.
+ *
+ *  @tparam BasePT The property type of the module whose result is having
+ *                 uncertainty attached, *e.g.*, xc_potential_quadrature.
+ */
+template<typename BasePT>
+DECLARE_TEMPLATED_PROPERTY_TYPE(XCUncertain, BasePT);
+
+template<typename BasePT>
+TEMPLATED_PROPERTY_TYPE_INPUTS(XCUncertain, BasePT) {
+    // Appends each result of BasePT, with the same key and type, as an input
+    auto rv = BasePT::inputs() + BasePT::results();
+    for(const auto& [key, value] : BasePT::results())
+        rv[key].set_description("The value to attach uncertainty to");
+    return rv;
+}
+
+template<typename BasePT>
+TEMPLATED_PROPERTY_TYPE_RESULTS(XCUncertain, BasePT) {
+    return BasePT::results();
+}
+
+/// Property type for attaching uncertainty to the XC energy from quadrature
+using xc_energy_uncertainty = XCUncertain<xc_energy_quadrature>;
+
+/// Property type for attaching uncertainty to the XC potential from quadrature
+using xc_potential_uncertainty = XCUncertain<xc_potential_quadrature>;
+
 } // namespace scf::property_types

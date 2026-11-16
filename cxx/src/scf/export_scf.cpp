@@ -48,6 +48,8 @@ EXPORT_PLUGIN(scf, SCF, m) {
     EXPORT_PROPERTY_TYPE(ConvergenceUncertainty, m);
     EXPORT_PROPERTY_TYPE(xc_energy_quadrature, m);
     EXPORT_PROPERTY_TYPE(xc_potential_quadrature, m);
+    EXPORT_PROPERTY_TYPE(xc_energy_uncertainty, m);
+    EXPORT_PROPERTY_TYPE(xc_potential_uncertainty, m);
 }
 
 } // namespace scf

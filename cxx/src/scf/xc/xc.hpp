@@ -24,6 +24,8 @@ DECLARE_MODULE(Density2Grid);
 DECLARE_MODULE(Gau2Grid);
 DECLARE_MODULE(GridFromFile);
 DECLARE_MODULE(GridFromIntegratorXX);
+DECLARE_MODULE(UQXCEnergy);
+DECLARE_MODULE(UQXCPotential);
 DECLARE_MODULE(XCEnergyViaQuadrature);
 DECLARE_MODULE(XCPotentialViaQuadrature);
 

@@ -57,3 +57,19 @@ class TestQuadrature(unittest.TestCase):
 
     def test_xc_potential_quadrature(self):
         self.check_fields(scf.xc_potential_quadrature())
+
+
+class TestXCUncertain(unittest.TestCase):
+    def check_fields(self, pt):
+        inputs = ["BraKet", "Grid", "tensor representation"]
+        self.assertEqual(len(pt.inputs()), len(inputs))
+        for label in inputs:
+            self.assertIn(label, pt.inputs())
+        self.assertEqual(len(pt.results()), 1)
+        self.assertIn("tensor representation", pt.results())
+
+    def test_xc_energy_uncertainty(self):
+        self.check_fields(scf.xc_energy_uncertainty())
+
+    def test_xc_potential_uncertainty(self):
+        self.check_fields(scf.xc_potential_uncertainty())

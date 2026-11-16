@@ -60,3 +60,17 @@ TEST_CASE("Quadrature") {
                                                     {"tensor representation"});
     }
 }
+
+TEST_CASE("XCUncertain") {
+    SECTION("xc_energy_uncertainty") {
+        test_property_type<xc_energy_uncertainty>(
+          {"BraKet", "Grid", "tensor representation"},
+          {"tensor representation"});
+    }
+
+    SECTION("xc_potential_uncertainty") {
+        test_property_type<xc_potential_uncertainty>(
+          {"BraKet", "Grid", "tensor representation"},
+          {"tensor representation"});
+    }
+}

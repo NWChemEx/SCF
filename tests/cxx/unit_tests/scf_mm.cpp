@@ -113,6 +113,10 @@ TEST_CASE("SCF plugin") {
               modules.has_submod(v_key + " Quadrature", "Density on a grid"));
             REQUIRE(modules.has_submod(v_key + " Quadrature", "AOs on a grid"));
         }
+        REQUIRE(modules.has_submod("UQ XC Energy", "Integration grid"));
+        REQUIRE(modules.has_submod("UQ XC Energy", "XC Energy"));
+        REQUIRE(modules.has_submod("UQ XC Potential", "Integration grid"));
+        REQUIRE(modules.has_submod("UQ XC Potential", "XC Potential"));
         REQUIRE(modules.has_submod("Loop", "Charge-charge"));
     }
 
