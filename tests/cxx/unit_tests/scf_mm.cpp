@@ -59,6 +59,7 @@ public:
         add_module<StubProvider<simde::Uncertainty<simde::ERI4>>>(
           "Analytic Error");
         add_module<StubProvider<simde::ERI4>>("Analytic Benchmark ERI4");
+        add_module<StubProvider<simde::UQInitializer>>("UQ Initializer");
     }
 };
 
@@ -81,7 +82,11 @@ const std::vector<std::array<std::string, 4>> wiring{
   {"SAD guess", "SAD Density", "chemcache", "sto-3g SAD density"},
   {"QCUP SCF", "ERIs", "integrals", "UQ Atom Symm Blocked Driver"},
   {"QCUP SCF", "ERI Error Model", "integrals", "Analytic Error"},
-  {"QCUP SCF", "Benchmark ERIs", "integrals", "Analytic Benchmark ERI4"}};
+  {"QCUP SCF", "Benchmark ERIs", "integrals", "Analytic Benchmark ERI4"},
+  {"Reference Grid XC Energy Error", "UQ Initializer", "integrals",
+   "UQ Initializer"},
+  {"Reference Grid XC Potential Error", "UQ Initializer", "integrals",
+   "UQ Initializer"}};
 
 } // namespace
 
@@ -117,6 +122,13 @@ TEST_CASE("SCF plugin") {
         REQUIRE(modules.has_submod("UQ XC Energy", "XC Energy"));
         REQUIRE(modules.has_submod("UQ XC Potential", "Integration grid"));
         REQUIRE(modules.has_submod("UQ XC Potential", "XC Potential"));
+        for(std::string q : {"Energy", "Potential"}) {
+            const auto error_key = "Reference Grid XC " + q + " Error";
+            REQUIRE(
+              modules.has_submod("UQ XC " + q, "Incompleteness Error Model"));
+            REQUIRE(modules.has_submod(error_key, "Reference grid"));
+            REQUIRE(modules.has_submod(error_key, "Reference XC Module"));
+        }
         REQUIRE(modules.has_submod("Loop", "Charge-charge"));
     }
 
@@ -126,6 +138,13 @@ TEST_CASE("SCF plugin") {
                 *modules.at("No MO uncertainty"));
         REQUIRE(loop.submods().at("Convergence uncertainty").value() ==
                 *modules.at("No convergence uncertainty"));
+    }
+
+    SECTION("Reference IntegratorXX Grid") {
+        const auto& inputs =
+          modules.at("Reference IntegratorXX Grid")->inputs();
+        REQUIRE(inputs.at("Angular Size").value<std::size_t>() == 5810);
+        REQUIRE(inputs.at("Radial Size").value<std::size_t>() == 150);
     }
 
     SECTION("QCUP SCF is a driver") {

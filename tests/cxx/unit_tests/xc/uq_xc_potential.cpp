@@ -15,6 +15,7 @@
  */
 
 #include "../../test_scf.hpp"
+#include <scf/xc/libxc/libxc.hpp>
 
 using grid_pt  = simde::MolecularGrid;
 using rho_pt   = simde::EDensityCollocationMatrix;
@@ -85,4 +86,69 @@ TEST_CASE("UQXCPotential") {
         mod.change_submod("Incompleteness Error Model", error_mod);
         REQUIRE(mod.run_as<pt>(braket) == uq_corr);
     }
+}
+
+// Runs the default wiring end to end: the default grid and SVWN3 quadrature,
+// then the reference grid error model with the real reference grid. Only the
+// "UQ Initializer" (which comes from Integrals) is mocked, and the reference
+// grid is made smaller (but still different) to keep the test fast.
+TEST_CASE("UQXCPotential with the reference grid error model") {
+    pluginplay::ModuleManager mm;
+    mm.load_plugin<scf::SCF>();
+
+    auto rho  = test_scf::he_density<double>();
+    auto aos  = test_scf::he_aos();
+    auto func = chemist::qm_operator::xc_functional::SVWN3;
+    simde::type::xc_e_type xc_op(func, simde::type::electron{}, rho);
+    chemist::braket::BraKet braket(aos, xc_op, aos);
+
+    const auto ref_grid_key = "Reference IntegratorXX Grid";
+    mm.change_input(ref_grid_key, "Radial Size", std::size_t{100});
+    mm.change_input(ref_grid_key, "Angular Size", std::size_t{590});
+
+    // The value and the reference value the error model should use
+    auto vxc      = mm.at("SVWN3 Potential").run_as<pt>(braket);
+    auto molecule = scf::xc::libxc::aos2molecule(aos.ao_basis_set());
+    auto ref_grid = mm.at(ref_grid_key).run_as<grid_pt>(molecule);
+    auto ref_vxc =
+      mm.at("SVWN3 Potential Quadrature").run_as<quad_pt>(braket, ref_grid);
+
+    auto use_kind = [&](simde::UQKind kind) {
+        mm.at("Reference Grid XC Potential Error")
+          .change_submod("UQ Initializer",
+                         pluginplay::make_lambda<simde::UQInitializer>(
+                           [=]() { return simde::UQFactory(kind); }));
+    };
+
+    using tensorwrapper::buffer::make_contiguous;
+    auto element = [](const auto& t) {
+        return make_contiguous(t.buffer()).get_elem({0, 0});
+    };
+    const auto v   = wtf::fp::float_cast<double>(element(vxc));
+    const auto ref = wtf::fp::float_cast<double>(element(ref_vxc));
+    REQUIRE(v != ref); // Otherwise there is no error to attach
+
+    SECTION("none") {
+        use_kind(simde::UQKind::none);
+        auto rv = mm.at("UQ XC Potential").run_as<pt>(braket);
+        REQUIRE(wtf::fp::float_cast<double>(element(rv)) == v);
+    }
+
+#ifdef ENABLE_SIGMA
+    SECTION("triplex") {
+        use_kind(simde::UQKind::triplex);
+        auto rv = mm.at("UQ XC Potential").run_as<pt>(braket);
+        auto x =
+          wtf::fp::float_cast<tensorwrapper::types::tpdouble>(element(rv));
+        REQUIRE(x.nominal() == v);
+        // One-sided: the deviation is entirely towards the reference value
+        if(ref > v) {
+            REQUIRE(x.lower() == v);
+            REQUIRE(x.upper() == Catch::Approx(ref).epsilon(1e-14));
+        } else {
+            REQUIRE(x.upper() == v);
+            REQUIRE(x.lower() == Catch::Approx(ref).epsilon(1e-14));
+        }
+    }
+#endif
 }

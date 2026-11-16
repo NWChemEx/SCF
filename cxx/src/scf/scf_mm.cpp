@@ -76,6 +76,11 @@ PLUGIN_CTOR(SCF) {
                         "Analytic Error");
     default_submod_from("integrals", "QCUP SCF", "Benchmark ERIs",
                         "Analytic Benchmark ERI4");
+
+    default_submod_from("integrals", "Reference Grid XC Energy Error",
+                        "UQ Initializer", "UQ Initializer");
+    default_submod_from("integrals", "Reference Grid XC Potential Error",
+                        "UQ Initializer", "UQ Initializer");
 }
 
 } // namespace scf

@@ -16,6 +16,7 @@
 
 #pragma once
 #include <pluginplay/pluginplay.hpp>
+#include <scf/property_types/quadrature.hpp>
 
 namespace scf::xc {
 
@@ -28,6 +29,19 @@ DECLARE_MODULE(UQXCEnergy);
 DECLARE_MODULE(UQXCPotential);
 DECLARE_MODULE(XCEnergyViaQuadrature);
 DECLARE_MODULE(XCPotentialViaQuadrature);
+
+/** @brief Estimates the error of a quadrature from a finer grid.
+ *
+ *  @tparam QuadPT The property type of the quadrature, e.g.,
+ *                 scf::property_types::xc_potential_quadrature.
+ */
+template<typename QuadPT>
+DECLARE_MODULE(ReferenceGridError);
+
+extern template struct ReferenceGridError<
+  scf::property_types::xc_energy_quadrature>;
+extern template struct ReferenceGridError<
+  scf::property_types::xc_potential_quadrature>;
 
 void set_defaults(pluginplay::ModuleMap& modules);
 void load_modules(pluginplay::ModuleMap& modules);
