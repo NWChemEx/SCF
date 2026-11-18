@@ -128,8 +128,10 @@ symmetric interval stores only the bounds: pinning
 whose midpoint, <span class="math notranslate nohighlight">\((\rho_i + r_i)/2\)</span>, is larger than <span class="math notranslate nohighlight">\(\rho_i\)</span>, so the
 best estimate of the density would be biased upward. The error of a quadrature
 also tends to have a known direction, which an asymmetric interval can
-represent. <code class="docutils literal notranslate"><span class="pre">sigma::Interval</span></code> stores only the bounds, so this type does not
-exist yet.</p>
+represent. <code class="docutils literal notranslate"><span class="pre">sigma::Interval</span></code> stores only the bounds. <code class="docutils literal notranslate"><span class="pre">sigma::Triplex</span></code>
+stores the bounds and, independently, a nominal value, i.e., it is an
+asymmetric interval. It is available in TensorWrapper as <code class="docutils literal notranslate"><span class="pre">tpdouble</span></code> and from a
+<code class="docutils literal notranslate"><span class="pre">UQ</span> <span class="pre">Initializer</span></code> as the <code class="docutils literal notranslate"><span class="pre">triplex</span></code> kind.</p>
 </section>
 <section id="errors-in-the-xc-energy-and-potential">
 <h2>Errors in the XC Energy and Potential<a class="headerlink" href="#errors-in-the-xc-energy-and-potential" title="Link to this heading"></a></h2>
@@ -351,14 +353,16 @@ can thus control the error models from the driver level.</p>
 <td><p>The module that evaluates the quadrature. Satisfies <code class="docutils literal notranslate"><span class="pre">Quadrature&lt;T&gt;</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Incompleteness</span> <span class="pre">Error</span> <span class="pre">Model</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">Grid</span> <span class="pre">Error</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">Grid</span> <span class="pre">XC</span> <span class="pre">Potential</span> <span class="pre">Error</span></code></p></td>
 <td><p>The error model that estimates the uncertainty from the incompleteness
 of the grid.</p></td>
 </tr>
 </tbody>
 </table>
-<p>The <code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">Grid</span> <span class="pre">Error</span></code> module refers to the “Reference Grid” error model
-introduced in the next section.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">Grid</span> <span class="pre">XC</span> <span class="pre">Potential</span> <span class="pre">Error</span></code> is the “Reference Grid” error model
+introduced in the next section. <code class="docutils literal notranslate"><span class="pre">UQ</span> <span class="pre">XC</span> <span class="pre">Energy</span></code> is the same, with
+<code class="docutils literal notranslate"><span class="pre">XC</span> <span class="pre">Energy</span></code>, <code class="docutils literal notranslate"><span class="pre">SVWN3</span> <span class="pre">Energy</span> <span class="pre">Quadrature</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">Grid</span> <span class="pre">XC</span> <span class="pre">Energy</span> <span class="pre">Error</span></code>.</p>
 </section>
 <section id="incompleteness-error-models">
 <h2>Incompleteness Error Models<a class="headerlink" href="#incompleteness-error-models" title="Link to this heading"></a></h2>
@@ -381,18 +385,63 @@ integral, and a one-sided deviation then excludes it. Making both deviations
 <code class="docutils literal notranslate"><span class="pre">Analytic</span> <span class="pre">Error</span></code> ERI error model and its benchmark ERIs. It is an estimate,
 not a bound, and costs one evaluation on the finer grid, including the density
 and AOs on that grid.</p>
-<p>The strategy is implemented as an error model, <code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">Grid</span> <span class="pre">Error</span></code> (see
-<a class="reference internal" href="#xc-uq-implementation">XC UQ Implementation</a>) that satisfies the <code class="docutils literal notranslate"><span class="pre">XCUncertain&lt;Quadrature&lt;T&gt;&gt;</span></code>
-property type. It has a submodule, <code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">XC</span> <span class="pre">Module</span></code>, which satisfies
-<code class="docutils literal notranslate"><span class="pre">Quadrature&lt;T&gt;</span></code>. The module gets the original grid as an input and thus
-should be able to determine a finer grid from it. This requires that the grid
-has identifiers for its radial and angular quadratures. The module then passes
-the inputs and the finer grid to the <code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">XC</span> <span class="pre">Module</span></code> submodule and
-uses the difference to construct the deviations. Finally, it converts the
-original result to the UQ type with its <code class="docutils literal notranslate"><span class="pre">UQ</span> <span class="pre">Initializer</span></code> submodule, keeping
-the original result as the mean, attaches the deviations, and returns that
-uncertain result, not the difference. This requires that the
-<code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">Grid</span> <span class="pre">Error</span></code> module also have a submodule for generating grids.</p>
+<p>The strategy is implemented as the error models
+<code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">Grid</span> <span class="pre">XC</span> <span class="pre">Energy</span> <span class="pre">Error</span></code> and <code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">Grid</span> <span class="pre">XC</span> <span class="pre">Potential</span> <span class="pre">Error</span></code>
+(see <a class="reference internal" href="#xc-uq-implementation">XC UQ Implementation</a>), which satisfy <code class="docutils literal notranslate"><span class="pre">XCUncertain&lt;Quadrature&lt;T&gt;&gt;</span></code>.
+Their submodules are:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 30.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Hook name</p></th>
+<th class="head"><p>Default key</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">grid</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">IntegratorXX</span> <span class="pre">Grid</span></code></p></td>
+<td><p>Builds the finer grid from the molecule.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">XC</span> <span class="pre">Module</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SVWN3</span> <span class="pre">Energy</span> <span class="pre">Quadrature</span></code> or <code class="docutils literal notranslate"><span class="pre">SVWN3</span> <span class="pre">Potential</span> <span class="pre">Quadrature</span></code></p></td>
+<td><p>Evaluates the quadrature on the finer grid. Must use the same
+functional as the quadrature being corrected.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">UQ</span> <span class="pre">Initializer</span></code></p></td>
+<td><p>Integrals’ <code class="docutils literal notranslate"><span class="pre">UQ</span> <span class="pre">Initializer</span></code></p></td>
+<td><p>The kind of uncertain value returned.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The module builds the finer grid, passes the inputs and the finer grid to the
+<code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">XC</span> <span class="pre">Module</span></code> submodule, and uses the element-wise difference to
+construct the deviations: <span class="math notranslate nohighlight">\(|d|\)</span> towards the reference value and
+<code class="docutils literal notranslate"><span class="pre">Opposite</span> <span class="pre">Side</span> <span class="pre">Fraction</span></code> (an input, default 0) times <span class="math notranslate nohighlight">\(|d|\)</span> away from
+it. It then converts the original result to the UQ type with its
+<code class="docutils literal notranslate"><span class="pre">UQ</span> <span class="pre">Initializer</span></code> submodule, keeping the original result as the nominal value,
+and returns that uncertain result, not the difference. Only the <code class="docutils literal notranslate"><span class="pre">triplex</span></code>
+kind stores both deviations exactly. The other kinds store the tightest value
+they can which contains them: the interval-like kinds store the bounds, and
+<code class="docutils literal notranslate"><span class="pre">Uncertain</span></code> uses the larger deviation. For now, the given result must hold
+doubles.</p>
+<p>The finer grid is not derived from the given grid. Instead,
+<code class="docutils literal notranslate"><span class="pre">Reference</span> <span class="pre">IntegratorXX</span> <span class="pre">Grid</span></code> is a copy of <code class="docutils literal notranslate"><span class="pre">Grid</span> <span class="pre">From</span> <span class="pre">IntegratorXX</span></code> with
+150 radial (Mura-Knowles) and 5810 angular (Lebedev-Laikov, the largest
+available) points per atom, unpruned, with Becke partitioning. The sizes come
+from a convergence study of SVWN3 water/STO-3G at a fixed (core-guess) density.
+With 5810 angular points, increasing the radial size from 150 to 250 changes
+<span class="math notranslate nohighlight">\(E^{XC}\)</span> by <span class="math notranslate nohighlight">\(1.1\times 10^{-11}\)</span> and <span class="math notranslate nohighlight">\(V^{XC}\)</span> (largest
+element) by <span class="math notranslate nohighlight">\(6.4\times 10^{-12}\)</span>. From 200 to 250 the changes are about
+<span class="math notranslate nohighlight">\(2\times 10^{-12}\)</span>, which is at the level of the rounding error of the
+sums. With 150 radial points, 3074 angular points agree with 5810 to
+<span class="math notranslate nohighlight">\(5\times 10^{-12}\)</span>, whereas 2030 do not (<span class="math notranslate nohighlight">\(6\times 10^{-10}\)</span>).</p>
+<p>The reference grid is expensive: about <span class="math notranslate nohighlight">\(2.6\times 10^{6}\)</span> points for
+water. Each call evaluates the quadrature, including the density and AOs, on
+it.</p>
 </section>
 <section id="grid-extrapolation">
 <h3>Grid Extrapolation<a class="headerlink" href="#grid-extrapolation" title="Link to this heading"></a></h3>

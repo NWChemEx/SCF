@@ -74,6 +74,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">scf::property_types Namespace Reference</div></div>
 </div><!--header-->
@@ -82,17 +83,27 @@ $(function() {
 <p>The namespace for property types defined by SCF.  
 <a href="namespacescf_1_1property__types.html#details">More...</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a341502a3330e446ec9210b15f5d005a3" id="r_a341502a3330e446ec9210b15f5d005a3"><td class="memItemLeft" align="right" valign="top"><a id="a341502a3330e446ec9210b15f5d005a3" name="a341502a3330e446ec9210b15f5d005a3"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>xc_energy_quadrature</b> = Quadrature&lt; simde::eval_braket&lt; simde::type::rscf_wf, simde::type::XC_e_type, simde::type::rscf_wf &gt; &gt;</td></tr>
+<tr class="memdesc:a341502a3330e446ec9210b15f5d005a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property type for evaluating the XC energy by quadrature. <br /></td></tr>
+<tr class="separator:a341502a3330e446ec9210b15f5d005a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a472166f8d4f2cf5861139d63fa6eaa45" id="r_a472166f8d4f2cf5861139d63fa6eaa45"><td class="memItemLeft" align="right" valign="top"><a id="a472166f8d4f2cf5861139d63fa6eaa45" name="a472166f8d4f2cf5861139d63fa6eaa45"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>xc_potential_quadrature</b> = Quadrature&lt; simde::aos_xc_e_aos &gt;</td></tr>
+<tr class="memdesc:a472166f8d4f2cf5861139d63fa6eaa45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property type for evaluating the AO matrix of the XC potential by quadrature. <br /></td></tr>
+<tr class="separator:a472166f8d4f2cf5861139d63fa6eaa45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31afd1c51ff3133b1176740f38c9f309" id="r_a31afd1c51ff3133b1176740f38c9f309"><td class="memItemLeft" align="right" valign="top"><a id="a31afd1c51ff3133b1176740f38c9f309" name="a31afd1c51ff3133b1176740f38c9f309"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>xc_energy_uncertainty</b> = XCUncertain&lt; <a class="el" href="namespacescf_1_1property__types.html#a341502a3330e446ec9210b15f5d005a3">xc_energy_quadrature</a> &gt;</td></tr>
+<tr class="memdesc:a31afd1c51ff3133b1176740f38c9f309"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property type for attaching uncertainty to the XC energy from quadrature. <br /></td></tr>
+<tr class="separator:a31afd1c51ff3133b1176740f38c9f309"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8e81ef022977a8b3d1f98d4a737821b" id="r_aa8e81ef022977a8b3d1f98d4a737821b"><td class="memItemLeft" align="right" valign="top"><a id="aa8e81ef022977a8b3d1f98d4a737821b" name="aa8e81ef022977a8b3d1f98d4a737821b"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>xc_potential_uncertainty</b> = XCUncertain&lt; <a class="el" href="namespacescf_1_1property__types.html#a472166f8d4f2cf5861139d63fa6eaa45">xc_potential_quadrature</a> &gt;</td></tr>
+<tr class="memdesc:aa8e81ef022977a8b3d1f98d4a737821b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Property type for attaching uncertainty to the XC potential from quadrature. <br /></td></tr>
+<tr class="separator:aa8e81ef022977a8b3d1f98d4a737821b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a865c6caa7b2341d46117d55fcb5b9167" id="r_a865c6caa7b2341d46117d55fcb5b9167"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescf_1_1property__types.html#a865c6caa7b2341d46117d55fcb5b9167">DECLARE_PROPERTY_TYPE</a> (MOUncertainty)</td></tr>
-<tr class="memdesc:a865c6caa7b2341d46117d55fcb5b9167"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attaches uncertainty to converged molecular orbitals.  <br /></td></tr>
-<tr class="separator:a865c6caa7b2341d46117d55fcb5b9167"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7533ccebe9c67bb613902c355c7480cb" id="r_a7533ccebe9c67bb613902c355c7480cb"><td class="memItemLeft" align="right" valign="top"><a id="a7533ccebe9c67bb613902c355c7480cb" name="a7533ccebe9c67bb613902c355c7480cb"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>PROPERTY_TYPE_INPUTS</b> (MOUncertainty)</td></tr>
-<tr class="separator:a7533ccebe9c67bb613902c355c7480cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad9dad7f934b3a9d4ffd0b83219e7ac2c" id="r_ad9dad7f934b3a9d4ffd0b83219e7ac2c"><td class="memItemLeft" align="right" valign="top"><a id="ad9dad7f934b3a9d4ffd0b83219e7ac2c" name="ad9dad7f934b3a9d4ffd0b83219e7ac2c"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>PROPERTY_TYPE_RESULTS</b> (MOUncertainty)</td></tr>
-<tr class="separator:ad9dad7f934b3a9d4ffd0b83219e7ac2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc0151a38149c1ad548f3392d297cda6" id="r_adc0151a38149c1ad548f3392d297cda6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescf_1_1property__types.html#adc0151a38149c1ad548f3392d297cda6">DECLARE_PROPERTY_TYPE</a> (ConvergenceUncertainty)</td></tr>
 <tr class="memdesc:adc0151a38149c1ad548f3392d297cda6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attaches the uncertainty from incomplete convergence to an energy.  <br /></td></tr>
 <tr class="separator:adc0151a38149c1ad548f3392d297cda6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -102,6 +113,39 @@ Functions</h2></td></tr>
 <tr class="memitem:a817ced9d01bff504c45ba2f7057ef474" id="r_a817ced9d01bff504c45ba2f7057ef474"><td class="memItemLeft" align="right" valign="top"><a id="a817ced9d01bff504c45ba2f7057ef474" name="a817ced9d01bff504c45ba2f7057ef474"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>PROPERTY_TYPE_RESULTS</b> (ConvergenceUncertainty)</td></tr>
 <tr class="separator:a817ced9d01bff504c45ba2f7057ef474"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a865c6caa7b2341d46117d55fcb5b9167" id="r_a865c6caa7b2341d46117d55fcb5b9167"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacescf_1_1property__types.html#a865c6caa7b2341d46117d55fcb5b9167">DECLARE_PROPERTY_TYPE</a> (MOUncertainty)</td></tr>
+<tr class="memdesc:a865c6caa7b2341d46117d55fcb5b9167"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attaches uncertainty to converged molecular orbitals.  <br /></td></tr>
+<tr class="separator:a865c6caa7b2341d46117d55fcb5b9167"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7533ccebe9c67bb613902c355c7480cb" id="r_a7533ccebe9c67bb613902c355c7480cb"><td class="memItemLeft" align="right" valign="top"><a id="a7533ccebe9c67bb613902c355c7480cb" name="a7533ccebe9c67bb613902c355c7480cb"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>PROPERTY_TYPE_INPUTS</b> (MOUncertainty)</td></tr>
+<tr class="separator:a7533ccebe9c67bb613902c355c7480cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9dad7f934b3a9d4ffd0b83219e7ac2c" id="r_ad9dad7f934b3a9d4ffd0b83219e7ac2c"><td class="memItemLeft" align="right" valign="top"><a id="ad9dad7f934b3a9d4ffd0b83219e7ac2c" name="ad9dad7f934b3a9d4ffd0b83219e7ac2c"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>PROPERTY_TYPE_RESULTS</b> (MOUncertainty)</td></tr>
+<tr class="separator:ad9dad7f934b3a9d4ffd0b83219e7ac2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98e9388ac169ca290bf7ca88a5120aa2" id="r_a98e9388ac169ca290bf7ca88a5120aa2"><td class="memTemplParams" colspan="2">template&lt;typename BasePT &gt; </td></tr>
+<tr class="memitem:a98e9388ac169ca290bf7ca88a5120aa2"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacescf_1_1property__types.html#a98e9388ac169ca290bf7ca88a5120aa2">DECLARE_TEMPLATED_PROPERTY_TYPE</a> (Quadrature, BasePT)</td></tr>
+<tr class="memdesc:a98e9388ac169ca290bf7ca88a5120aa2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluates the quantity of another property type by quadrature.  <br /></td></tr>
+<tr class="separator:a98e9388ac169ca290bf7ca88a5120aa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3332f988408ff2fbc65853741e1a78a" id="r_ad3332f988408ff2fbc65853741e1a78a"><td class="memTemplParams" colspan="2"><a id="ad3332f988408ff2fbc65853741e1a78a" name="ad3332f988408ff2fbc65853741e1a78a"></a>
+template&lt;typename BasePT &gt; </td></tr>
+<tr class="memitem:ad3332f988408ff2fbc65853741e1a78a"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><b>TEMPLATED_PROPERTY_TYPE_INPUTS</b> (Quadrature, BasePT)</td></tr>
+<tr class="separator:ad3332f988408ff2fbc65853741e1a78a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46c1f3ada2d0558dab38d2b284c75926" id="r_a46c1f3ada2d0558dab38d2b284c75926"><td class="memTemplParams" colspan="2"><a id="a46c1f3ada2d0558dab38d2b284c75926" name="a46c1f3ada2d0558dab38d2b284c75926"></a>
+template&lt;typename BasePT &gt; </td></tr>
+<tr class="memitem:a46c1f3ada2d0558dab38d2b284c75926"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><b>TEMPLATED_PROPERTY_TYPE_RESULTS</b> (Quadrature, BasePT)</td></tr>
+<tr class="separator:a46c1f3ada2d0558dab38d2b284c75926"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a774018b6fd9cafc60f98507d7990205e" id="r_a774018b6fd9cafc60f98507d7990205e"><td class="memTemplParams" colspan="2">template&lt;typename BasePT &gt; </td></tr>
+<tr class="memitem:a774018b6fd9cafc60f98507d7990205e"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacescf_1_1property__types.html#a774018b6fd9cafc60f98507d7990205e">DECLARE_TEMPLATED_PROPERTY_TYPE</a> (XCUncertain, BasePT)</td></tr>
+<tr class="memdesc:a774018b6fd9cafc60f98507d7990205e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attaches uncertainty to the result of another property type.  <br /></td></tr>
+<tr class="separator:a774018b6fd9cafc60f98507d7990205e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8f280e8a8d209c4ff9165324313b429" id="r_ae8f280e8a8d209c4ff9165324313b429"><td class="memTemplParams" colspan="2"><a id="ae8f280e8a8d209c4ff9165324313b429" name="ae8f280e8a8d209c4ff9165324313b429"></a>
+template&lt;typename BasePT &gt; </td></tr>
+<tr class="memitem:ae8f280e8a8d209c4ff9165324313b429"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><b>TEMPLATED_PROPERTY_TYPE_INPUTS</b> (XCUncertain, BasePT)</td></tr>
+<tr class="separator:ae8f280e8a8d209c4ff9165324313b429"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2004fda37798d5b5257ca915f0d552d8" id="r_a2004fda37798d5b5257ca915f0d552d8"><td class="memTemplParams" colspan="2"><a id="a2004fda37798d5b5257ca915f0d552d8" name="a2004fda37798d5b5257ca915f0d552d8"></a>
+template&lt;typename BasePT &gt; </td></tr>
+<tr class="memitem:a2004fda37798d5b5257ca915f0d552d8"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><b>TEMPLATED_PROPERTY_TYPE_RESULTS</b> (XCUncertain, BasePT)</td></tr>
+<tr class="separator:a2004fda37798d5b5257ca915f0d552d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The namespace for property types defined by SCF. </p>
@@ -145,6 +189,85 @@ Functions</h2></td></tr>
 
 <p>Attaches uncertainty to converged molecular orbitals. </p>
 <p>Called by an SCF once it has converged. The orbital energies and coefficients are the eigenpairs of the converged Fock matrix in the metric of the overlap matrix. The result is the coefficients with uncertainty attached, <em>e.g.</em>, from the uncertainty in the Fock matrix and from incomplete convergence. </p>
+
+</div>
+</div>
+<a id="a98e9388ac169ca290bf7ca88a5120aa2" name="a98e9388ac169ca290bf7ca88a5120aa2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a98e9388ac169ca290bf7ca88a5120aa2">&#9670;&#160;</a></span>DECLARE_TEMPLATED_PROPERTY_TYPE() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename BasePT &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">scf::property_types::DECLARE_TEMPLATED_PROPERTY_TYPE </td>
+          <td>(</td>
+          <td class="paramtype">Quadrature&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BasePT&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Evaluates the quantity of another property type by quadrature. </p>
+<p>Modules satisfying this property type evaluate the quantity computed by <code>BasePT</code> by quadrature on a grid they are given, rather than on a grid they build themselves. This lets the caller choose the grid, <em>e.g.</em>, to evaluate the same quadrature on a finer grid to estimate the error of the grid. The inputs are those of <code>BasePT</code> plus the grid, and the results are those of <code>BasePT</code>.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">BasePT</td><td>The property type whose quantity is evaluated by quadrature, <em>e.g.</em>, simde::aos_xc_e_aos for the XC potential. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a774018b6fd9cafc60f98507d7990205e" name="a774018b6fd9cafc60f98507d7990205e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a774018b6fd9cafc60f98507d7990205e">&#9670;&#160;</a></span>DECLARE_TEMPLATED_PROPERTY_TYPE() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename BasePT &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">scf::property_types::DECLARE_TEMPLATED_PROPERTY_TYPE </td>
+          <td>(</td>
+          <td class="paramtype">XCUncertain&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BasePT&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Attaches uncertainty to the result of another property type. </p>
+<p>Modules satisfying this property type are error models for the XC energy and potential, <em>e.g.</em>, for the error from the incompleteness of the grid. They are given the inputs of <code>BasePT</code> and the results of calling a module satisfying <code>BasePT</code> with those inputs. The results are those of <code>BasePT</code>, but with uncertainty attached: each value is a UQ type whose nominal value is the corresponding value of the given results. The module satisfying this property type gets the UQ type from its own <code>UQ Initializer</code> submodule.</p>
+<p>This property type is a stop gap. It should eventually replace SimDE's <code>Uncertainty</code> property type.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">BasePT</td><td>The property type of the module whose result is having uncertainty attached, <em>e.g.</em>, xc_potential_quadrature. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
