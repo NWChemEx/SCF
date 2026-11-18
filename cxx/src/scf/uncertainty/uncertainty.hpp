@@ -15,7 +15,7 @@
  */
 
 #pragma once
-#include <scf/property_types.hpp>
+#include <scf/property_types/property_types.hpp>
 #include <simde/simde.hpp>
 
 namespace scf::uncertainty {

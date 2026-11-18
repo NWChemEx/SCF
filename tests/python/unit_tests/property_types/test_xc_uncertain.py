@@ -17,28 +17,17 @@ import unittest
 import scf
 
 
-class TestMOUncertainty(unittest.TestCase):
-    def test_fields(self):
-        pt = scf.MOUncertainty()
-        inputs = [
-            "Fock matrix",
-            "Overlap matrix",
-            "Orbital energies",
-            "Orbital coefficients",
-            "Density change",
-        ]
+class TestXCUncertain(unittest.TestCase):
+    def check_fields(self, pt):
+        inputs = ["BraKet", "Grid", "tensor representation"]
         self.assertEqual(len(pt.inputs()), len(inputs))
         for label in inputs:
             self.assertIn(label, pt.inputs())
         self.assertEqual(len(pt.results()), 1)
-        self.assertIn("Orbital coefficients", pt.results())
+        self.assertIn("tensor representation", pt.results())
 
+    def test_xc_energy_uncertainty(self):
+        self.check_fields(scf.xc_energy_uncertainty())
 
-class TestConvergenceUncertainty(unittest.TestCase):
-    def test_fields(self):
-        pt = scf.ConvergenceUncertainty()
-        self.assertEqual(len(pt.inputs()), 2)
-        self.assertIn("Energy", pt.inputs())
-        self.assertIn("Energy change", pt.inputs())
-        self.assertEqual(len(pt.results()), 1)
-        self.assertIn("Energy", pt.results())
+    def test_xc_potential_uncertainty(self):
+        self.check_fields(scf.xc_potential_uncertainty())

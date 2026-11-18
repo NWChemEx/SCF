@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-#include "../test_scf.hpp"
-#include <scf/property_types.hpp>
+#pragma once
+#include "../../test_scf.hpp"
+#include <initializer_list>
+#include <string>
 
-using namespace scf::property_types;
+namespace test_scf {
 
-namespace {
-
-using string_list = std::initializer_list<std::string>;
-
-// Checks that the property type T has exactly the given inputs and results
+/// Checks that the property type @p T has exactly the given inputs and results
 template<typename T>
-void test_property_type(string_list input_fields, string_list result_fields) {
+void test_property_type(std::initializer_list<std::string> input_fields,
+                        std::initializer_list<std::string> result_fields) {
     auto inputs = T::inputs();
     REQUIRE(inputs.size() == input_fields.size());
     for(const auto& field : input_fields) REQUIRE(inputs.count(field) == 1);
@@ -35,16 +34,4 @@ void test_property_type(string_list input_fields, string_list result_fields) {
     for(const auto& field : result_fields) REQUIRE(results.count(field) == 1);
 }
 
-} // namespace
-
-TEST_CASE("MOUncertainty") {
-    test_property_type<MOUncertainty>(
-      {"Fock matrix", "Overlap matrix", "Orbital energies",
-       "Orbital coefficients", "Density change"},
-      {"Orbital coefficients"});
-}
-
-TEST_CASE("ConvergenceUncertainty") {
-    test_property_type<ConvergenceUncertainty>({"Energy", "Energy change"},
-                                               {"Energy"});
-}
+} // namespace test_scf

@@ -51,8 +51,10 @@ symmetric interval stores only the bounds: pinning
 whose midpoint, :math:`(\rho_i + r_i)/2`, is larger than :math:`\rho_i`, so the
 best estimate of the density would be biased upward. The error of a quadrature
 also tends to have a known direction, which an asymmetric interval can
-represent. ``sigma::Interval`` stores only the bounds, so this type does not
-exist yet.
+represent. ``sigma::Interval`` stores only the bounds. ``sigma::Triplex``
+stores the bounds and, independently, a nominal value, i.e., it is an
+asymmetric interval. It is available in TensorWrapper as ``tpdouble`` and from a
+``UQ Initializer`` as the ``triplex`` kind.
 
 *************************************
 Errors in the XC Energy and Potential
@@ -293,12 +295,14 @@ To summarize, the submodules of the ``UQ XC Potential`` module are:
      - ``SVWN3 Potential Quadrature``
      - The module that evaluates the quadrature. Satisfies ``Quadrature<T>``.
    * - ``Incompleteness Error Model``
-     - ``Reference Grid Error``
+     - ``Reference Grid XC Potential Error``
      - The error model that estimates the uncertainty from the incompleteness
        of the grid.
 
-The ``Reference Grid Error`` module refers to the "Reference Grid" error model
-introduced in the next section.
+``Reference Grid XC Potential Error`` is the "Reference Grid" error model
+introduced in the next section. ``UQ XC Energy`` is the same, with
+``XC Energy``, ``SVWN3 Energy Quadrature``, and
+``Reference Grid XC Energy Error``.
 
 ***************************
 Incompleteness Error Models
@@ -326,18 +330,56 @@ integral, and a one-sided deviation then excludes it. Making both deviations
 not a bound, and costs one evaluation on the finer grid, including the density
 and AOs on that grid.
 
-The strategy is implemented as an error model, ``Reference Grid Error`` (see
-`XC UQ Implementation`_) that satisfies the ``XCUncertain<Quadrature<T>>``
-property type. It has a submodule, ``Reference XC Module``, which satisfies
-``Quadrature<T>``. The module gets the original grid as an input and thus
-should be able to determine a finer grid from it. This requires that the grid
-has identifiers for its radial and angular quadratures. The module then passes
-the inputs and the finer grid to the ``Reference XC Module`` submodule and
-uses the difference to construct the deviations. Finally, it converts the
-original result to the UQ type with its ``UQ Initializer`` submodule, keeping
-the original result as the mean, attaches the deviations, and returns that
-uncertain result, not the difference. This requires that the
-``Reference Grid Error`` module also have a submodule for generating grids.
+The strategy is implemented as the error models
+``Reference Grid XC Energy Error`` and ``Reference Grid XC Potential Error``
+(see `XC UQ Implementation`_), which satisfy ``XCUncertain<Quadrature<T>>``.
+Their submodules are:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 30 40
+
+   * - Hook name
+     - Default key
+     - Purpose
+   * - ``Reference grid``
+     - ``Reference IntegratorXX Grid``
+     - Builds the finer grid from the molecule.
+   * - ``Reference XC Module``
+     - ``SVWN3 Energy Quadrature`` or ``SVWN3 Potential Quadrature``
+     - Evaluates the quadrature on the finer grid. Must use the same
+       functional as the quadrature being corrected.
+   * - ``UQ Initializer``
+     - Integrals' ``UQ Initializer``
+     - The kind of uncertain value returned.
+
+The module builds the finer grid, passes the inputs and the finer grid to the
+``Reference XC Module`` submodule, and uses the element-wise difference to
+construct the deviations: :math:`|d|` towards the reference value and
+``Opposite Side Fraction`` (an input, default 0) times :math:`|d|` away from
+it. It then converts the original result to the UQ type with its
+``UQ Initializer`` submodule, keeping the original result as the nominal value,
+and returns that uncertain result, not the difference. Only the ``triplex``
+kind stores both deviations exactly. The other kinds store the tightest value
+they can which contains them: the interval-like kinds store the bounds, and
+``Uncertain`` uses the larger deviation. For now, the given result must hold
+doubles.
+
+The finer grid is not derived from the given grid. Instead,
+``Reference IntegratorXX Grid`` is a copy of ``Grid From IntegratorXX`` with
+150 radial (Mura-Knowles) and 5810 angular (Lebedev-Laikov, the largest
+available) points per atom, unpruned, with Becke partitioning. The sizes come
+from a convergence study of SVWN3 water/STO-3G at a fixed (core-guess) density.
+With 5810 angular points, increasing the radial size from 150 to 250 changes
+:math:`E^{XC}` by :math:`1.1\times 10^{-11}` and :math:`V^{XC}` (largest
+element) by :math:`6.4\times 10^{-12}`. From 200 to 250 the changes are about
+:math:`2\times 10^{-12}`, which is at the level of the rounding error of the
+sums. With 150 radial points, 3074 angular points agree with 5810 to
+:math:`5\times 10^{-12}`, whereas 2030 do not (:math:`6\times 10^{-10}`).
+
+The reference grid is expensive: about :math:`2.6\times 10^{6}` points for
+water. Each call evaluates the quadrature, including the density and AOs, on
+it.
 
 Grid Extrapolation
 ------------------

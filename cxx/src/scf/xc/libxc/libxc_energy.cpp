@@ -15,34 +15,34 @@
  */
 
 #include "libxc.hpp"
+#include <scf/property_types/quadrature.hpp>
 #include <simde/simde.hpp>
 
 namespace scf::xc::libxc {
 namespace {
 
-const auto desc = R"()";
+const auto desc = R"(
+Exchange-Correlation Energy Quadrature via LibXC
+================================================
+
+Evaluates the exchange-correlation energy of a restricted wavefunction by
+quadrature on the provided grid, using LibXC to evaluate the LDA functional.
+Only double-precision densities are supported.
+)";
 
 } // namespace
 
-using XC_e_t = simde::type::XC_e_type;
-
-template<typename WFType>
-using pt = simde::eval_braket<WFType, XC_e_t, WFType>;
-
-using grid_pt     = simde::MolecularGrid;
+using pt          = scf::property_types::xc_energy_quadrature;
 using rho2grid_pt = simde::EDensityCollocationMatrix;
 
-MODULE_CTOR(LibXCEnergy) {
-    using wf_type = simde::type::rscf_wf;
-    satisfies_property_type<pt<wf_type>>();
+MODULE_CTOR(LibXCEnergyQuadrature) {
+    satisfies_property_type<pt>();
     description(desc);
-    add_submodule<grid_pt>("Integration grid");
     add_submodule<rho2grid_pt>("Density on a grid");
 }
 
-MODULE_RUN(LibXCEnergy) {
-    using wf_type        = simde::type::rscf_wf;
-    const auto& [braket] = pt<wf_type>::unwrap_inputs(inputs);
+MODULE_RUN(LibXCEnergyQuadrature) {
+    const auto& [braket, grid] = pt::unwrap_inputs(inputs);
 
     const auto& bra_wf = braket.bra();
     const auto& xc_op  = braket.op();
@@ -53,14 +53,6 @@ MODULE_RUN(LibXCEnergy) {
 
     const auto func_name = xc_op.get_functional_name();
     const auto& P        = xc_op.get_rhs_particle();
-    const auto& aos      = P.basis_set().ao_basis_set();
-
-    // Molecule from AOs
-    const auto mol = libxc::aos2molecule(aos);
-
-    // Get grid
-    auto& grid_mod   = submods.at("Integration grid");
-    const auto& grid = grid_mod.run_as<simde::MolecularGrid>(mol);
 
     // Get density on grid
     auto rho_mod    = submods.at("Density on a grid");
@@ -75,7 +67,7 @@ MODULE_RUN(LibXCEnergy) {
     exc_xc("") = weight("i") * x_xc("i");
 
     auto rv = results();
-    return pt<wf_type>::wrap_results(rv, exc_xc);
+    return pt::wrap_results(rv, exc_xc);
 }
 
 } // namespace scf::xc::libxc
