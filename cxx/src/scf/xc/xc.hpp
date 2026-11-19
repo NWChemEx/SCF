@@ -17,8 +17,16 @@
 #pragma once
 #include <pluginplay/pluginplay.hpp>
 #include <scf/property_types/quadrature.hpp>
+#include <simde/simde.hpp>
+#include <string>
+#include <vector>
 
 namespace scf::xc {
+
+/// The property type for the XC energy of a restricted SCF wavefunction
+using xc_energy_pt =
+  simde::eval_braket<simde::type::rscf_wf, simde::type::XC_e_type,
+                     simde::type::rscf_wf>;
 
 DECLARE_MODULE(AOsOnGrid);
 DECLARE_MODULE(Density2Grid);
@@ -42,6 +50,49 @@ extern template struct ReferenceGridError<
   scf::property_types::xc_energy_quadrature>;
 extern template struct ReferenceGridError<
   scf::property_types::xc_potential_quadrature>;
+
+/** @brief Forwards an XC calculation to the module for its functional.
+ *
+ *  The functional is read from the XC operator of the input braket. Each
+ *  functional in xc_dispatch_table() is a submodule, keyed by
+ *  XCDispatchEntry::key.
+ *
+ *  @tparam PT The property type of the XC calculation, i.e.,
+ *             simde::aos_xc_e_aos or xc_energy_pt.
+ */
+template<typename PT>
+DECLARE_MODULE(XCDispatcher);
+
+extern template struct XCDispatcher<simde::aos_xc_e_aos>;
+extern template struct XCDispatcher<xc_energy_pt>;
+
+/// An XC functional and the modules which, by default, evaluate it
+struct XCDispatchEntry {
+    /// The functional
+    chemist::qm_operator::xc_functional functional;
+
+    /// The key of the functional's submodule in the XC dispatchers
+    std::string key;
+
+    /// The key of the module computing the functional's XC potential
+    std::string potential;
+
+    /// The key of the module computing the functional's XC energy
+    std::string energy;
+};
+
+/** @brief The functionals the XC dispatchers support in this build.
+ *
+ *  SVWN3 always uses the native modules. The remaining functionals use GauXC,
+ *  if SCF was built with it, and otherwise LibXC, if SCF was built with it
+ *  and LibXC supports the functional.
+ *
+ *  @return One entry per supported functional.
+ *
+ *  @throw std::bad_alloc if there is a problem allocating the table. Strong
+ *                        throw guarantee.
+ */
+std::vector<XCDispatchEntry> xc_dispatch_table();
 
 void set_defaults(pluginplay::ModuleMap& modules);
 void load_modules(pluginplay::ModuleMap& modules);

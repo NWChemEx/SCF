@@ -38,19 +38,8 @@ inline void set_defaults(pluginplay::ModuleMap& modules) {
     // modules.change_submod(ao_driver, "Fock matrix", "Fock Matrix Builder");
     modules.change_submod(ao_driver, "Density matrix",
                           "Density matrix builder");
-// GauXC and LibXC's "XC Potential"/"XC Energy" modules satisfy the same
-// property types (see scf::xc::gauxc::xc_potential.cpp/xc_energy.cpp and
-// scf::xc::libxc::libxc_potential.cpp/libxc_energy.cpp), so either is a
-// valid default; GauXC is preferred when both are available. Neither module
-// exists in the plugin when its BUILD_* option is off, and
-// ModuleMap::change_submod throws if pointed at a key that isn't registered, so
-// this must mirror the same guards scf::xc::set_defaults uses (see xc.cpp)
-// rather than unconditionally defaulting to GauXC.
-#ifdef BUILD_GAUXC
-    modules.change_submod(ao_driver, "XC Potential", "GauXC XC Potential");
-#elif defined(BUILD_LIBXC)
-    modules.change_submod(ao_driver, "XC Potential", "LibXC Potential");
-#endif
+    // The dispatchers pick the XC module from the operator's functional
+    modules.change_submod(ao_driver, "XC Potential", "XC Potential Dispatcher");
 
     modules.change_submod("Fock Matrix Builder", "Two center evaluator",
                           ao_driver);
@@ -61,11 +50,8 @@ inline void set_defaults(pluginplay::ModuleMap& modules) {
 
     modules.change_submod("Electronic energy", "determinant driver",
                           det_driver);
-#ifdef BUILD_GAUXC
-    modules.change_submod("Electronic energy", "XC Energy", "GauXC XC Energy");
-#elif defined(BUILD_LIBXC)
-    modules.change_submod("Electronic energy", "XC Energy", "LibXC Energy");
-#endif
+    modules.change_submod("Electronic energy", "XC Energy",
+                          "XC Energy Dispatcher");
 }
 
 } // namespace scf::matrix_builder

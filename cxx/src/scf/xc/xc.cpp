@@ -48,6 +48,9 @@ void load_modules(pluginplay::ModuleMap& modules) {
     modules.add_module<Density2Grid>("Density2Grid");
     modules.add_module<UQXCEnergy>("UQ XC Energy");
     modules.add_module<UQXCPotential>("UQ XC Potential");
+    modules.add_module<XCDispatcher<simde::aos_xc_e_aos>>(
+      "XC Potential Dispatcher");
+    modules.add_module<XCDispatcher<xc_energy_pt>>("XC Energy Dispatcher");
 
     using scf::property_types::xc_energy_quadrature;
     using scf::property_types::xc_potential_quadrature;
@@ -72,6 +75,12 @@ void set_defaults(pluginplay::ModuleMap& modules) {
     libxc::set_defaults(modules);
     native::set_defaults(modules);
     modules.change_submod("Density2Grid", "AOs on a grid", "AOs on a grid");
+
+    for(const auto& entry : xc_dispatch_table()) {
+        modules.change_submod("XC Potential Dispatcher", entry.key,
+                              entry.potential);
+        modules.change_submod("XC Energy Dispatcher", entry.key, entry.energy);
+    }
 
     // The UQ XC modules default to the native SVWN3 quadratures, since they
     // support the UQ types, and to the reference grid error models. The

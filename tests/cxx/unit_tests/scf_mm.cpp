@@ -132,6 +132,19 @@ TEST_CASE("SCF plugin") {
         REQUIRE(modules.has_submod("Loop", "Charge-charge"));
     }
 
+    SECTION("XC modules are picked by the functional") {
+        auto submod = [&](const std::string& mod, const std::string& key) {
+            return modules.at(mod)->submods().at(key).value();
+        };
+        const auto v_key = "XC Potential Dispatcher";
+        const auto e_key = "XC Energy Dispatcher";
+        REQUIRE(submod("SCF integral driver", "XC Potential") ==
+                *modules.at(v_key));
+        REQUIRE(submod("Electronic energy", "XC Energy") == *modules.at(e_key));
+        REQUIRE(submod(v_key, "SVWN3") == *modules.at("SVWN3 Potential"));
+        REQUIRE(submod(e_key, "SVWN3") == *modules.at("SVWN3 Energy"));
+    }
+
     SECTION("Ordinary SCF attaches no uncertainty") {
         const auto& loop = *modules.at("Loop");
         REQUIRE(loop.submods().at("MO uncertainty").value() ==
