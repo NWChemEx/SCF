@@ -47,6 +47,12 @@ class TestQCUPSCF(unittest.TestCase):
         egy = self.mm.run_as(self.ao_energy, "SCF Driver", self.aos, self.sys)
         self.assertAlmostEqual(np.array(egy), -74.94208027122616, places=6)
 
+    def test_qcup_dft(self):
+        # QCUP SCF reaches through "SCF Driver", which wires the functional
+        self.mm.change_input("SCF Driver", "DFT Functional", "SVWN3")
+        egy = self.mm.run_as(self.ao_energy, "QCUP SCF", self.aos, self.sys)
+        self.assertIsNotNone(egy)
+
     def setUp(self):
         # Setup Module Manager
         self.mm = pp.ModuleManager(pz.runtime.RuntimeView())

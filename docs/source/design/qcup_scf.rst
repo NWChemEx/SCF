@@ -309,6 +309,19 @@ a submodule, ``"SCF"``, bound to ``SCF Driver``, and whose ``run_`` runs
 that submodule with its own inputs. The ``"SCF"`` submodule is also what puts
 ``SCF Driver``'s call graph in the driver's call graph.
 
+``SCF Driver`` is itself a driver. Its ``"DFT Functional"`` input chooses
+between Hartree-Fock (``"None"``, the default) and Kohn-Sham DFT, *e.g.*,
+``"SVWN3"``, for which it wires the Kohn-Sham operators into ``Loop`` and
+``Core guess``. ``QCUP SCF`` reaches through ``SCF Driver`` to the modules
+below it, as the driver design allows, so it does not repeat that input. To
+run an uncertainty-quantified DFT calculation, the user sets
+``"DFT Functional"`` on ``SCF Driver`` and runs ``QCUP SCF``:
+
+.. code-block:: python
+
+   mm.change_input("SCF Driver", "DFT Functional", "SVWN3")
+   e = mm.run_as(simde.AOEnergy(), "QCUP SCF", aos, sys)
+
 The driver lives in SCF, even though most of the modules it configures come
 from Integrals. This follows the rules in the driver design for drivers and
 plugins:

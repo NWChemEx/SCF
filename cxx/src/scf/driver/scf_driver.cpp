@@ -14,15 +14,49 @@
  * limitations under the License.
  */
 
+#include "../xc/xc.hpp"
 #include "driver.hpp"
+#include <algorithm>
+#include <string>
 
 namespace scf::driver {
 namespace {
 
 const auto desc = R"(
+SCF Driver
+----------
+
+Computes the restricted SCF energy of a chemical system: "Hamiltonian" builds
+the Hamiltonian, "Guess" the initial wavefunction, and "Optimizer" converges
+it.
+
+"DFT Functional" chooses between Hartree-Fock and Kohn-Sham DFT. With "None",
+the default, the modules are used as they are wired, i.e., Hartree-Fock by
+default. With the name of an XC functional, e.g., "SVWN3", this driver wires
+the Kohn-Sham operators, with that functional, into "Loop" and "Core guess".
+Which functionals are available depends on how SCF was built; the input's
+check lists them.
 )";
 
+/// The value of "DFT Functional" which leaves the wiring as it is
+const std::string no_functional = "None";
+
+/// The values "DFT Functional" may have, separated by commas
+std::string dft_functional_names() {
+    std::string rv = no_functional;
+    for(const auto& entry : xc::xc_dispatch_table()) rv += ", " + entry.key;
+    return rv;
 }
+
+/// Is @p name a value "DFT Functional" may have?
+bool is_dft_functional(const std::string& name) {
+    if(name == no_functional) return true;
+    const auto table = xc::xc_dispatch_table();
+    return std::any_of(table.begin(), table.end(),
+                       [&](const auto& entry) { return entry.key == name; });
+}
+
+} // namespace
 
 using simde::type::hamiltonian;
 
@@ -42,7 +76,7 @@ using egy_pt = simde::EvaluateBraKet<braket_t<WfType>>;
 template<typename WfType>
 using opt_pt = simde::Optimize<egy_pt<WfType>, WfType>;
 
-MODULE_CTOR(SCFDriver) {
+DRIVER_CTOR(SCFDriver) {
     using wf_type = simde::type::rscf_wf;
 
     description(desc);
@@ -50,9 +84,33 @@ MODULE_CTOR(SCFDriver) {
     add_submodule<ham_pt>("Hamiltonian");
     add_submodule<guess_pt<wf_type>>("Guess");
     add_submodule<opt_pt<wf_type>>("Optimizer");
+
+    const std::string dft_key = "DFT Functional";
+    pluginplay::ModuleInput::validity_check<std::string> check{
+      is_dft_functional};
+    add_input<std::string>(dft_key)
+      .set_description("The XC functional, or \"None\" for Hartree-Fock")
+      .set_default(no_functional)
+      .add_check(check, "Is one of: " + dft_functional_names());
+
+    // One branch per functional. There is no branch for "None", so that
+    // Hartree-Fock leaves the wiring as it is.
+    const auto RKS_op = "Restricted Kohn-Sham Op";
+    const auto rks_op = "Restricted One-Electron Kohn-Sham Op";
+    pluginplay::ConditionalWiring* chain = nullptr;
+    for(const auto& entry : xc::xc_dispatch_table()) {
+        chain = chain ? &chain->otherwise(dft_key, entry.key) :
+                        &when(dft_key, entry.key);
+        chain->set_input(RKS_op, "XC Potential", entry.functional)
+          .set_input(rks_op, "XC Potential", entry.functional)
+          .set_submod("Loop", "One-electron Fock operator", rks_op)
+          .set_submod("Loop", "Fock operator", RKS_op)
+          .set_submod("Core guess", "Build Fock operator", rks_op)
+          .required();
+    }
 }
 
-MODULE_RUN(SCFDriver) {
+DRIVER_RUN(SCFDriver) {
     using wf_type = simde::type::rscf_wf;
 
     const auto& [ao_params, sys] = pt::unwrap_inputs(inputs);

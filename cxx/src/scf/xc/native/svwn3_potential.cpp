@@ -15,6 +15,7 @@
  */
 
 #include "../libxc/libxc.hpp"
+#include "../xc.hpp"
 #include "native.hpp"
 #include <scf/property_types/quadrature.hpp>
 #include <simde/simde.hpp>
@@ -65,13 +66,14 @@ MODULE_RUN(SVWN3PotentialQuadrature) {
     const auto& P   = xc_op.get_rhs_particle();
     const auto& aos = bra_aos.ao_basis_set();
 
-    // Get AOs on the grid
-    auto& aos_on_grid_mod   = submods.at("AOs on a grid");
-    const auto& aos_on_grid = aos_on_grid_mod.run_as<ao_on_grid_pt>(grid, aos);
-
     // Get density on grid
     auto& rho_mod   = submods.at("Density on a grid");
     const auto& rho = rho_mod.run_as<rho2grid_pt>(grid, P);
+
+    // Get AOs on the grid, as the type of the density, e.g., an uncertain type
+    auto& aos_on_grid_mod  = submods.at("AOs on a grid");
+    const auto aos_on_grid = scf::xc::to_type_of(
+      aos_on_grid_mod.run_as<ao_on_grid_pt>(grid, aos), rho);
 
     auto v_xc    = svwn3_potential(rho);
     auto weights = tensorify_weights(grid, rho);

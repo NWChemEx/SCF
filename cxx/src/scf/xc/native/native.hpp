@@ -71,11 +71,12 @@ simde::type::tensor svwn3_potential(const simde::type::tensor& rho_on_grid);
  *
  *  Unlike libxc::tensorify_weights, the weights are not assumed to be
  *  doubles. Instead they are extracted as the floating-point type of @p like.
+ *  Weights which are doubles are converted to that type, with no uncertainty.
  *
  *  @param[in] grid The grid whose weights are being extracted.
  *  @param[in] like A tensor holding the floating-point type to use.
  *
- *  @throw std::runtime_error if the weights of @p grid can not be retrieved as
+ *  @throw std::runtime_error if the weights of @p grid are neither doubles nor
  *                            @p like's floating-point type. Strong throw
  *                            guarantee.
  */

@@ -94,6 +94,20 @@ struct XCDispatchEntry {
  */
 std::vector<XCDispatchEntry> xc_dispatch_table();
 
+/** @brief Returns @p t converted to the floating-point type of @p like.
+ *
+ *  Tensors of different floating-point types can not be contracted, so the
+ *  quadratures use this to convert, e.g., the AOs on a grid, which hold
+ *  doubles, to the type of an uncertain density. @p t is returned as is if it
+ *  already has that type. Otherwise it must hold doubles, each of which
+ *  becomes an element of the new type with no uncertainty.
+ *
+ *  @throw std::runtime_error if @p t has neither the type of @p like nor
+ *                            double. Strong throw guarantee.
+ */
+simde::type::tensor to_type_of(const simde::type::tensor& t,
+                               const simde::type::tensor& like);
+
 void set_defaults(pluginplay::ModuleMap& modules);
 void load_modules(pluginplay::ModuleMap& modules);
 

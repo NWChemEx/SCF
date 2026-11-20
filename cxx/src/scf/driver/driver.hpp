@@ -20,7 +20,7 @@
 
 namespace scf::driver {
 
-DECLARE_MODULE(SCFDriver);
+DECLARE_DRIVER(SCFDriver);
 DECLARE_MODULE(SCFLoop);
 DECLARE_DRIVER(QCUPSCF);
 

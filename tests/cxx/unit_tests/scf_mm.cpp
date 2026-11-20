@@ -164,6 +164,15 @@ TEST_CASE("SCF plugin") {
         REQUIRE(modules.at("QCUP SCF")->is_driver());
     }
 
+    SECTION("SCF Driver is a driver which chooses the DFT functional") {
+        const auto& driver = *modules.at("SCF Driver");
+        REQUIRE(driver.is_driver());
+        const auto& func = driver.inputs().at("DFT Functional");
+        REQUIRE(func.value<std::string>() == "None");
+        REQUIRE(func.is_valid(std::string("SVWN3")));
+        REQUIRE_FALSE(func.is_valid(std::string("Not a functional")));
+    }
+
     pluginplay::ModuleManager mm;
     mm.load_plugin<scf::SCF>();
 

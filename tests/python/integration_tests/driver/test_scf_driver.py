@@ -39,14 +39,7 @@ class TestSCFDriver(unittest.TestCase):
         if self.mm.count("GauXC XC Potential") == 0:
             self.skipTest("SCF was built without GauXC; PBE is unavailable")
 
-        func = chemist.qm_operator.xc_functional.PBE
-        RKS_op = "Restricted Kohn-Sham Op"
-        rks_op = "Restricted One-Electron Kohn-Sham Op"
-        self.mm.change_input(RKS_op, "XC Potential", func)
-        self.mm.change_input(rks_op, "XC Potential", func)
-        self.mm.change_submod("Loop", "One-electron Fock operator", rks_op)
-        self.mm.change_submod("Loop", "Fock operator", RKS_op)
-        self.mm.change_submod("Core guess", "Build Fock Operator", rks_op)
+        self.mm.change_input("SCF Driver", "DFT Functional", "PBE")
         egy = self.mm.run_as(self.ao_energy, "SCF Driver", self.aos, self.sys)
         self.assertAlmostEqual(np.array(egy), -75.22989870343218, places=6)
 

@@ -65,14 +65,32 @@ struct ElementwiseKernel {
     FunctionType fxn;
 };
 
-/// Extracts the grid weights as the type of the visited buffer
+/** @brief Extracts the grid weights as the type of the visited buffer.
+ *
+ *  Weights which are doubles, e.g., those of an ordinary grid used with an
+ *  uncertain density, become values of that type with no uncertainty.
+ */
 struct WeightsKernel {
     template<typename FloatType>
     simde::type::tensor operator()(const std::span<FloatType>&) {
         using clean_type = std::remove_cv_t<FloatType>;
+        using types      = tensorwrapper::types::floating_point_types;
+        auto to_clean    = [](auto weight) -> clean_type {
+            using weight_type = std::remove_cv_t<decltype(weight)>;
+            if constexpr(std::is_same_v<weight_type, clean_type>) {
+                return weight;
+            } else if constexpr(std::is_same_v<weight_type, double>) {
+                return clean_type(weight);
+            } else {
+                throw std::runtime_error(
+                  "Native XC: the grid weights must be doubles or the type of "
+                     "the density");
+            }
+        };
         std::vector<clean_type> weights(m_pgrid->size());
         for(std::size_t i = 0; i < weights.size(); ++i)
-            weights[i] = m_pgrid->at(i).get_weight().value<clean_type>();
+            weights[i] = wtf::fp::visit_float_view<types>(
+              to_clean, m_pgrid->at(i).get_weight());
         return make_vector(std::move(weights));
     }
 

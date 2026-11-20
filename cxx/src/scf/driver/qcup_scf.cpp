@@ -29,7 +29,10 @@ tracked as uncertainties: the calculation uses the uncertain type chosen with
 "UQ Type", and the result is an energy with a bound or estimate of its error.
 
 This driver runs the "SCF" submodule, which is "SCF Driver" by default, and
-only changes how the modules below it are wired:
+only changes how the modules below it are wired. "SCF Driver" is itself a
+driver, which this driver reaches through: e.g., setting "SCF Driver"'s "DFT
+Functional" to "SVWN3" makes this an uncertainty-quantified SVWN3
+calculation. The settings of this driver are:
 
 - "UQ Type" configures the Integrals plugin's "UQ Initializer", which every
   module that creates uncertain values from doubles uses.

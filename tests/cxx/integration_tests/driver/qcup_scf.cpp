@@ -184,6 +184,25 @@ TEST_CASE("QCUP SCF") {
         REQUIRE(c == c_no);
         REQUIRE(r > r_no);
     }
+
+    SECTION("DFT") {
+        // QCUP SCF reaches through "SCF Driver", which wires the functional
+        mm.change_input("SCF Driver", "DFT Functional", std::string("SVWN3"));
+
+        // The SVWN3 energy, without screening
+        using tensorwrapper::buffer::get_raw_data;
+        using tensorwrapper::buffer::make_contiguous;
+        const auto e_ref = mm.run_as<pt>("SCF Driver", aos, h2o);
+        const auto ref =
+          get_raw_data<double>(make_contiguous(e_ref.buffer()))[0];
+
+        const auto e           = mm.run_as<pt>("QCUP SCF", aos, h2o);
+        const auto [c, radius] = center_and_radius<idouble>(e);
+        REQUIRE(std::fabs(c - ref) <= radius);
+
+        // Hartree-Fock would be within a few microhartree of "screened"
+        REQUIRE(std::fabs(c - screened) > 1.0E-3);
+    }
 }
 
 // "SCF Driver" only returns the energy, which does not depend on the MO
