@@ -321,10 +321,11 @@ the difference, :math:`d = E^{Quad}_{\mathrm{ref}} - E^{Quad}`, to estimate the
 size of :math:`\delta E^{Quad}`. The deviation is :math:`|d|` on both sides of
 the value. The sign of :math:`d` is not used as the direction of the error:
 refinement need not converge monotonically, and in the grid-incompleteness
-study (``uncertainty/grid_incompleteness`` in this repository; SVWN3 for He,
-H\ :sub:`2`, and water in STO-3G through aug-cc-pVQZ) the error of the
-quadrature changes sign as the grid is refined, *e.g.*, for H\ :sub:`2` in
-aug-cc-pVTZ it is positive with 20 radial points and negative with 50. A
+study (the ``grid_incompleteness`` package of the QCUPDFT repository in the
+QCUncertainty organization; SVWN3 for He, H\ :sub:`2`, and water in STO-3G
+through aug-cc-pVQZ) the error of the quadrature changes sign as the grid is
+refined, *e.g.*, for H\ :sub:`2` in aug-cc-pVTZ it is positive with 20 radial
+points and negative with 50. A
 deviation only on the side of the reference value would then exclude the exact
 integral. This mirrors the ``Analytic Error`` ERI error model and its benchmark
 ERIs. It is an estimate, not a bound, and costs one evaluation on the finer

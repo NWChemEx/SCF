@@ -27,7 +27,6 @@ header:
     - build/**
     - '**/venv/**'
     - '**/.venv/**'
-    - 'uncertainty/grid_incompleteness/*.pkl'
     - '**/.pytest_cache/**'
 
   comment: never
