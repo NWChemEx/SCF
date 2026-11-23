@@ -166,7 +166,7 @@ TEST_CASE("ReferenceGridError (potential)") {
         REQUIRE(doubles(rv) == doubles(value));
     }
 
-    SECTION("throws if the value does not hold doubles") {
+    SECTION("throws if the value holds neither doubles nor a UQ type") {
         tensorwrapper::shape::Smooth shape{2, 2};
         tensorwrapper::buffer::Contiguous buffer(
           std::vector<float>{1.0f, 2.0f, 3.0f, 4.0f}, shape);
@@ -255,6 +255,36 @@ TEST_CASE("ReferenceGridError (potential)") {
         for(std::size_t i = 0; i < corr.size(); ++i) {
             REQUIRE(b[i][0] == corr[i][0]);
             REQUIRE(b[i][2] == corr[i][1]);
+        }
+    }
+
+    SECTION("an uncertain value keeps its type and uncertainty") {
+        // Intervals of radius r around the centers of x
+        auto make_intervals = [](const std::vector<double>& x, double r) {
+            using tensorwrapper::types::construct_uq_type;
+            std::vector<idouble> data;
+            for(auto xi : x) data.push_back(construct_uq_type<idouble>(xi, r));
+            tensorwrapper::shape::Smooth shape{2, 2};
+            tensorwrapper::buffer::Contiguous buffer(std::move(data), shape);
+            return tensor(shape, std::move(buffer));
+        };
+        auto uq_value = make_intervals({1.0, 2.0, 3.0, 4.0}, 0.1);
+        // d is the largest distance from the value's center to the
+        // reference's range: {0.7, 0.2, 1.2, 0.45}
+        auto uq_ref = make_intervals({1.5, 2.0, 2.0, 4.25}, 0.2);
+
+        // The UQ Initializer is not used: the result has the value's type
+        auto rv = run_model<v_quad_pt>(mm, key, braket, uq_value, uq_ref,
+                                       UQKind::triplex);
+        auto b  = bounds<idouble>(rv);
+
+        // The value's radius plus d
+        std::vector<std::array<double, 2>> corr{
+          {0.2, 1.8}, {1.7, 2.3}, {1.7, 4.3}, {3.45, 4.55}};
+        using Catch::Matchers::WithinAbs;
+        for(std::size_t i = 0; i < corr.size(); ++i) {
+            REQUIRE_THAT(b[i][0], WithinAbs(corr[i][0], 1.0E-12));
+            REQUIRE_THAT(b[i][2], WithinAbs(corr[i][1], 1.0E-12));
         }
     }
 #endif

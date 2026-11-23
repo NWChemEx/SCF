@@ -16,6 +16,7 @@
 
 #include "libxc/libxc.hpp"
 #include "xc.hpp"
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <integratorxx/quadratures/s2/lebedev_laikov.hpp>
@@ -39,11 +40,13 @@ incompleteness of its grid, and attaches it to the result of the quadrature.
 
 The quadrature is evaluated a second time, by the "Reference XC Module"
 submodule, on a grid which is finer than the given grid. Let d be the
-reference value minus the given value. The given value becomes an uncertain
-value whose nominal value is the given value and whose deviation is |d| on
-both sides. This is done element-wise, e.g., for each element of the XC
-potential. The deviation is symmetric because the sign of d is not a reliable
-estimate of the direction of the error: as a grid is refined, the error of
+largest distance between the center of the given value and the range of the
+reference value, i.e., the largest of |upper(ref) - center(value)| and
+|lower(ref) - center(value)|. For a reference which holds doubles, this is
+|ref - value|. The given value becomes an uncertain value whose nominal value
+is the given value and whose deviation is d on both sides. This is done element-wise, e.g., for each element of the XC
+potential. The deviation is symmetric because the side the reference is on
+is not a reliable estimate of the direction of the error: as a grid is refined, the error of
 the quadrature can change sign.
 
 The finer grid is chosen from the radial and angular sizes the given grid
@@ -57,7 +60,10 @@ grid" submodule builds the finer grid. It is run with its "Radial Size" and
 e.g., "Grid From IntegratorXX". Its other inputs are used as they are, and
 should match those used to make the given grid.
 
-The kind of uncertain value comes from the "UQ Initializer" submodule.
+If the given value holds doubles, the kind of uncertain value comes from the
+"UQ Initializer" submodule. If the given value is already uncertain, e.g.,
+because the density is, it keeps its type and its uncertainty, and each
+element gets an extra, independent uncertainty of d.
 
 This is an estimate, not a bound: the difference between two grids can be
 smaller than the error of the coarser one.
@@ -66,7 +72,7 @@ The "Reference XC Module" must evaluate the same functional as the module
 whose result is being given. Each call costs one quadrature on the finer grid,
 including the density and AOs on that grid.
 
-The given value must hold doubles.
+The given value must hold doubles or an uncertain type.
 )";
 
 /// Returns the AO basis set of an XC energy or XC potential braket
@@ -80,21 +86,68 @@ const auto& get_aos(const BraKetType& braket) {
     }
 }
 
-/// Returns the elements of @p t, which must hold doubles, in row-major order
-std::vector<double> to_doubles(const simde::type::tensor& t,
-                               const std::string& what) {
+/// The centers, lower bounds, and upper bounds of the elements of a tensor
+struct Bounds {
+    std::vector<double> center;
+    std::vector<double> lower;
+    std::vector<double> upper;
+};
+
+/// Returns the bounds of the elements of @p t, in row-major order
+Bounds get_bounds(const simde::type::tensor& t) {
     using tensorwrapper::buffer::make_contiguous;
     using tensorwrapper::buffer::visit_contiguous_buffer;
-    auto visitor = [&](auto span) -> std::vector<double> {
-        using value_type = typename decltype(span)::value_type;
-        if constexpr(std::is_same_v<std::remove_cv_t<value_type>, double>) {
-            return std::vector<double>(span.begin(), span.end());
-        } else {
-            throw std::runtime_error("Reference Grid Error: the " + what +
-                                     " must hold doubles");
+    using tensorwrapper::types::uq_center;
+    using tensorwrapper::types::uq_lower;
+    using tensorwrapper::types::uq_upper;
+    auto visitor = [](auto span) {
+        Bounds rv;
+        for(const auto& x : span) {
+            rv.center.push_back(double(uq_center(x)));
+            rv.lower.push_back(double(uq_lower(x)));
+            rv.upper.push_back(double(uq_upper(x)));
         }
+        return rv;
     };
     return visit_contiguous_buffer(visitor, make_contiguous(t.buffer()));
+}
+
+/// Does @p t hold doubles?
+bool holds_doubles(const simde::type::tensor& t) {
+    using tensorwrapper::buffer::make_contiguous;
+    using tensorwrapper::buffer::visit_contiguous_buffer;
+    auto visitor = [](auto span) {
+        using value_type = typename decltype(span)::value_type;
+        return std::is_same_v<std::remove_cv_t<value_type>, double>;
+    };
+    return visit_contiguous_buffer(visitor, make_contiguous(t.buffer()));
+}
+
+/** @brief Adds an independent uncertainty of radius @p d[i] to element i of
+ *         @p t, which must hold an uncertain type, in place.
+ *
+ *  @throw std::runtime_error if @p t does not hold an uncertain type.
+ */
+void add_errors(simde::type::tensor& t, const std::vector<double>& d) {
+    using tensorwrapper::buffer::make_contiguous;
+    using tensorwrapper::buffer::visit_contiguous_buffer;
+    auto visitor = [&](auto span) {
+        using element_t = typename decltype(span)::element_type;
+        using clean_t   = std::remove_cv_t<element_t>;
+        if constexpr(!std::is_const_v<element_t> &&
+                     tensorwrapper::types::is_uq_type_v<clean_t>) {
+            using tensorwrapper::types::construct_uq_type;
+            using tensorwrapper::types::uq_center;
+            using center_t = decltype(uq_center(std::declval<clean_t>()));
+            for(std::size_t i = 0; i < span.size(); ++i)
+                span[i] = span[i] + construct_uq_type<clean_t>(center_t(0),
+                                                               center_t(d[i]));
+        } else {
+            throw std::runtime_error("Reference Grid Error: the given value "
+                                     "must hold doubles or an uncertain type");
+        }
+    };
+    visit_contiguous_buffer(visitor, make_contiguous(t.buffer()));
 }
 
 /// Returns the shape of @p t
@@ -217,12 +270,25 @@ TEMPLATED_MODULE_RUN(ReferenceGridError, QuadPT) {
     auto& ref_mod  = submods.at("Reference XC Module");
     const auto ref = ref_mod.run_as<QuadPT>(braket, ref_grid);
 
-    const auto v = to_doubles(value, "given value");
-    const auto r = to_doubles(ref, "reference value");
-    if(v.size() != r.size())
+    const auto v = get_bounds(value).center;
+    const auto r = get_bounds(ref);
+    if(v.size() != r.center.size())
         throw std::runtime_error(
           "Reference Grid Error: the given and reference values differ in "
           "size");
+
+    std::vector<double> d(v.size());
+    for(std::size_t i = 0; i < v.size(); ++i)
+        d[i] =
+          std::max(std::fabs(r.upper[i] - v[i]), std::fabs(r.lower[i] - v[i]));
+
+    // An uncertain value keeps its type and gets the error added to it
+    if(!holds_doubles(value)) {
+        auto rv_t = value;
+        add_errors(rv_t, d);
+        auto rv = results();
+        return error_pt<QuadPT>::wrap_results(rv, std::move(rv_t));
+    }
 
     const auto& factory = submods.at("UQ Initializer").run_as<uq_pt>();
 
@@ -232,8 +298,7 @@ TEMPLATED_MODULE_RUN(ReferenceGridError, QuadPT) {
         std::vector<float_type> elements;
         elements.reserve(v.size());
         for(std::size_t i = 0; i < v.size(); ++i) {
-            const auto d = std::fabs(r[i] - v[i]);
-            auto element = factory(v[i], d, d);
+            auto element = factory(v[i], d[i], d[i]);
             elements.push_back(wtf::fp::float_cast<float_type>(element));
         }
         tensorwrapper::buffer::Contiguous buffer(std::move(elements), shape);

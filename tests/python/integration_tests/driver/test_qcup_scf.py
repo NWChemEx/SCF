@@ -48,8 +48,12 @@ class TestQCUPSCF(unittest.TestCase):
         self.assertAlmostEqual(np.array(egy), -74.94208027122616, places=6)
 
     def test_qcup_dft(self):
-        # QCUP SCF reaches through "SCF Driver", which wires the functional
-        self.mm.change_input("SCF Driver", "DFT Functional", "SVWN3")
+        # Coarse grids, so that the reference grid is cheap
+        self.mm.change_input("Grid From IntegratorXX", "Radial Size", 20)
+        self.mm.change_input("Grid From IntegratorXX", "Angular Size", 50)
+
+        # Forwarded to "SCF Driver", with the error of the grid attached
+        self.mm.change_input("QCUP SCF", "DFT Functional", "SVWN3")
         egy = self.mm.run_as(self.ao_energy, "QCUP SCF", self.aos, self.sys)
         self.assertIsNotNone(egy)
 

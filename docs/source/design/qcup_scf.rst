@@ -312,15 +312,23 @@ that submodule with its own inputs. The ``"SCF"`` submodule is also what puts
 ``SCF Driver`` is itself a driver. Its ``"DFT Functional"`` input chooses
 between Hartree-Fock (``"None"``, the default) and Kohn-Sham DFT, *e.g.*,
 ``"SVWN3"``, for which it wires the Kohn-Sham operators into ``Loop`` and
-``Core guess``. ``QCUP SCF`` reaches through ``SCF Driver`` to the modules
-below it, as the driver design allows, so it does not repeat that input. To
-run an uncertainty-quantified DFT calculation, the user sets
-``"DFT Functional"`` on ``SCF Driver`` and runs ``QCUP SCF``:
+``Core guess``. ``QCUP SCF`` has a ``"DFT Functional"`` input too. If it is
+not ``"None"``, ``QCUP SCF`` forwards it to ``SCF Driver``, and, since the
+quadrature grid is a numerical approximation like the screening of the ERIs,
+also wires its error in: the XC potential and the XC energy are computed by
+``UQ XC Potential`` and ``UQ XC Energy``, whose error models are
+``Reference Grid XC Potential Error`` and ``Reference Grid XC Energy Error``.
+``QCUP SCF`` reaches through ``SCF Driver`` to the modules below it to do so,
+as the driver design allows:
 
 .. code-block:: python
 
-   mm.change_input("SCF Driver", "DFT Functional", "SVWN3")
+   mm.change_input("QCUP SCF", "DFT Functional", "SVWN3")
    e = mm.run_as(simde.AOEnergy(), "QCUP SCF", aos, sys)
+
+With ``"None"``, ``QCUP SCF`` leaves the wiring of the XC modules as it is.
+Setting ``"DFT Functional"`` on ``SCF Driver`` alone therefore still runs
+that functional, but the error of the grid is not part of the result.
 
 The driver lives in SCF, even though most of the modules it configures come
 from Integrals. This follows the rules in the driver design for drivers and
@@ -362,6 +370,10 @@ with ``"integrals"``.
      - input
      - ``"interval"``
      - ``UQ Initializer``: ``"UQ Type"``
+   * - ``DFT Functional``
+     - input
+     - ``"None"``
+     - ``SCF Driver``: ``"DFT Functional"``, unless ``"None"``
    * - ``ERIs``
      - submodule
      - ``UQ Atom Symm Blocked Driver`` (Integrals)
@@ -418,6 +430,11 @@ Fixed Wiring
 
 - Memoization is turned off for every module except ``ERI4``. This is
   required for now.
+- Unless ``DFT Functional`` is ``"None"``, ``SCF integral driver``'s
+  ``"XC Potential"`` is ``UQ XC Potential`` and ``Electronic energy``'s
+  ``"XC Energy"`` is ``UQ XC Energy``, with ``"Incompleteness Error Model"``
+  set to ``Reference Grid XC Potential Error`` and
+  ``Reference Grid XC Energy Error``, respectively.
 - The cross-plugin defaults that SCF's plugin already sets
   (``Born-Oppenheimer approximation``, ``AO integral driver``, ``Overlap``,
   ``sto-3g SAD density``) apply to the copies as well, because the copies are

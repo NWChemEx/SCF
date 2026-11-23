@@ -15,6 +15,7 @@
  */
 
 #include "driver.hpp"
+#include <string>
 
 namespace scf::driver {
 namespace {
@@ -29,13 +30,19 @@ tracked as uncertainties: the calculation uses the uncertain type chosen with
 "UQ Type", and the result is an energy with a bound or estimate of its error.
 
 This driver runs the "SCF" submodule, which is "SCF Driver" by default, and
-only changes how the modules below it are wired. "SCF Driver" is itself a
-driver, which this driver reaches through: e.g., setting "SCF Driver"'s "DFT
-Functional" to "SVWN3" makes this an uncertainty-quantified SVWN3
-calculation. The settings of this driver are:
+only changes how the modules below it are wired. The settings of this driver
+are:
 
 - "UQ Type" configures the Integrals plugin's "UQ Initializer", which every
   module that creates uncertain values from doubles uses.
+- "DFT Functional" chooses between Hartree-Fock ("None", the default) and
+  Kohn-Sham DFT, e.g., "SVWN3". A functional is forwarded to the "DFT
+  Functional" input of "SCF Driver", which wires the Kohn-Sham operators, and
+  the XC potential and XC energy are computed by "UQ XC Potential" and "UQ XC
+  Energy", which attach the error of the integration grid estimated by
+  "Reference Grid XC Potential Error" and "Reference Grid XC Energy Error".
+  The quadratures of those modules must support the functional and the
+  uncertain type.
 - "ERIs" is used for the four-center ERIs of the Coulomb and exchange
   matrices. By default it attaches the error of "ERI Error Model" to the
   screened ERIs.
@@ -81,6 +88,27 @@ DRIVER_CTOR(QCUPSCF) {
                        "or thresholded affine")
       .set_default(std::string("interval"))
       .set_required_target(uq_initializer, "UQ Type");
+
+    // -- DFT, with the error of the integration grid -------------------------
+    // "None" leaves the wiring as it is, i.e., Hartree-Fock unless the user
+    // set "SCF Driver"'s "DFT Functional" themselves. Any other value is
+    // checked by "SCF Driver"'s "DFT Functional" input.
+    const std::string dft_key = "DFT Functional";
+    add_input<std::string>(dft_key)
+      .set_description("The XC functional, or \"None\" for Hartree-Fock")
+      .set_default(std::string("None"));
+
+    const auto e_error_key = "Reference Grid XC Energy Error";
+    const auto v_error_key = "Reference Grid XC Potential Error";
+    const auto error_model = "Incompleteness Error Model";
+    when(dft_key, std::string("None"))
+      .otherwise()
+      .forward_input("SCF Driver", dft_key, dft_key)
+      .set_submod("SCF integral driver", "XC Potential", "UQ XC Potential")
+      .set_submod("Electronic energy", "XC Energy", "UQ XC Energy")
+      .set_submod("UQ XC Potential", error_model, v_error_key)
+      .set_submod("UQ XC Energy", error_model, e_error_key)
+      .required();
 
     // -- The ERIs and their error model -------------------------------------
     const integrals_key uq_eris{"integrals", "UQ Atom Symm Blocked Driver"};

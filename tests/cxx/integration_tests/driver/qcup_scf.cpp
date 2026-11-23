@@ -186,22 +186,57 @@ TEST_CASE("QCUP SCF") {
     }
 
     SECTION("DFT") {
-        // QCUP SCF reaches through "SCF Driver", which wires the functional
-        mm.change_input("SCF Driver", "DFT Functional", std::string("SVWN3"));
-
-        // The SVWN3 energy, without screening
         using tensorwrapper::buffer::get_raw_data;
         using tensorwrapper::buffer::make_contiguous;
-        const auto e_ref = mm.run_as<pt>("SCF Driver", aos, h2o);
-        const auto ref =
-          get_raw_data<double>(make_contiguous(e_ref.buffer()))[0];
+        auto to_double = [](const tensor_t& t) {
+            return get_raw_data<double>(make_contiguous(t.buffer()))[0];
+        };
 
-        const auto e           = mm.run_as<pt>("QCUP SCF", aos, h2o);
+        // Running a module locks the grid, so each grid gets its own
+        // ModuleManager
+        const auto grid_key = "Grid From IntegratorXX";
+        const auto svwn3    = std::string("SVWN3");
+        auto set_grid       = [&](auto& mm_i, std::size_t radial,
+                            std::size_t angular) {
+            mm_i.change_input(grid_key, "Radial Size", radial);
+            mm_i.change_input(grid_key, "Angular Size", angular);
+        };
+
+        // The SVWN3 energy on the reference grid, without screening
+        auto mm_fine = test_scf::load_modules<double>();
+        mm_fine.change_input("SCF Driver", "DFT Functional", svwn3);
+        set_grid(mm_fine, 30, 110);
+        const auto fine = to_double(mm_fine.run_as<pt>("SCF Driver", aos, h2o));
+
+        // Coarse grids, so that the reference grid, 30 x 110, is cheap
+        set_grid(mm, 20, 50);
+        mm.change_input("SCF Driver", "DFT Functional", svwn3);
+
+        // QCUP SCF forwards the functional to "SCF Driver" and attaches the
+        // error of the grid, so the bound contains the reference grid energy
+        mm.copy_module("QCUP SCF", "QCUP SVWN3");
+        mm.change_input("QCUP SVWN3", "DFT Functional", svwn3);
+        const auto e           = mm.run_as<pt>("QCUP SVWN3", aos, h2o);
         const auto [c, radius] = center_and_radius<idouble>(e);
-        REQUIRE(std::fabs(c - ref) <= radius);
+        REQUIRE(std::fabs(c - fine) <= radius);
 
         // Hartree-Fock would be within a few microhartree of "screened"
         REQUIRE(std::fabs(c - screened) > 1.0E-3);
+
+        // Without its "DFT Functional", QCUP SCF still runs the functional
+        // "SCF Driver" was given, but the bound misses the grid error
+        const auto e_no         = mm.run_as<pt>("QCUP SCF", aos, h2o);
+        const auto [c_no, r_no] = center_and_radius<idouble>(e_no);
+        REQUIRE(std::fabs(c_no - screened) > 1.0E-3);
+        REQUIRE(std::fabs(c_no - fine) > r_no);
+        REQUIRE(radius > r_no);
+
+        // The ModuleManager's XC modules are not changed
+        const auto& v_xc =
+          mm.at("SCF integral driver").submods().at("XC Potential");
+        REQUIRE(&v_xc.value() == &mm.at("XC Potential Dispatcher"));
+        const auto& e_xc = mm.at("Electronic energy").submods().at("XC Energy");
+        REQUIRE(&e_xc.value() == &mm.at("XC Energy Dispatcher"));
     }
 }
 
