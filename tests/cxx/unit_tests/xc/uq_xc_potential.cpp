@@ -15,6 +15,7 @@
  */
 
 #include "../../test_scf.hpp"
+#include <cmath>
 #include <scf/xc/libxc/libxc.hpp>
 
 using grid_pt  = simde::MolecularGrid;
@@ -89,9 +90,9 @@ TEST_CASE("UQXCPotential") {
 }
 
 // Runs the default wiring end to end: the default grid and SVWN3 quadrature,
-// then the reference grid error model with the real reference grid. Only the
-// "UQ Initializer" (which comes from Integrals) is mocked, and the reference
-// grid is made smaller (but still different) to keep the test fast.
+// then the reference grid error model, which builds its finer grid with the
+// same grid module. Only the "UQ Initializer" (which comes from Integrals) is
+// mocked, and the grid is made small to keep the test fast.
 TEST_CASE("UQXCPotential with the reference grid error model") {
     pluginplay::ModuleManager mm;
     mm.load_plugin<scf::SCF>();
@@ -102,14 +103,19 @@ TEST_CASE("UQXCPotential with the reference grid error model") {
     simde::type::xc_e_type xc_op(func, simde::type::electron{}, rho);
     chemist::braket::BraKet braket(aos, xc_op, aos);
 
-    const auto ref_grid_key = "Reference IntegratorXX Grid";
-    mm.change_input(ref_grid_key, "Radial Size", std::size_t{100});
-    mm.change_input(ref_grid_key, "Angular Size", std::size_t{590});
+    // The error model should build its finer grid as 30 x 110
+    const auto grid_key = "Grid From IntegratorXX";
+    const auto ref_key  = "Expected reference grid";
+    mm.copy_module(grid_key, ref_key);
+    mm.change_input(grid_key, "Radial Size", std::size_t{20});
+    mm.change_input(grid_key, "Angular Size", std::size_t{50});
+    mm.change_input(ref_key, "Radial Size", std::size_t{30});
+    mm.change_input(ref_key, "Angular Size", std::size_t{110});
 
     // The value and the reference value the error model should use
     auto vxc      = mm.at("SVWN3 Potential").run_as<pt>(braket);
     auto molecule = scf::xc::libxc::aos2molecule(aos.ao_basis_set());
-    auto ref_grid = mm.at(ref_grid_key).run_as<grid_pt>(molecule);
+    auto ref_grid = mm.at(ref_key).run_as<grid_pt>(molecule);
     auto ref_vxc =
       mm.at("SVWN3 Potential Quadrature").run_as<quad_pt>(braket, ref_grid);
 
@@ -141,14 +147,10 @@ TEST_CASE("UQXCPotential with the reference grid error model") {
         auto x =
           wtf::fp::float_cast<tensorwrapper::types::tpdouble>(element(rv));
         REQUIRE(x.nominal() == v);
-        // One-sided: the deviation is entirely towards the reference value
-        if(ref > v) {
-            REQUIRE(x.lower() == v);
-            REQUIRE(x.upper() == Catch::Approx(ref).epsilon(1e-14));
-        } else {
-            REQUIRE(x.upper() == v);
-            REQUIRE(x.lower() == Catch::Approx(ref).epsilon(1e-14));
-        }
+        // Symmetric: the deviation is |ref - v| on both sides
+        const auto d = std::fabs(ref - v);
+        REQUIRE(x.lower() == Catch::Approx(v - d).epsilon(1e-14));
+        REQUIRE(x.upper() == Catch::Approx(v + d).epsilon(1e-14));
     }
 #endif
 }

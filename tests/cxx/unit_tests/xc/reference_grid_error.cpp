@@ -29,30 +29,66 @@ using simde::type::tensor;
 
 namespace {
 
-/// Runs a fresh copy of the error model @p key, with all submodules mocked
+// Stands in for "Grid From IntegratorXX". It returns a one-point grid whose
+// weight and x-coordinate are the radial and angular sizes it was run with,
+// so the reference XC module can check them.
+struct FakeGrid : pluginplay::ModuleBase {
+    FakeGrid() : pluginplay::ModuleBase(this) {
+        satisfies_property_type<grid_pt>();
+        add_input<std::size_t>("Radial Size").set_default(std::size_t{0});
+        add_input<std::size_t>("Angular Size").set_default(std::size_t{0});
+    }
+
+private:
+    result_map_type run_(input_map_type inputs,
+                         submodule_map_type) const override {
+        const auto r = inputs.at("Radial Size").value<std::size_t>();
+        const auto a = inputs.at("Angular Size").value<std::size_t>();
+        auto rv      = results();
+        return grid_pt::wrap_results(rv, sized_grid(r, a));
+    }
+
+public:
+    /// The grid returned for a radial size @p r and angular size @p a
+    static chemist::Grid sized_grid(std::size_t r, std::size_t a) {
+        std::vector<chemist::GridPoint> points{chemist::GridPoint(
+          static_cast<double>(r), static_cast<double>(a), 0.0, 0.0)};
+        return chemist::Grid(points.begin(), points.end());
+    }
+};
+
+/// The grid the given value was evaluated on, recording @p r and @p a
+chemist::Grid given_grid(std::size_t r, std::size_t a) {
+    auto grid = test_scf::h2_xc_grid();
+    grid.set_radial_size(r);
+    grid.set_angular_size(a);
+    return grid;
+}
+
+/** @brief Runs a fresh copy of the error model @p key.
+ *
+ *  The given grid records the sizes @p r and @p a, and the reference grid
+ *  must be built with the sizes @p ref_r and @p ref_a. The "Reference grid"
+ *  submodule is a FakeGrid and the other submodules are lambdas.
+ */
 template<typename QuadPT, typename BraKetType>
 tensor run_model(pluginplay::ModuleManager& mm, const std::string& key,
                  const BraKetType& braket, const tensor& value,
-                 const tensor& ref, UQKind kind, double fraction = 0.0) {
+                 const tensor& ref, UQKind kind, const chemist::Grid& grid,
+                 std::size_t ref_r, std::size_t ref_a) {
     using error_pt = scf::property_types::XCUncertain<QuadPT>;
 
-    // Modules lock once they run, so each call uses its own copy
+    // Modules lock once they run, so each call uses its own copies
     static std::size_t counter = 0;
-    const auto copy_key        = key + " " + std::to_string(counter++);
+    const auto suffix          = " " + std::to_string(counter++);
+    const auto copy_key        = key + suffix;
+    const auto grid_key        = "Fake grid" + suffix;
     mm.copy_module(key, copy_key);
+    mm.add_module<FakeGrid>(grid_key);
     auto& mod = mm.at(copy_key);
 
-    // The grid the given value was evaluated on, and the reference grid
-    auto grid = test_scf::h2_xc_grid();
-    std::vector<chemist::GridPoint> ref_points{
-      chemist::GridPoint(1.0, 0.0, 0.0, 0.0)};
-    chemist::Grid ref_grid(ref_points.begin(), ref_points.end());
-
-    mod.change_submod("Reference grid",
-                      pluginplay::make_lambda<grid_pt>([&](auto&& mol) {
-                          REQUIRE(mol.size() == 2);
-                          return ref_grid;
-                      }));
+    const auto ref_grid = FakeGrid::sized_grid(ref_r, ref_a);
+    mm.change_submod(copy_key, "Reference grid", grid_key);
     mod.change_submod(
       "Reference XC Module",
       pluginplay::make_lambda<QuadPT>([&](auto&& braket_in, auto&& grid_in) {
@@ -63,8 +99,16 @@ tensor run_model(pluginplay::ModuleManager& mm, const std::string& key,
     mod.change_submod("UQ Initializer", pluginplay::make_lambda<uq_pt>([=]() {
                           return simde::UQFactory(kind);
                       }));
-    mod.change_input("Opposite Side Fraction", fraction);
     return mod.template run_as<error_pt>(braket, grid, value);
+}
+
+/// run_model for a given grid of 10 x 14, whose reference grid is 15 x 38
+template<typename QuadPT, typename BraKetType>
+tensor run_model(pluginplay::ModuleManager& mm, const std::string& key,
+                 const BraKetType& braket, const tensor& value,
+                 const tensor& ref, UQKind kind) {
+    return run_model<QuadPT>(mm, key, braket, value, ref, kind,
+                             given_grid(10, 14), 15, 38);
 }
 
 /// The elements of @p t (a scalar or a matrix) as T, in row-major order
@@ -132,9 +176,60 @@ TEST_CASE("ReferenceGridError (potential)") {
           std::runtime_error);
     }
 
-    SECTION("throws for a negative Opposite Side Fraction") {
+    SECTION("reference grid sizes") {
+        auto run = [&](std::size_t r, std::size_t a, std::size_t ref_r,
+                       std::size_t ref_a) {
+            return run_model<v_quad_pt>(mm, key, braket, value, ref,
+                                        UQKind::none, given_grid(r, a), ref_r,
+                                        ref_a);
+        };
+        // Radial: x 1.5, rounded up. Angular: the smallest Lebedev-Laikov
+        // grid with at least twice as many points.
+        REQUIRE(doubles(run(150, 194, 225, 434)) == doubles(value));
+        REQUIRE(doubles(run(75, 302, 113, 770)) == doubles(value));
+        // Angular: the largest grid if no grid has twice as many points
+        REQUIRE(doubles(run(150, 3074, 225, 5810)) == doubles(value));
+        // Angular: the largest grid is not refined
+        REQUIRE(doubles(run(150, 5810, 225, 5810)) == doubles(value));
+    }
+
+    SECTION("throws if the given grid does not record its sizes") {
+        auto no_sizes = test_scf::h2_xc_grid();
+        REQUIRE_THROWS_AS(run_model<v_quad_pt>(mm, key, braket, value, ref,
+                                               UQKind::none, no_sizes, 15, 38),
+                          std::invalid_argument);
+
+        auto radial_only = test_scf::h2_xc_grid();
+        radial_only.set_radial_size(10);
+        REQUIRE_THROWS_AS(run_model<v_quad_pt>(mm, key, braket, value, ref,
+                                               UQKind::none, radial_only, 15,
+                                               38),
+                          std::invalid_argument);
+    }
+
+    SECTION("throws if the angular size is not a Lebedev-Laikov size") {
+        REQUIRE_THROWS_AS(run_model<v_quad_pt>(mm, key, braket, value, ref,
+                                               UQKind::none, given_grid(10, 15),
+                                               15, 38),
+                          std::invalid_argument);
+    }
+
+    SECTION("throws if the reference grid module has no size inputs") {
+        const auto copy_key = std::string(key) + " no size inputs";
+        mm.copy_module(key, copy_key);
+        auto& mod = mm.at(copy_key);
+        mod.change_submod("Reference grid",
+                          pluginplay::make_lambda<grid_pt>(
+                            [](auto&&) { return test_scf::h2_xc_grid(); }));
+        mod.change_submod("Reference XC Module",
+                          pluginplay::make_lambda<v_quad_pt>(
+                            [&](auto&&, auto&&) { return ref; }));
+        mod.change_submod("UQ Initializer",
+                          pluginplay::make_lambda<uq_pt>(
+                            []() { return simde::UQFactory(UQKind::none); }));
+        using error_pt = scf::property_types::XCUncertain<v_quad_pt>;
         REQUIRE_THROWS_AS(
-          run_model<v_quad_pt>(mm, key, braket, value, ref, UQKind::none, -0.5),
+          mod.run_as<error_pt>(braket, given_grid(10, 14), value),
           std::invalid_argument);
     }
 
@@ -143,21 +238,11 @@ TEST_CASE("ReferenceGridError (potential)") {
     using tensorwrapper::types::tpdouble;
     using triple = std::array<double, 3>;
 
-    SECTION("triplex, one-sided") {
+    SECTION("triplex is symmetric") {
         auto rv =
           run_model<v_quad_pt>(mm, key, braket, value, ref, UQKind::triplex);
         std::vector<triple> corr{
-          {1.0, 1.0, 1.5}, {2.0, 2.0, 2.0}, {2.0, 3.0, 3.0}, {4.0, 4.0, 4.25}};
-        REQUIRE(bounds<tpdouble>(rv) == corr);
-    }
-
-    SECTION("triplex, opposite side fraction 0.5") {
-        auto rv = run_model<v_quad_pt>(mm, key, braket, value, ref,
-                                       UQKind::triplex, 0.5);
-        std::vector<triple> corr{{0.75, 1.0, 1.5},
-                                 {2.0, 2.0, 2.0},
-                                 {2.0, 3.0, 3.5},
-                                 {3.875, 4.0, 4.25}};
+          {0.5, 1.0, 1.5}, {2.0, 2.0, 2.0}, {2.0, 3.0, 4.0}, {3.75, 4.0, 4.25}};
         REQUIRE(bounds<tpdouble>(rv) == corr);
     }
 
@@ -166,7 +251,7 @@ TEST_CASE("ReferenceGridError (potential)") {
           run_model<v_quad_pt>(mm, key, braket, value, ref, UQKind::interval);
         auto b = bounds<idouble>(rv);
         std::vector<std::array<double, 2>> corr{
-          {1.0, 1.5}, {2.0, 2.0}, {2.0, 3.0}, {4.0, 4.25}};
+          {0.5, 1.5}, {2.0, 2.0}, {2.0, 4.0}, {3.75, 4.25}};
         for(std::size_t i = 0; i < corr.size(); ++i) {
             REQUIRE(b[i][0] == corr[i][0]);
             REQUIRE(b[i][2] == corr[i][1]);
@@ -200,14 +285,14 @@ TEST_CASE("ReferenceGridError (energy)") {
         auto rv = run_model<e_quad_pt>(mm, key, braket, value, tensor(-0.5),
                                        UQKind::triplex);
         REQUIRE(bounds<tpdouble>(rv) ==
-                std::vector<triple>{{-1.0, -1.0, -0.5}});
+                std::vector<triple>{{-1.5, -1.0, -0.5}});
     }
 
     SECTION("triplex, reference below") {
         auto rv = run_model<e_quad_pt>(mm, key, braket, value, tensor(-1.5),
                                        UQKind::triplex);
         REQUIRE(bounds<tpdouble>(rv) ==
-                std::vector<triple>{{-1.5, -1.0, -1.0}});
+                std::vector<triple>{{-1.5, -1.0, -0.5}});
     }
 #endif
 }

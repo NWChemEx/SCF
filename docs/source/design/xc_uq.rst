@@ -49,9 +49,8 @@ below it. An asymmetric interval allows this without changing the mean. A
 symmetric interval stores only the bounds: pinning
 :math:`[\rho_i - r_i, \rho_i + r_i]` at zero gives :math:`[0, \rho_i + r_i]`,
 whose midpoint, :math:`(\rho_i + r_i)/2`, is larger than :math:`\rho_i`, so the
-best estimate of the density would be biased upward. The error of a quadrature
-also tends to have a known direction, which an asymmetric interval can
-represent. ``sigma::Interval`` stores only the bounds. ``sigma::Triplex``
+best estimate of the density would be biased upward. ``sigma::Interval`` stores
+only the bounds. ``sigma::Triplex``
 stores the bounds and, independently, a nominal value, i.e., it is an
 asymmetric interval. It is available in TensorWrapper as ``tpdouble`` and from a
 ``UQ Initializer`` as the ``triplex`` kind.
@@ -318,17 +317,18 @@ Reference Grid
 
 Evaluate the quadrature a second time on a finer grid, giving
 :math:`E^{Quad}_{\mathrm{ref}}` (or :math:`V^{Quad}_{\mathrm{ref}}`), and use
-the difference, :math:`d = E^{Quad}_{\mathrm{ref}} - E^{Quad}`, as an estimate
-of :math:`-\delta E^{Quad}`. The sign of :math:`d` is taken as an estimate of
-the direction of the error, so the deviation on the side of the reference
-value is :math:`|d|`, and the deviation on the other side can be zero or a
-fraction of :math:`|d|`. This is a heuristic: refinement need not converge
-monotonically, so the finer grid can lie on the wrong side of the exact
-integral, and a one-sided deviation then excludes it. Making both deviations
-:math:`|d|` avoids this at the cost of a wider interval. This mirrors the
-``Analytic Error`` ERI error model and its benchmark ERIs. It is an estimate,
-not a bound, and costs one evaluation on the finer grid, including the density
-and AOs on that grid.
+the difference, :math:`d = E^{Quad}_{\mathrm{ref}} - E^{Quad}`, to estimate the
+size of :math:`\delta E^{Quad}`. The deviation is :math:`|d|` on both sides of
+the value. The sign of :math:`d` is not used as the direction of the error:
+refinement need not converge monotonically, and in the grid-incompleteness
+study (``uncertainty/grid_incompleteness`` in this repository; SVWN3 for He,
+H\ :sub:`2`, and water in STO-3G through aug-cc-pVQZ) the error of the
+quadrature changes sign as the grid is refined, *e.g.*, for H\ :sub:`2` in
+aug-cc-pVTZ it is positive with 20 radial points and negative with 50. A
+deviation only on the side of the reference value would then exclude the exact
+integral. This mirrors the ``Analytic Error`` ERI error model and its benchmark
+ERIs. It is an estimate, not a bound, and costs one evaluation on the finer
+grid, including the density and AOs on that grid.
 
 The strategy is implemented as the error models
 ``Reference Grid XC Energy Error`` and ``Reference Grid XC Potential Error``
@@ -343,8 +343,9 @@ Their submodules are:
      - Default key
      - Purpose
    * - ``Reference grid``
-     - ``Reference IntegratorXX Grid``
-     - Builds the finer grid from the molecule.
+     - ``Grid From IntegratorXX``
+     - Builds the finer grid from the molecule. Must have ``Radial Size`` and
+       ``Angular Size`` inputs.
    * - ``Reference XC Module``
      - ``SVWN3 Energy Quadrature`` or ``SVWN3 Potential Quadrature``
      - Evaluates the quadrature on the finer grid. Must use the same
@@ -354,32 +355,32 @@ Their submodules are:
      - The kind of uncertain value returned.
 
 The module builds the finer grid, passes the inputs and the finer grid to the
-``Reference XC Module`` submodule, and uses the element-wise difference to
-construct the deviations: :math:`|d|` towards the reference value and
-``Opposite Side Fraction`` (an input, default 0) times :math:`|d|` away from
-it. It then converts the original result to the UQ type with its
-``UQ Initializer`` submodule, keeping the original result as the nominal value,
-and returns that uncertain result, not the difference. Only the ``triplex``
-kind stores both deviations exactly. The other kinds store the tightest value
-they can which contains them: the interval-like kinds store the bounds, and
-``Uncertain`` uses the larger deviation. For now, the given result must hold
-doubles.
+``Reference XC Module`` submodule, and uses the element-wise difference as the
+deviation on both sides. It then converts the original result to the UQ type
+with its ``UQ Initializer`` submodule, keeping the original result as the
+nominal value, and returns that uncertain result, not the difference. For now,
+the given result must hold doubles.
 
-The finer grid is not derived from the given grid. Instead,
-``Reference IntegratorXX Grid`` is a copy of ``Grid From IntegratorXX`` with
-150 radial (Mura-Knowles) and 5810 angular (Lebedev-Laikov, the largest
-available) points per atom, unpruned, with Becke partitioning. The sizes come
-from a convergence study of SVWN3 water/STO-3G at a fixed (core-guess) density.
-With 5810 angular points, increasing the radial size from 150 to 250 changes
-:math:`E^{XC}` by :math:`1.1\times 10^{-11}` and :math:`V^{XC}` (largest
-element) by :math:`6.4\times 10^{-12}`. From 200 to 250 the changes are about
-:math:`2\times 10^{-12}`, which is at the level of the rounding error of the
-sums. With 150 radial points, 3074 angular points agree with 5810 to
-:math:`5\times 10^{-12}`, whereas 2030 do not (:math:`6\times 10^{-10}`).
+The finer grid is derived from the given grid. ``chemist::Grid`` records the
+radial and angular sizes of the atom-centered product grid it was made from
+(``Grid From IntegratorXX`` sets them from its inputs), and the given grid must
+record both. From them, the finer sizes are:
 
-The reference grid is expensive: about :math:`2.6\times 10^{6}` points for
-water. Each call evaluates the quadrature, including the density and AOs, on
-it.
+- radial: 1.5 times the given radial size, rounded up;
+- angular: the size of the smallest Lebedev-Laikov grid with at least twice as
+  many points as the given angular size, which must itself be a
+  Lebedev-Laikov size, or 5810 (the largest Lebedev-Laikov grid) if there is no
+  such grid. A given angular size of 5810 is thus not refined.
+
+These steps are roughly those of the radial and angular sizes in the
+grid-incompleteness study. The ``Reference grid`` submodule is run with its
+``Radial Size`` and ``Angular Size`` inputs set to the finer sizes. All of its
+other inputs (*e.g.*, the radial quadrature, pruning, and partitioning) are
+used as they are, so by default it is the module which builds the given grid,
+``Grid From IntegratorXX``, and the two grids differ only in their sizes. For
+the default grid (150 radial and 194 angular points) the finer grid has 225
+radial and 434 angular points, so each call costs a little more than three
+times the quadrature it is estimating the error of.
 
 Grid Extrapolation
 ------------------
@@ -438,7 +439,7 @@ Summary
    * - Reference grid
      - estimate
      - 1 evaluation on a finer grid
-     - direction of the error is estimated (heuristic)
+     - symmetric; finer grid derived from the given grid
    * - Grid extrapolation
      - estimate
      - several evaluations

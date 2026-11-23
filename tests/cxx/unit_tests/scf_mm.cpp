@@ -153,11 +153,15 @@ TEST_CASE("SCF plugin") {
                 *modules.at("No convergence uncertainty"));
     }
 
-    SECTION("Reference IntegratorXX Grid") {
-        const auto& inputs =
-          modules.at("Reference IntegratorXX Grid")->inputs();
-        REQUIRE(inputs.at("Angular Size").value<std::size_t>() == 5810);
-        REQUIRE(inputs.at("Radial Size").value<std::size_t>() == 150);
+    SECTION("Reference grid error models refine the integration grid") {
+        const auto& grid = *modules.at("Grid From IntegratorXX");
+        for(std::string q : {"Energy", "Potential"}) {
+            const auto& error =
+              *modules.at("Reference Grid XC " + q + " Error");
+            const auto& uq = *modules.at("UQ XC " + q);
+            REQUIRE(error.submods().at("Reference grid").value() == grid);
+            REQUIRE(uq.submods().at("Integration grid").value() == grid);
+        }
     }
 
     SECTION("QCUP SCF is a driver") {

@@ -17,9 +17,13 @@
 #include "libxc/libxc.hpp"
 #include "xc.hpp"
 #include <cmath>
+#include <cstdint>
+#include <integratorxx/quadratures/s2/lebedev_laikov.hpp>
+#include <optional>
 #include <scf/property_types/xc_uncertain.hpp>
 #include <simde/simde.hpp>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <vector>
 
@@ -34,25 +38,33 @@ Estimates the error of an exchange-correlation (XC) quadrature from the
 incompleteness of its grid, and attaches it to the result of the quadrature.
 
 The quadrature is evaluated a second time, by the "Reference XC Module"
-submodule, on the much finer grid built by the "Reference grid" submodule. Let
-d be the reference value minus the given value. The sign of d is taken as the
-direction of the error, so the given value becomes an uncertain value whose
-nominal value is the given value, whose deviation towards the reference value
-is |d|, and whose deviation away from it is "Opposite Side Fraction" times
-|d|. This is done element-wise, e.g., for each element of the XC potential.
+submodule, on a grid which is finer than the given grid. Let d be the
+reference value minus the given value. The given value becomes an uncertain
+value whose nominal value is the given value and whose deviation is |d| on
+both sides. This is done element-wise, e.g., for each element of the XC
+potential. The deviation is symmetric because the sign of d is not a reliable
+estimate of the direction of the error: as a grid is refined, the error of
+the quadrature can change sign.
 
-The kind of uncertain value comes from the "UQ Initializer" submodule. Only the
-triplex kind stores both deviations exactly; the other kinds store the
-tightest value they can which contains them.
+The finer grid is chosen from the radial and angular sizes the given grid
+records (see chemist::Grid), so the given grid must record both. The radial
+size is multiplied by 1.5 (rounding up). The angular size, which must be the
+size of a Lebedev-Laikov grid, is replaced by the size of the smallest
+Lebedev-Laikov grid with at least twice as many points, or by the largest
+Lebedev-Laikov grid (5810 points) if there is no such grid. The "Reference
+grid" submodule builds the finer grid. It is run with its "Radial Size" and
+"Angular Size" inputs set to the finer sizes, so it must have these inputs,
+e.g., "Grid From IntegratorXX". Its other inputs are used as they are, and
+should match those used to make the given grid.
 
-This is an estimate, not a bound: refinement need not converge monotonically,
-so the reference value can lie on the wrong side of the exact integral, and a
-one-sided deviation then excludes it. Increasing "Opposite Side Fraction"
-guards against this at the cost of a wider interval.
+The kind of uncertain value comes from the "UQ Initializer" submodule.
+
+This is an estimate, not a bound: the difference between two grids can be
+smaller than the error of the coarser one.
 
 The "Reference XC Module" must evaluate the same functional as the module
-whose result is being given. Each call costs one quadrature on the reference
-grid, including the density and AOs on that grid.
+whose result is being given. Each call costs one quadrature on the finer grid,
+including the density and AOs on that grid.
 
 The given value must hold doubles.
 )";
@@ -95,6 +107,65 @@ tensorwrapper::shape::Smooth get_shape(const simde::type::tensor& t) {
     return tensorwrapper::shape::Smooth(extents.begin(), extents.end());
 }
 
+/// The radial size of the finer grid is this times the given radial size
+constexpr double radial_factor = 1.5;
+
+/// The angular size of the finer grid is at least this times the given size
+constexpr std::size_t angular_factor = 2;
+
+/// Returns the radial size of the grid finer than one with @p radial_size
+std::size_t finer_radial_size(std::size_t radial_size) {
+    if(radial_size == 0)
+        throw std::invalid_argument(
+          "Reference Grid Error: the radial size of the given grid must be "
+          "positive");
+    const auto r = std::ceil(radial_factor * static_cast<double>(radial_size));
+    return static_cast<std::size_t>(r);
+}
+
+/** @brief Returns the angular size of the grid finer than one with
+ *         @p angular_size.
+ *
+ *  This is the size of the smallest Lebedev-Laikov grid with at least
+ *  angular_factor times @p angular_size points, or the size of the largest
+ *  Lebedev-Laikov grid if there is no such grid.
+ *
+ *  @throw std::invalid_argument if @p angular_size is not the size of a
+ *                               Lebedev-Laikov grid.
+ */
+std::size_t finer_angular_size(std::size_t angular_size) {
+    using traits_type =
+      IntegratorXX::quadrature_traits<IntegratorXX::LebedevLaikov<double>>;
+    auto order = traits_type::algebraic_order_by_npts(
+      static_cast<std::int64_t>(angular_size));
+    if(order < 0)
+        throw std::invalid_argument(
+          "Reference Grid Error: the angular size of the given grid (" +
+          std::to_string(angular_size) +
+          ") is not the size of a Lebedev-Laikov grid");
+
+    const auto target = angular_factor * angular_size;
+    auto n_points     = angular_size;
+    while(n_points < target) {
+        const auto next_order = traits_type::next_algebraic_order(order + 1);
+        if(next_order <= order) break; // Already the largest grid
+        order = next_order;
+        n_points =
+          static_cast<std::size_t>(traits_type::npts_by_algebraic_order(order));
+    }
+    return n_points;
+}
+
+/// Returns the @p what size of the given grid, throwing if it is not set
+std::size_t get_size(const std::optional<std::size_t>& size,
+                     const std::string& what) {
+    if(!size.has_value())
+        throw std::invalid_argument("Reference Grid Error: the given grid "
+                                    "does not record its " +
+                                    what + " size");
+    return *size;
+}
+
 } // namespace
 
 template<typename QuadPT>
@@ -109,32 +180,39 @@ TEMPLATED_MODULE_CTOR(ReferenceGridError, QuadPT) {
     description(desc);
 
     add_submodule<grid_pt>("Reference grid")
-      .set_description("Builds the finer grid the reference value is "
-                       "evaluated on");
+      .set_description("Builds the finer grid. Must have \"Radial Size\" and "
+                       "\"Angular Size\" inputs");
     add_submodule<QuadPT>("Reference XC Module")
       .set_description("Evaluates the reference value. Must use the same "
                        "functional as the given value");
     add_submodule<uq_pt>("UQ Initializer")
       .set_description("Determines the kind of uncertain value returned");
-
-    add_input<double>("Opposite Side Fraction")
-      .set_default(0.0)
-      .set_description("The deviation away from the reference value, as a "
-                       "fraction of |reference - value|. Must be "
-                       "non-negative");
 }
 
 template<typename QuadPT>
 TEMPLATED_MODULE_RUN(ReferenceGridError, QuadPT) {
     const auto& [braket, grid, value] = error_pt<QuadPT>::unwrap_inputs(inputs);
-    const auto f = inputs.at("Opposite Side Fraction").value<double>();
-    if(f < 0.0)
-        throw std::invalid_argument(
-          "Reference Grid Error: Opposite Side Fraction must be non-negative");
 
-    const auto& aos      = get_aos(braket);
-    auto& grid_mod       = submods.at("Reference grid");
-    const auto& ref_grid = grid_mod.run_as<grid_pt>(libxc::aos2molecule(aos));
+    const auto radial            = get_size(grid.get_radial_size(), "radial");
+    const auto angular           = get_size(grid.get_angular_size(), "angular");
+    const std::size_t ref_radial = finer_radial_size(radial);
+    const std::size_t ref_angular = finer_angular_size(angular);
+
+    // Runs the "Reference grid" submodule with the finer sizes
+    const auto& aos = get_aos(braket);
+    auto& grid_mod  = submods.at("Reference grid").value();
+    auto ref_inputs = grid_mod.inputs();
+    ref_inputs = grid_pt::wrap_inputs(ref_inputs, libxc::aos2molecule(aos));
+    for(const auto* key : {"Radial Size", "Angular Size"})
+        if(!ref_inputs.count(key))
+            throw std::invalid_argument(
+              "Reference Grid Error: the \"Reference grid\" submodule must "
+              "have a \"" +
+              std::string(key) + "\" input");
+    ref_inputs.at("Radial Size").change(ref_radial);
+    ref_inputs.at("Angular Size").change(ref_angular);
+    const auto ref_grid =
+      std::get<0>(grid_pt::unwrap_results(grid_mod.run(ref_inputs)));
 
     auto& ref_mod  = submods.at("Reference XC Module");
     const auto ref = ref_mod.run_as<QuadPT>(braket, ref_grid);
@@ -154,10 +232,8 @@ TEMPLATED_MODULE_RUN(ReferenceGridError, QuadPT) {
         std::vector<float_type> elements;
         elements.reserve(v.size());
         for(std::size_t i = 0; i < v.size(); ++i) {
-            const auto d     = r[i] - v[i];
-            const auto plus  = d >= 0.0 ? std::fabs(d) : f * std::fabs(d);
-            const auto minus = d >= 0.0 ? f * std::fabs(d) : std::fabs(d);
-            auto element     = factory(v[i], minus, plus);
+            const auto d = std::fabs(r[i] - v[i]);
+            auto element = factory(v[i], d, d);
             elements.push_back(wtf::fp::float_cast<float_type>(element));
         }
         tensorwrapper::buffer::Contiguous buffer(std::move(elements), shape);

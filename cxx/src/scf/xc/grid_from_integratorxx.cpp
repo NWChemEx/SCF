@@ -40,6 +40,10 @@ pruned), recentered on each atom and combined with fuzzy-cell partition
 weights. Unlike GridFromFile, this module actually consumes the "Molecule"
 property-type input.
 
+The returned grid records the "Radial Size" and "Angular Size" inputs as its
+radial and angular sizes (see chemist::Grid). These are the sizes before any
+pruning.
+
 The "Float Type" input selects the concrete floating-point type used to
 generate the grid (points and weights alike) before it is type-erased into
 the returned chemist::Grid, by name as registered with WTF (see
@@ -229,6 +233,8 @@ MODULE_RUN(GridFromIntegratorXX) {
           return build_grid<T>(molecule, radial_quad, radial_size, angular_size,
                                pruning, partition, max_batch_sz);
       });
+    grid.set_radial_size(radial_size);
+    grid.set_angular_size(angular_size);
 
     auto rv = results();
     return pt::wrap_results(rv, std::move(grid));

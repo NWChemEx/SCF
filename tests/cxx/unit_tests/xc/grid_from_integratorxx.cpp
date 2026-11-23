@@ -64,6 +64,14 @@ TEMPLATE_TEST_CASE("GridFromIntegratorXX", "[xc][molecular-grid]", float,
         }
     }
 
+    SECTION("Records the radial and angular sizes") {
+        auto he   = test_scf::make_he<chemist::Molecule>();
+        auto grid = mod.run_as<pt>(he);
+
+        REQUIRE(grid.get_radial_size() == radial_size);
+        REQUIRE(grid.get_angular_size() == angular_size);
+    }
+
     SECTION("H2: point count scales with number of atoms") {
         auto h2   = test_scf::make_h2<chemist::Molecule>();
         auto grid = mod.run_as<pt>(h2);
@@ -97,6 +105,24 @@ TEST_CASE("GridFromIntegratorXX: Radial Quadrature Type") {
         auto grid = mod.run_as<pt>(he);
         REQUIRE(grid.size() == radial_size * angular_size);
     }
+}
+
+TEST_CASE("GridFromIntegratorXX: sizes of a pruned grid") {
+    // The recorded sizes are the ones before pruning, even though a pruned
+    // grid has fewer points than their product.
+    pluginplay::ModuleManager mm;
+    mm.load_plugin<scf::SCF>();
+    auto& mod = mm.at("Grid From IntegratorXX");
+    mod.change_input("Radial Size", std::size_t{20});
+    mod.change_input("Angular Size", std::size_t{110});
+    mod.change_input("Pruning Scheme", std::string("Robust"));
+
+    auto he   = test_scf::make_he<chemist::Molecule>();
+    auto grid = mod.run_as<pt>(he);
+
+    REQUIRE(grid.size() < std::size_t{20 * 110});
+    REQUIRE(grid.get_radial_size() == 20);
+    REQUIRE(grid.get_angular_size() == 110);
 }
 
 TEST_CASE("GridFromIntegratorXX: Float Type parsing") {
